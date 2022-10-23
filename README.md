@@ -16,11 +16,11 @@ Download as a zip and install like a normal addon
 
 # Support
 If you appreciate this work consider buying it for $3.57 _(This is our lowest calculated margin)_ on BlenderMarket. Look at our other products Anthony-Aragues & Adam Earle.
-> **Anthony-Aragues:**
+**Anthony-Aragues:**
 > 1. BlenderMarket: https://blendermarket.com/creators/anthony-aragues
 > 2. Discord:
 
-> **Adam Earle:**
+**Adam Earle:**
 > 1. GumRoad: https://mradamearle.gumroad.com/
 > 2. Discord: https://discord.gg/nkPA7KxwRX
 > 3. Youtube: https://www.youtube.com/playlist?list=PLWn1OdWrqvz2dqIzVFV4wneZs1z2FauP0
