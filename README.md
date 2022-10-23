@@ -1,17 +1,19 @@
 #  StopMotion
-StopMotion Addon successor to the experimental "KeyMesh" addon
+StopMotion Addon successor to the experimental addon "KeyMesh". So far we have tested that this addon works with meshes and curves.
+This is primarly a keyframe oriented addon for switching objects out.
 
 Compatability
 Blender versions 3.3 and above
 
 
 # Features
-    1. 
-    2. 
+    1. Swtiching objects out on the fly offering a stopmotion/ cutout animation behaviour.
+    2. Adding and Removing keys for animation.
+    3. Remove technicalities for animators to help create a more fluid experience while animating.
     
     
 # Install
-Download as a zip and install like a normal addon
+Download as a zip and install like a normal addon.
 
 
 
