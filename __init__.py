@@ -6,7 +6,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "StopMotion",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (0, 9, 6),
+    "version": (0, 9, 7),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
@@ -22,6 +22,8 @@ bl_info = {
 # key_object = the swap NAME data currently in use
 # key_object_id = the id NEEDED and set by the key
 
+# /Applications/Blender.app/Contents/MacOS/Blender
+
 
 class KEY_PT_Main(bpy.types.Panel):
     bl_label = "StopMotion"
@@ -33,6 +35,8 @@ class KEY_PT_Main(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        row = layout.row()
+        row.label(text="ctrl + shift + A")
         row = layout.row()
         row.operator("key.insert")
         row = layout.row()
