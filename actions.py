@@ -53,6 +53,13 @@ def getObject(strName):
     return None
 
 
+def copyData(objTarget, objReference):
+    objTarget.data = objReference.data.copy()
+    if objReference.animation_data is not None:
+        objTarget.animation_data = objReference.animation_data.copy()
+    objTarget["key_object"] = objReference.name_full
+
+
 def swapData(objTarget, objReference):
     objTarget.data = objReference.data
     if objReference.animation_data is not None:
@@ -69,6 +76,36 @@ def getFrameObject(obj, intObjectId):
     return None
 
 
+def getTmp(objTarget):
+    intSwapId = objTarget.get("key_id")
+    if intSwapId is not None:
+        strTmp = f'{config.PREFIX}_{intSwapId}_tmp'
+        objTmp = getObject(strTmp)
+        if objTmp is not None:
+            return objTmp
+        else:
+            return setTmp(intSwapId, objTarget)
+
+
+def setTmp(objTarget):
+    intSwapId = objTarget.get("key_id")
+    strTmp = f'{config.PREFIX}_{intSwapId}_tmp'
+    objTmp = getObject(strTmp)
+    if objTmp is not None:
+        # get the old data block so we can remove it
+        objDataBlock = objTmp.data
+        objTmp.data = objTarget.data.copy()
+        if objTmp.type == 'CURVE':
+            bpy.data.curves.remove(objDataBlock)
+        elif objTmp.type == 'MESH':
+            bpy.data.meshes.remove(objDataBlock)
+    else:
+        objTmp = bpy.data.objects.new(strTmp, objTarget.data.copy())
+        objTmp.data.use_fake_user = True
+        objTmp["key_id"] = intSwapId
+    return objTmp
+
+
 def onFrame(scene):
     context = bpy.context
     strMode = context.object.mode
@@ -79,24 +116,37 @@ def onFrame(scene):
         # obj must have an id and set an object_id it expects
         # obj must have same id as swa object and not already by the one in use
         # intObjectId = obj.get("key_object_id")
+        objTmp = getTmp(obj)
         intObjectId = keyframes.getKeyframeValue(
             obj, '["key_object_id"]', scene.frame_current, '<=')
-        if obj.get("key_id") is not None and intObjectId is not None:
+        if intObjectId is not None:
             objFrame = getFrameObject(obj, intObjectId)
             if objFrame is not None and obj.get("key_object") != objFrame.name_full:
+                # override tmp data block
                 swapData(obj, objFrame)
+                objTmp = setTmp(objFrame)
+                swapData(obj, objTmp)
+
     if strMode == 'EDIT':
         bpy.ops.object.mode_set(mode='EDIT')
 
 
 def setSwapObject(context, obj, intFrame):
-    if context.object.mode == 'EDIT':
+    strMode = context.object.mode
+    if strMode == 'EDIT':
         obj.update_from_editmode()
     # get the ID for the OBJECT group (not the frame/mesh)
     intSwapId = obj.get('key_id')
     if intSwapId is None:
         intSwapId = getNextSwapId()
         obj['key_id'] = intSwapId
+    # set a tmp object if none exists
+    strTmp = f'{config.PREFIX}_{intSwapId}_tmp'
+    objTmp = getObject(strTmp)
+    if objTmp is None:
+        objTmp = bpy.data.objects.new(strTmp, obj.data.copy())
+        objTmp.data.use_fake_user = True
+        objTmp["key_id"] = intSwapId
     if hasattr(context, 'active_object') == False:
         context.view_layer.objects.active = obj
     intSwapObjectId = keyframes.getKeyframeValue(
@@ -110,11 +160,11 @@ def setSwapObject(context, obj, intFrame):
     # make sure a frame object doesn't already exist
     objFrame = getObject(strFrame)
     if objFrame is None:
-        print('no frame object found', strFrame)
+        # print('no frame object found', strFrame)
         # create the frame object
         objFrame = bpy.data.objects.new(strFrame, obj.data.copy())
         objFrame.data.use_fake_user = True
-        objFrame["key_id"] = obj.get('key_id')
+        objFrame["key_id"] = intSwapId
     else:
         objFrame.data = obj.data.copy()
     if obj.animation_data is not None and hasattr(obj.animation_data, 'copy'):
