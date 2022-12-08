@@ -70,7 +70,7 @@ class KEY_OT_Insert(bpy.types.Operator):
         return context.selected_objects is not None
 
     def execute(self, context):
-        if hasattr(context.active_object.data, 'animation_data') and hasattr(context.active_object.data.animation_data, 'action'):
+        if context.active_object.data is not None and hasattr(context.active_object.data, 'animation_data') and hasattr(context.active_object.data.animation_data, 'action'):
             self.report(
                 {'ERROR'}, "This object has data block animation data that will not survive data block swapping")
         actions.setSwapObject(context, context.active_object,

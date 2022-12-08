@@ -19,13 +19,10 @@ def getNextSwapId():
     return intIndex+1
 
 
-def getNextSwapObjectId():
-    intIndex = 0
-    for obj in bpy.data.objects:
-        intObjectId = obj.get("key_object_id")
-        if intObjectId is not None and intObjectId > intIndex:
-            intIndex = intObjectId
-    return intIndex+1
+def getNextSwapObjectId(obj):
+    intSwapObjectId = keyframes.getKeyframeValue(
+        obj, '["key_object_id"]', 0, 'max')
+    return intSwapObjectId+1
 
 
 def setSwapKey(obj, intObjectId, intFrame):
@@ -151,10 +148,10 @@ def setSwapObject(context, obj, intFrame):
         context.view_layer.objects.active = obj
     intSwapObjectId = keyframes.getKeyframeValue(
         obj, '["key_object_id"]', intFrame, '=')
-    # print('setSwapObject', intFrame, intSwapObjectId)
+    #print('setSwapObject', intFrame, intSwapObjectId)
     if intSwapObjectId is None:
-        intSwapObjectId = getNextSwapObjectId()
-        intSwapObjectId = int(intSwapObjectId)
+        intSwapObjectId = getNextSwapObjectId(obj)
+        # print(intSwapObjectId)
     strFrame = getSwapObjectName(obj, intSwapObjectId)
     obj["key_object"] = strFrame
     # make sure a frame object doesn't already exist

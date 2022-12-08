@@ -14,6 +14,9 @@ def getKeyframeValue(obj, strPath, intFrame, mode):
                     elif mode == '<=':
                         if keyframe_point.co.x <= intFrame or intFrameId is None:
                             intFrameId = keyframe_point.co.y
+                    elif mode == 'max':
+                        if keyframe_point.co.y > intFrame or intFrameId is None:
+                            intFrameId = keyframe_point.co.y
                 break
     if intFrameId != None:
         intFrameId = int(intFrameId)
