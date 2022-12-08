@@ -22,6 +22,8 @@ def getNextSwapId():
 def getNextSwapObjectId(obj):
     intSwapObjectId = keyframes.getKeyframeValue(
         obj, '["key_object_id"]', 0, 'max')
+    if intSwapObjectId is None:
+        return 0
     return intSwapObjectId+1
 
 
