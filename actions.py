@@ -3,17 +3,10 @@ from . import config
 from . import keyframes
 
 
-def getSwapId(obj):
-    intId = obj.get('key_id')
-    if intId is not None:
-        return intId
-    return None
-
-
 def getNextSwapId():
     intIndex = 0
     for obj in bpy.data.objects:
-        intId = getSwapId(obj)
+        intId = obj.get("key_id")
         if intId is not None and intId > intIndex:
             intIndex = intId
     return intIndex+1
@@ -27,12 +20,15 @@ def getNextSwapObjectId(obj):
     return intSwapObjectId+1
 
 
-def setSwapKey(obj, intObjectId, intFrame):
-    obj['key_object_id'] = intObjectId
-    obj.keyframe_insert(
-        data_path='["key_object_id"]', frame=intFrame)
+def setSwapKey(obj, intObjectId, intFrame, update=True):
+    if update == True:
+        obj['key_object_id'] = intObjectId
+    if obj.animation_data is None:
+        obj.keyframe_insert(
+            data_path='["key_object_id"]', frame=intFrame)
     for fcurve in obj.animation_data.action.fcurves:
         if fcurve.data_path == '["key_object_id"]':
+            fcurve.keyframe_points.insert(frame=intFrame, value=intObjectId)
             for keyframe_point in fcurve.keyframe_points:
                 keyframe_point.interpolation = 'CONSTANT'
 
@@ -130,10 +126,7 @@ def onFrame(scene):
         bpy.ops.object.mode_set(mode='EDIT')
 
 
-def setSwapObject(context, obj, intFrame):
-    strMode = context.object.mode
-    if strMode == 'EDIT':
-        obj.update_from_editmode()
+def getSwapId(obj):
     # get the ID for the OBJECT group (not the frame/mesh)
     intSwapId = obj.get('key_id')
     if intSwapId is None:
@@ -146,17 +139,18 @@ def setSwapObject(context, obj, intFrame):
         objTmp = bpy.data.objects.new(strTmp, obj.data.copy())
         objTmp.data.use_fake_user = True
         objTmp["key_id"] = intSwapId
-    if hasattr(context, 'active_object') == False:
-        context.view_layer.objects.active = obj
+    return intSwapId
+
+
+def getSwapObjectId(obj, intFrame):
     intSwapObjectId = keyframes.getKeyframeValue(
         obj, '["key_object_id"]', intFrame, '=')
-    #print('setSwapObject', intFrame, intSwapObjectId)
     if intSwapObjectId is None:
         intSwapObjectId = getNextSwapObjectId(obj)
-        # print(intSwapObjectId)
-    strFrame = getSwapObjectName(obj, intSwapObjectId)
-    obj["key_object"] = strFrame
-    # make sure a frame object doesn't already exist
+    return intSwapObjectId
+
+
+def setFrameObject(obj, strFrame, intSwapId):
     objFrame = getObject(strFrame)
     if objFrame is None:
         # print('no frame object found', strFrame)
@@ -170,9 +164,39 @@ def setSwapObject(context, obj, intFrame):
         objFrame.animation_data = obj.animation_data.copy()
     if obj.data.animation_data is not None and hasattr(obj.data.animation_data, 'copy'):
         objFrame.data.animation_data = obj.data.animation_data.copy()
+
+
+def setSwapObject(context, obj, intFrame):
+    strMode = context.object.mode
+    if strMode == 'EDIT':
+        obj.update_from_editmode()
+    if hasattr(context, 'active_object') == False:
+        context.view_layer.objects.active = obj
+    intSwapId = getSwapId(obj)
+    intSwapObjectId = getSwapObjectId(obj, intFrame)
+    strFrame = getSwapObjectName(obj, intSwapObjectId)
+    obj["key_object"] = strFrame
+    # make sure a frame object doesn't already exist
+    setFrameObject(obj, strFrame, intSwapId)
     setSwapKey(obj, intSwapObjectId, intFrame)
     bpy.app.handlers.frame_change_post.clear()
     bpy.app.handlers.frame_change_post.append(onFrame)
+
+
+# take all selected objects, and assign them to active object as keyframes from current position
+def addSwapObjects(context, arrSelected, obj):
+    intSwapId = getSwapId(obj)
+    intCurrentFrame = context.scene.frame_current
+    for i, objSelected in enumerate(arrSelected):
+        intInsertFrame = intCurrentFrame+i
+        keyframes.nudgeFrames(obj, intInsertFrame, 1)
+        intSwapObjectId = getSwapObjectId(obj, intInsertFrame)
+        # get the frame object name based on the target object
+        strFrame = getSwapObjectName(obj, intSwapObjectId)
+        # but the objects being copied are the selected ones
+        setFrameObject(objSelected, strFrame, intSwapId)
+        # set swap key, but dont change current key, because we are nudging frames not changing frames
+        setSwapKey(obj, intSwapObjectId, intInsertFrame, update=False)
 
 
 def removeObject(obj):

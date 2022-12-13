@@ -6,7 +6,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "StopMotion",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (0, 9, 7),
+    "version": (0, 9, 8),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
@@ -39,6 +39,8 @@ class KEY_PT_Main(bpy.types.Panel):
         row.label(text="ctrl + shift + A")
         row = layout.row()
         row.operator("key.insert")
+        row = layout.row()
+        row.operator("key.add_selected")
         row = layout.row()
         row.operator("key.remove")
 
@@ -78,6 +80,21 @@ class KEY_OT_Insert(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class KEY_OT_AddSelected(bpy.types.Operator):
+    """Create a Stop Motion Key for the current object"""
+    bl_idname = "key.add_selected"
+    bl_label = "Add Selected to Active"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @ classmethod
+    def poll(cls, context):
+        return context.selected_objects is not None and context.active_object is not None
+
+    def execute(self, context):
+        actions.addSwapObjects(
+            context, context.selected_objects, context.active_object)
+        return {'FINISHED'}
+
 ####|| HANDLER ||####
 
 
@@ -94,6 +111,7 @@ def onFrame_handler(scene: bpy.types.Scene):
 arrClasses = [
     KEY_PT_Main,
     KEY_OT_Insert,
+    KEY_OT_AddSelected,
     KEY_OT_Remove
 ]
 
