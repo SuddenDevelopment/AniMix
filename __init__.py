@@ -46,6 +46,8 @@ class KEY_PT_Main(bpy.types.Panel):
         row = layout.row()
         row.operator("key.separate_selected")
         row = layout.row()
+        row.operator("key.merge")
+        row = layout.row()
         row.operator("key.remove")
 
 
@@ -85,7 +87,7 @@ class KEY_OT_Insert(bpy.types.Operator):
 
 
 class KEY_OT_AddSelected(bpy.types.Operator):
-    """Create a Stop Motion Key for the current object"""
+    """add selected objects as keyframe objects in actuve_object"""
     bl_idname = "key.add_selected"
     bl_label = "Add Selected to Active"
     bl_options = {'REGISTER', 'UNDO'}
@@ -101,7 +103,7 @@ class KEY_OT_AddSelected(bpy.types.Operator):
 
 
 class KEY_OT_CopySelected(bpy.types.Operator):
-    """Create a Stop Motion Key for the current object"""
+    """copy selected frames to be their own object"""
     bl_idname = "key.copy_selected"
     bl_label = "Copy Selected Frames"
     bl_options = {'REGISTER', 'UNDO'}
@@ -116,7 +118,7 @@ class KEY_OT_CopySelected(bpy.types.Operator):
 
 
 class KEY_OT_SeparateSelected(bpy.types.Operator):
-    """Create a Stop Motion Key for the current object"""
+    """remove selected frames from active object to be their own objects in a collection"""
     bl_idname = "key.separate_selected"
     bl_label = "Separate Selected Frames"
     bl_options = {'REGISTER', 'UNDO'}
@@ -127,6 +129,23 @@ class KEY_OT_SeparateSelected(bpy.types.Operator):
 
     def execute(self, context):
         actions.exposeSelectedFrameObjects(context.active_object, True)
+        return {'FINISHED'}
+
+
+class KEY_OT_Merge(bpy.types.Operator):
+    """merge selected objects to the current frame of active object"""
+    bl_idname = "key.merge"
+    bl_label = "Merge Selected to Active"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @ classmethod
+    def poll(cls, context):
+        return context.active_object is not None and context.selected_objects is not None
+
+    def execute(self, context):
+        bpy.ops.object.join()
+        actions.setSwapObject(context, context.active_object,
+                              context.scene.frame_current)
         return {'FINISHED'}
 
 ####|| HANDLER ||####
@@ -148,6 +167,7 @@ arrClasses = [
     KEY_OT_AddSelected,
     KEY_OT_CopySelected,
     KEY_OT_SeparateSelected,
+    KEY_OT_Merge,
     KEY_OT_Remove
 ]
 
