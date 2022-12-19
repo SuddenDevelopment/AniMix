@@ -7,6 +7,67 @@ def getFCurves(obj, inDataBlock=False):
     return arrFCurves
 
 
+def actKeyframe(obj, intFrame, strMode, inDataBlock=False):
+    arrFcurves = getFCurves(obj, inDataBlock)
+    for fcurve in arrFcurves:
+        for keyframe in fcurve.keyframe_points:
+            if keyframe.co[0] == intFrame:
+                if strMode == 'get':
+                    return keyframe
+                elif strMode == 'remove':
+                    fcurve.keyframe_points.remove(keyframe)
+
+
+def setFrameSpacing(obj, intSpacing):
+    # get the selected range of frames for an object. Space the keyframe_points evenly by the input param
+    # apply to object and data block animation_data
+    arrAllFrames = getFCurves(obj, False)
+    arrDataFrames = getFCurves(obj, True)
+    arrAllFrames = arrAllFrames + arrDataFrames
+    # ordered unique set of selected Frames to work with across obj and data block
+    arrAllFrames.sort()
+    arrAllFrames = [*set(arrAllFrames)]
+    intFrameCount = len(arrAllFrames)
+    intFirstFrame = arrAllFrames[0]
+    intRange = arrAllFrames[intFrameCount-1]-intFirstFrame
+    # anything after this frame needs to get pushed by the delta.
+    intLastFrame = intFirstFrame+(intFrameCount*intSpacing)
+    # need to know if new range is larger or smaller
+    dicFrames = {}
+    if intFrameCount > 1:
+        for i, intFrame in enumerate(arrAllFrames):
+            dicFrames[intFrame] = intFirstFrame+(i*intSpacing)
+    setNewFrames(obj, dicFrames, intLastFrame,
+                 intRange, inDataBlock=False)
+    setNewFrames(obj, dicFrames, intLastFrame,
+                 intRange, True)
+    return
+
+
+def getSelectedFrames(obj, inDataBlock=False):
+    arrFrames = []
+    arrFCurves = getFCurves(obj, inDataBlock)
+    for i, fcurve in enumerate(arrFCurves):
+        for ii, keyframe_point in enumerate(fcurve.keyframe_points):
+            if keyframe_point.select_control_point == True:
+                arrFrames.append(int(keyframe_point.co.x))
+    return arrFrames
+
+
+def setNewFrames(obj, dicFrames, intLastFrame, intPushFrames, inDataBlock=False):
+    arrFCurves = getFCurves(obj, inDataBlock)
+    print(dicFrames)
+    for i, fcurve in enumerate(arrFCurves):
+        for ii, keyframe_point in enumerate(fcurve.keyframe_points):
+            intFrame = keyframe_point.co.x
+            intNewFrame = dicFrames.get(intFrame)
+            if intNewFrame != None:
+                keyframe_point.co.x = intNewFrame
+            elif intFrame > intLastFrame:
+                keyframe_point.co.x += intPushFrames
+    return
+
+
 def getKeyframeValue(obj, strPath, intFrame, mode):
     intFrameId = None
     arrFcurves = getFCurves(obj)

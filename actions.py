@@ -103,7 +103,9 @@ def setTmp(objTarget):
 
 def onFrame(scene):
     context = bpy.context
-    strMode = context.object.mode
+    strMode = 'OBJECT'
+    if context.active_object is not None:
+        strMode = context.object.mode
     # object swapping for key feature
     if strMode == 'EDIT':
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -216,3 +218,34 @@ def removeAllKeyData(obj):
             if objTmp.get('key_id') == intGroupID and objTmp.name_full.startswith(f'{config.PREFIX}_'):
                 removeObject(obj)
     return
+
+
+def exposeSelectedFrameObjects(obj, remove=False):
+    # unselect the parent object
+    obj.select_set(False)
+    objCollection = obj.users_collection[0]
+    # get the selected keyframes array
+    arrKeyframes = keyframes.getSelectedFrames(obj)
+    for intFrame in arrKeyframes:
+        # get the object for that keyframe
+        intSwapObjectId = keyframes.getKeyframeValue(
+            obj, '["key_object_id"]', intFrame, '=')
+        strFrameObject = getSwapObjectName(obj, intSwapObjectId)
+        objFrame = getObject(strFrameObject)
+        # link the object to the same collection as parent
+        if objFrame is not None:
+            strFrameName = f'{obj.name}_Frame_{intFrame}'
+            if remove == True:
+                objFrame.name = strFrameName
+                objCollection.objects.link(objFrame)
+                objFrame['key_id'] = None
+                # leave the new object as selected.
+                objFrame.select_set(True)
+                # remove keyframes from old object
+                keyframes.actKeyframe(obj, intFrame, 'remove')
+            elif remove == False:
+                # make a copy
+                objNew = bpy.data.objects.new(
+                    strFrameName, objFrame.data.copy())
+                objCollection.objects.link(objNew)
+                objNew.select_set(True)

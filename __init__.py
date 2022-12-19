@@ -6,7 +6,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "StopMotion",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (0, 9, 8),
+    "version": (0, 9, 9),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
@@ -41,6 +41,10 @@ class KEY_PT_Main(bpy.types.Panel):
         row.operator("key.insert")
         row = layout.row()
         row.operator("key.add_selected")
+        row = layout.row()
+        row.operator("key.copy_selected")
+        row = layout.row()
+        row.operator("key.separate_selected")
         row = layout.row()
         row.operator("key.remove")
 
@@ -95,6 +99,36 @@ class KEY_OT_AddSelected(bpy.types.Operator):
             context, context.selected_objects, context.active_object)
         return {'FINISHED'}
 
+
+class KEY_OT_CopySelected(bpy.types.Operator):
+    """Create a Stop Motion Key for the current object"""
+    bl_idname = "key.copy_selected"
+    bl_label = "Copy Selected Frames"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @ classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        actions.exposeSelectedFrameObjects(context.active_object, False)
+        return {'FINISHED'}
+
+
+class KEY_OT_SeparateSelected(bpy.types.Operator):
+    """Create a Stop Motion Key for the current object"""
+    bl_idname = "key.separate_selected"
+    bl_label = "Separate Selected Frames"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @ classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        actions.exposeSelectedFrameObjects(context.active_object, True)
+        return {'FINISHED'}
+
 ####|| HANDLER ||####
 
 
@@ -112,6 +146,8 @@ arrClasses = [
     KEY_PT_Main,
     KEY_OT_Insert,
     KEY_OT_AddSelected,
+    KEY_OT_CopySelected,
+    KEY_OT_SeparateSelected,
     KEY_OT_Remove
 ]
 
