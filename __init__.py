@@ -1,6 +1,9 @@
 import bpy
+import time
 import sys
 from . import actions
+from . import prefs
+from . import demo_panel_op
 from bpy.app.handlers import persistent
 
 bl_info = {
@@ -15,7 +18,7 @@ bl_info = {
 }
 ####|| CREDIT ||####
 # stop motion logic was started from the keymesh addon https://github.com/pablodp606/keymesh-addon
-
+# UI is from the bl_ui_widgets library here: https://github.com/mmmrqs/bl_ui_widgets
 ####|| NOTES ||####
 # custom_properties:
 # key_id = the container object id, may change later to allow copying frames across objects
@@ -23,6 +26,32 @@ bl_info = {
 # key_object_id = the id NEEDED and set by the key
 
 # /Applications/Blender.app/Contents/MacOS/Blender
+
+
+class Variables(bpy.types.PropertyGroup):
+    OpState1: bpy.props.BoolProperty(default=False)
+    OpState2: bpy.props.BoolProperty(default=False)
+    OpState3: bpy.props.BoolProperty(default=False)
+    OpState4: bpy.props.BoolProperty(default=False)
+    OpState5: bpy.props.BoolProperty(default=False)
+    OpState6: bpy.props.BoolProperty(default=False)
+    RemoVisible: bpy.props.BoolProperty(default=False)
+    btnRemoText: bpy.props.StringProperty(default="Open Demo Panel")
+    btnRemoTime: bpy.props.IntProperty(default=0)
+
+# --- ### Helper functions
+
+
+def is_quadview_region(context):
+    """ Identifies whether screen is in QuadView mode and if yes returns the corresponding area and region
+    """
+    for area in context.screen.areas:
+        if area.type == 'VIEW_3D':
+            if len(area.spaces.active.region_quadviews) > 0:
+                region = [
+                    region for region in area.regions if region.type == 'WINDOW'][3]
+                return (True, area, region)
+    return (False, None, None)
 
 
 class KEY_PT_Main(bpy.types.Panel):
@@ -49,6 +78,62 @@ class KEY_PT_Main(bpy.types.Panel):
         row.operator("key.merge")
         row = layout.row()
         row.operator("key.remove")
+        if context.space_data.type == 'VIEW_3D':
+            remoteVisible = (context.scene.var.RemoVisible and int(
+                time.time()) - context.scene.var.btnRemoTime <= 1)
+            # -- remote control switch button
+            if remoteVisible:
+                op = self.layout.operator(
+                    KEY_OT_Show_Panel.bl_idname, text="Close Remote Control")
+            else:
+                # Make sure the button starts turned off every time
+                op = self.layout.operator(
+                    KEY_OT_Show_Panel.bl_idname, text="Open Remote Control")
+        return None
+
+
+class KEY_OT_Show_Panel(bpy.types.Operator):
+    ''' Opens/Closes the remote control demo panel '''
+    bl_idname = "object.set_demo_panel"
+    bl_label = "Open Demo Panel"
+    bl_description = "Turns the remote control demo panel on/off"
+
+    # --- Blender interface methods
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def invoke(self, context, event):
+        # input validation:
+        return self.execute(context)
+
+    def execute(self, context):
+        if context.scene.var.RemoVisible and int(time.time()) - context.scene.var.btnRemoTime <= 1:
+            # If it is active then set its visible status to False so that it be closed and reset the button label
+            context.scene.var.btnRemoText = "Open Remote Control"
+            context.scene.var.RemoVisible = False
+        else:
+            # If it is not active then set its visible status to True so that it be opened and reset the button label
+            context.scene.var.btnRemoText = "Close Remote Control"
+            context.scene.var.RemoVisible = True
+            is_quadview, area, region = is_quadview_region(context)
+            if is_quadview:
+                override = bpy.context.copy()
+                override["area"] = area
+                override["region"] = region
+            # Had to put this "try/except" statement because when user clicked repeatedly too fast
+            # on the operator's button it would crash the call due to a context incorrect situation
+            try:
+                if is_quadview:
+                    context.scene.var.objRemote = bpy.ops.object.dp_ot_draw_operator(
+                        override, 'INVOKE_DEFAULT')
+                else:
+                    context.scene.var.objRemote = bpy.ops.object.dp_ot_draw_operator(
+                        'INVOKE_DEFAULT')
+            except:
+                return {'CANCELLED'}
+
+        return {'FINISHED'}
 
 
 class KEY_OT_Remove(bpy.types.Operator):
@@ -87,7 +172,7 @@ class KEY_OT_Insert(bpy.types.Operator):
 
 
 class KEY_OT_AddSelected(bpy.types.Operator):
-    """add selected objects as keyframe objects in actuve_object"""
+    """add selected objects as keyframe objects in active_object"""
     bl_idname = "key.add_selected"
     bl_label = "Add Selected to Active"
     bl_options = {'REGISTER', 'UNDO'}
@@ -168,7 +253,9 @@ arrClasses = [
     KEY_OT_CopySelected,
     KEY_OT_SeparateSelected,
     KEY_OT_Merge,
-    KEY_OT_Remove
+    KEY_OT_Remove,
+    KEY_OT_Show_Panel,
+    Variables
 ]
 
 
@@ -197,11 +284,14 @@ def register():
         kmi = km.keymap_items.new(
             "key.insert", type="A", value="PRESS", shift=True, ctrl=True)
         addon_keymaps.append((km, kmi))
+    bpy.types.Scene.var = bpy.props.PointerProperty(type=Variables)
+    demo_panel_op.register()
+    prefs.register()
 
 
 def unregister():
     cleanse_modules()
-    for i in arrClasses:
+    for i in reversed(arrClasses):
         bpy.utils.unregister_class(i)
     bpy.app.handlers.load_post.remove(onFrame_handler)
     bpy.app.handlers.frame_change_post.clear()
@@ -209,6 +299,8 @@ def unregister():
     for km, kmi in addon_keymaps:
         km.keymap_items.remove(kmi)
     addon_keymaps.clear()
+    demo_panel_op.unregister()
+    prefs.unregister()
 
 
 if __name__ == "__main__":
