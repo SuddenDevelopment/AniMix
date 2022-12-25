@@ -28,7 +28,7 @@ def is_quadview_region(context):
     return (False, None, None)
 
 
-class DP_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
+class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
     bl_idname = "object.dp_ot_draw_operator"
     bl_label = "bl ui widgets custom operator"
     bl_description = "Operator for bl ui widgets"
@@ -61,60 +61,11 @@ class DP_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         self.valid_modes = {}
 
         # From Preferences/Themes/User Interface/"State"
-        theme = bpy.context.preferences.themes[0]
-        ui = theme.user_interface
-        widget_style = getattr(ui, "wcol_state")
-        status_color = tuple(widget_style.inner_changed) + (0.3,)
-
-        btnC = 0            # Element counter
-        btnS = 4            # Button separation (for the smallest ones)
-        btnG = 0            # Button gap (for the biggest ones)
-        btnW = 56           # Button width
-        # Button height (takes 2 small buttons plus their separation)
-        btnH = 40 + btnS
-
-        marginX = 16        # Margin from left border
-        marginY = 20        # Margin from top border
-
-        btnX = marginX + 1  # Button position X (for the very first button)
-        btnY = marginY + 1  # Button position Y (for the very first button)
-        btnC += 1
-        #
-        btnC += 1
-        btnC += 1
-        btnC += 1
-        oldX = (btnX + ((btnW - 1 + btnG) * btnC))
-        oldH = btnH
-        oldW = btnW
-        newX = oldX + marginX + btnW - 1 + btnS
-        btnW = 96
-        newY = btnY + btnH + btnS
-        newX = newX + btnW - 1 + btnS
-        btnW = 120
+        # theme = bpy.context.preferences.themes[0]
+        # ui = theme.user_interface
+        # widget_style = getattr(ui, "wcol_state")
+        # status_color = tuple(widget_style.inner_changed) + (0.3,)
         # -----------
-
-        # Panel desired width  (beware: this math is good for my setup only)
-        panW = newX + btnW + 2 + marginX
-        panH = newY + btnH + 0 + 10 + 35  # Panel desired height (ditto)
-
-        # Save the panel's size to preferences properties to be used in there
-        bpy.context.preferences.addons[package].preferences.RC_PAN_W = panW
-        bpy.context.preferences.addons[package].preferences.RC_PAN_H = panH
-
-        # Need this just because I want the panel to be centered
-        if bpy.context.preferences.addons[package].preferences.RC_UI_BIND:
-            # From Preferences/Interface/"Display"
-            ui_scale = bpy.context.preferences.view.ui_scale
-        else:
-            ui_scale = 1
-        over_scale = bpy.context.preferences.addons[package].preferences.RC_SCALE
-
-        # The panel X and Y coords are in relation to the bottom-left corner of the 3D viewport area
-        # Panel X coordinate, for panel's top-left corner
-        panX = int((bpy.context.area.width - panW *
-                   ui_scale * over_scale) / 2.0) + 1
-        # The '100' is just a spacing                           # Panel Y coordinate, for panel's top-left corner
-        panY = panH
 
         # This is for displaying the widgets tooltips. Only need one instance!
         self.tooltip = BL_UI_Tooltip()
@@ -285,11 +236,11 @@ class DP_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
 
 def register():
-    bpy.utils.register_class(DP_OT_draw_operator)
+    bpy.utils.register_class(KEY_OT_draw_operator)
 
 
 def unregister():
-    bpy.utils.unregister_class(DP_OT_draw_operator)
+    bpy.utils.unregister_class(KEY_OT_draw_operator)
 
 
 if __name__ == '__main__':

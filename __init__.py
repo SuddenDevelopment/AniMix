@@ -3,7 +3,7 @@ import time
 import sys
 from . import actions
 from . import prefs
-from . import demo_panel_op
+from . import ui_panel
 from bpy.app.handlers import persistent
 
 bl_info = {
@@ -285,7 +285,7 @@ def register():
             "key.insert", type="A", value="PRESS", shift=True, ctrl=True)
         addon_keymaps.append((km, kmi))
     bpy.types.Scene.var = bpy.props.PointerProperty(type=Variables)
-    demo_panel_op.register()
+    ui_panel.register()
     prefs.register()
 
 
@@ -299,7 +299,7 @@ def unregister():
     for km, kmi in addon_keymaps:
         km.keymap_items.remove(kmi)
     addon_keymaps.clear()
-    demo_panel_op.unregister()
+    ui_panel.unregister()
     prefs.unregister()
 
 
