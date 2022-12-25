@@ -116,24 +116,15 @@ class DP_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         # The '100' is just a spacing                           # Panel Y coordinate, for panel's top-left corner
         panY = panH
 
-        self.panel = BL_UI_Drag_Panel(panX, panY, panW, 70)
-        # Options are: {HEADER,PANEL,SUBPANEL,TOOLTIP,NONE}
-        self.panel.style = 'PANEL'
-
         # This is for displaying the widgets tooltips. Only need one instance!
         self.tooltip = BL_UI_Tooltip()
-
-        self.label1 = BL_UI_Label(5, 12, panW, 18)
-        self.label1.style = 'TITLE'
-        self.label1.text = "StopMotion Actions"
-        self.label1.size = 14
 # ==========
         objButtonDefaults = {
             "bg_color": (0, 0, 0, 0),
             "outline_color": (1, 1, 1, 0.4),
             "roundness": 0.4,
             "corner_radius": 10,
-            "shadow": True,
+            "has_shadow": True,
             "rounded_corners": (0, 0, 0, 0),
             "iconFile": 'add_asset',
             "imageSize": (32, 32),
@@ -212,6 +203,18 @@ class DP_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         setattr(objNewBtn, strProp, objButtonSettings[strProp])
                 # add the btn to "self"
                 setattr(self, strButton, objNewBtn)
+        self.insert_key.set_mouse_up(self.insert_key_click)
+        intPositionX += intGroupSpacing
+        self.panel = BL_UI_Drag_Panel(
+            intButtonSize, intButtonSize, intPositionX, 70)
+        # Options are: {HEADER,PANEL,SUBPANEL,TOOLTIP,NONE}
+        self.panel.style = 'PANEL'
+        self.panel.bg_color = (0, 0, 0, 0.5)
+
+        self.label1 = BL_UI_Label(5, 12, intPositionX, 18)
+        self.label1.style = 'TITLE'
+        self.label1.text = "StopMotion Actions"
+        self.label1.size = 14
 
     def on_invoke(self, context, event):
         # Add your widgets here (TODO: perhaps a better, more automated solution?)
@@ -255,26 +258,7 @@ class DP_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         bpy.context.scene.var.RemoVisible = True
 
     # -- Helper function
-
-    def suppress_rendering(self, area, region):
-        '''
-            This is a special case 'overriding function' to allow subclass control for displaying (rendering) the panel.
-            Function is defined in class BL_UI_OT_draw_operator (bl_ui_draw_op.py) and available to be inherited here.
-            If not included here the function in the superclass just returns 'False' and rendering is always executed.
-            When 'True" is returned below, the rendering of the entire panel is bypassed and it is not drawn on screen.
-        '''
-        return False
-
     def terminate_execution(self, area, region, event):
-        '''
-            This is a special case 'overriding function' to allow subclass control for terminating/closing the panel.
-            Function is defined in class BL_UI_OT_draw_operator (bl_ui_draw_op.py) and available to be inherited here.
-            If not included here the function in the superclass just returns 'False' and no termination is executed.
-            When 'True" is returned below, the execution is auto terminated and the 'Remote Control' panel closes itself.
-        '''
-        '''
-            BEWARE THAT ARGUMENTS 'AREA' AND/OR 'REGION' CAN BE EQUAL TO "NONE"
-        '''
         if self.panel.quadview and area is None:
             bpy.context.scene.var.RemoVisible = False
         else:
@@ -294,8 +278,11 @@ class DP_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
         return (not bpy.context.scene.var.RemoVisible)
 
+    def insert_key_click(self, widget, event, x, y):
+        bpy.ops.key.insert()
 
 # -Register/unregister processes
+
 
 def register():
     bpy.utils.register_class(DP_OT_draw_operator)
