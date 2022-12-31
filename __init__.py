@@ -4,6 +4,7 @@ import sys
 from . import actions
 from . import prefs
 from . import ui_panel
+from . import version
 from bpy.app.handlers import persistent
 
 bl_info = {
@@ -89,6 +90,10 @@ class KEY_PT_Main(bpy.types.Panel):
                 # Make sure the button starts turned off every time
                 op = self.layout.operator(
                     KEY_OT_Show_Panel.bl_idname, text="Open Remote Control")
+        if bpy.context.window_manager.KEY_message != "":
+            row = layout.row(align=True)
+            row.alignment = 'EXPAND'
+            row.label(icon="INFO", text=bpy.context.window_manager.KEY_message)
         return None
 
 
@@ -285,8 +290,11 @@ def register():
             "key.insert", type="A", value="PRESS", shift=True, ctrl=True)
         addon_keymaps.append((km, kmi))
     bpy.types.Scene.var = bpy.props.PointerProperty(type=Variables)
+    bpy.types.WindowManager.KEY_message = bpy.props.StringProperty(
+        name="Info", default="")
     ui_panel.register()
     prefs.register()
+    version.check_version(bl_info)
 
 
 def unregister():
@@ -301,6 +309,7 @@ def unregister():
     addon_keymaps.clear()
     ui_panel.unregister()
     prefs.unregister()
+    del bpy.types.WindowManager.KEY_message
 
 
 if __name__ == "__main__":

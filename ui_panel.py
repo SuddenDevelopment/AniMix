@@ -86,27 +86,46 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
             {
                 "name": 'keys',
                 "buttons": {
-                        "insert_key": {},
-                        "remove_key": {},
-                        "insert_blank_key": {},
-                        "insert_blank_keys": {}
+                    "insert_key": {},
+                    "remove_key": {},
+                    "insert_blank_key": {},
                 },
             }, {
-                "name": 'data',
+                "name": 'duplicate',
                 "buttons":
                     {
-                        "copy_data": {},
-                        "cut_data": {},
-                        "paste_data": {},
+                        "clone_key": {},
+                        "clone_unique_key": {},
+                        "clone_object": {},
+                        "clone_object_blank_keys": {},
                     },
+            },  {
+                "name": 'frames',
+                "buttons": {
+                    "add_space": {},
+                    "remove_space": {},
+                    "set_space": {}
+                }
+            }, {
+                "name": 'objects',
+                "buttons":
+                    {
+                        "separate_objects": {},
+                        "combine_objects": {}
+                    },
+            }, {
+                "name": 'geometry',
+                "buttons": {
+                    "copy_geo": {},
+                    "cut_geo": {},
+                    "paste_geo": {},
+                },
             }, {
                 "name": 'selected',
                 "buttons":
                     {
                         "add_asset": {},
-                        "add_selected_asset": {},
-                        "add_selected_to_object": {},
-                    },
+                    }
             }
         ]
         # layout settings
