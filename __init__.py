@@ -15,6 +15,7 @@ bl_info = {
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
     "warning": "",
+    "website": "https://blendermarket.com/products/lily-gizmos",
     "category": "Animation",
 }
 ####|| CREDIT ||####
@@ -29,13 +30,7 @@ bl_info = {
 # /Applications/Blender.app/Contents/MacOS/Blender
 
 
-class Variables(bpy.types.PropertyGroup):
-    OpState1: bpy.props.BoolProperty(default=False)
-    OpState2: bpy.props.BoolProperty(default=False)
-    OpState3: bpy.props.BoolProperty(default=False)
-    OpState4: bpy.props.BoolProperty(default=False)
-    OpState5: bpy.props.BoolProperty(default=False)
-    OpState6: bpy.props.BoolProperty(default=False)
+class PanelProps(bpy.types.PropertyGroup):
     RemoVisible: bpy.props.BoolProperty(default=False)
     btnRemoText: bpy.props.StringProperty(default="Open Demo Panel")
     btnRemoTime: bpy.props.IntProperty(default=0)
@@ -80,20 +75,24 @@ class KEY_PT_Main(bpy.types.Panel):
         row = layout.row()
         row.operator("key.remove")
         if context.space_data.type == 'VIEW_3D':
-            remoteVisible = (context.scene.var.RemoVisible and int(
-                time.time()) - context.scene.var.btnRemoTime <= 1)
+            remoteVisible = (context.window_manager.KEY_UI.RemoVisible and int(
+                time.time()) - context.window_manager.KEY_UI.btnRemoTime <= 1)
             # -- remote control switch button
             if remoteVisible:
                 op = self.layout.operator(
-                    KEY_OT_Show_Panel.bl_idname, text="Close Remote Control")
+                    KEY_OT_Show_Panel.bl_idname, text="Hide Viewport Panel")
             else:
                 # Make sure the button starts turned off every time
                 op = self.layout.operator(
-                    KEY_OT_Show_Panel.bl_idname, text="Open Remote Control")
+                    KEY_OT_Show_Panel.bl_idname, text="Show Viewport Panel")
         if bpy.context.window_manager.KEY_message != "":
-            row = layout.row(align=True)
+            box = layout.box()
+            row = box.row(align=True)
             row.alignment = 'EXPAND'
             row.label(icon="INFO", text=bpy.context.window_manager.KEY_message)
+            row = box.row()
+            row.operator(
+                'wm.url_open', text="Product Page", icon="URL").url = bl_info['website']
         return None
 
 
@@ -113,14 +112,14 @@ class KEY_OT_Show_Panel(bpy.types.Operator):
         return self.execute(context)
 
     def execute(self, context):
-        if context.scene.var.RemoVisible and int(time.time()) - context.scene.var.btnRemoTime <= 1:
+        if context.window_manager.KEY_UI.RemoVisible and int(time.time()) - context.window_manager.KEY_UI.btnRemoTime <= 1:
             # If it is active then set its visible status to False so that it be closed and reset the button label
-            context.scene.var.btnRemoText = "Open Remote Control"
-            context.scene.var.RemoVisible = False
+            context.window_manager.KEY_UI.btnRemoText = "Show Viewport Panel"
+            context.window_manager.KEY_UI.RemoVisible = False
         else:
             # If it is not active then set its visible status to True so that it be opened and reset the button label
-            context.scene.var.btnRemoText = "Close Remote Control"
-            context.scene.var.RemoVisible = True
+            context.window_manager.KEY_UI.btnRemoText = "Hide Viewport Panel"
+            context.window_manager.KEY_UI.RemoVisible = True
             is_quadview, area, region = is_quadview_region(context)
             if is_quadview:
                 override = bpy.context.copy()
@@ -130,10 +129,10 @@ class KEY_OT_Show_Panel(bpy.types.Operator):
             # on the operator's button it would crash the call due to a context incorrect situation
             try:
                 if is_quadview:
-                    context.scene.var.objRemote = bpy.ops.object.dp_ot_draw_operator(
+                    context.window_manager.KEY_UI.objRemote = bpy.ops.object.dp_ot_draw_operator(
                         override, 'INVOKE_DEFAULT')
                 else:
-                    context.scene.var.objRemote = bpy.ops.object.dp_ot_draw_operator(
+                    context.window_manager.KEY_UI.objRemote = bpy.ops.object.dp_ot_draw_operator(
                         'INVOKE_DEFAULT')
             except:
                 return {'CANCELLED'}
@@ -260,7 +259,7 @@ arrClasses = [
     KEY_OT_Merge,
     KEY_OT_Remove,
     KEY_OT_Show_Panel,
-    Variables
+    PanelProps
 ]
 
 
@@ -289,7 +288,7 @@ def register():
         kmi = km.keymap_items.new(
             "key.insert", type="A", value="PRESS", shift=True, ctrl=True)
         addon_keymaps.append((km, kmi))
-    bpy.types.Scene.var = bpy.props.PointerProperty(type=Variables)
+    bpy.types.WindowManager.KEY_UI = bpy.props.PointerProperty(type=PanelProps)
     bpy.types.WindowManager.KEY_message = bpy.props.StringProperty(
         name="Info", default="")
     ui_panel.register()
@@ -309,6 +308,7 @@ def unregister():
     addon_keymaps.clear()
     ui_panel.unregister()
     prefs.unregister()
+    del bpy.types.WindowManager.KEY_UI
     del bpy.types.WindowManager.KEY_message
 
 

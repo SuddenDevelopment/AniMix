@@ -17,6 +17,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # --- ### Header
+from . bl_ui_widget import BL_UI_Widget
+import time
+import bpy
 bl_info = {"name": "BL UI Widgets",
            "description": "UI Widgets to draw in the 3D view",
            "author": "Marcelo M. Marques",
@@ -42,10 +45,6 @@ bl_info = {"name": "BL UI Widgets",
 #        {'BL_UI_Drag_Panel','BL_UI_Button','BL_UI_Slider','BL_UI_Checkbox','BL_UI_Tooltip'}
 
 # --- ### Imports
-import bpy
-import time
-
-from . bl_ui_widget import BL_UI_Widget
 
 
 class BL_UI_Patch(BL_UI_Widget):
@@ -55,18 +54,27 @@ class BL_UI_Patch(BL_UI_Widget):
 
         # Note: '_style' value will always be ignored if the bg_color value is overriden after object initialization.
 
-        self._style = 'NONE'                    # Patch background color styles are: {HEADER,PANEL,SUBPANEL,BOX,TOOLTIP,NONE}
-        self._bg_color = None                   # Patch background color (defaults to invisible)
-        self._shadow_color = None               # Panel shadow color (defaults to invisible)
-        self._outline_color = None              # Panel outline color (defaults to invisible)
-        self._roundness = 0                     # Patch corners roundness factor [0..1]
+        # Patch background color styles are: {HEADER,PANEL,SUBPANEL,BOX,TOOLTIP,NONE}
+        self._style = 'NONE'
+        # Patch background color (defaults to invisible)
+        self._bg_color = None
+        # Panel shadow color (defaults to invisible)
+        self._shadow_color = None
+        # Panel outline color (defaults to invisible)
+        self._outline_color = None
+        # Patch corners roundness factor [0..1]
+        self._roundness = 0
         self._radius = 0                        # Patch corners circular radius
-        self._rounded_corners = (0, 0, 0, 0)    # 1=Round/0=Straight, coords:(bottomLeft,topLeft,topRight,bottomRight)
-        self._has_shadow = False                # Indicates whether a shadow must be drawn around the patch
+        # 1=Round/0=Straight, coords:(bottomLeft,topLeft,topRight,bottomRight)
+        self._rounded_corners = (0, 0, 0, 0)
+        # Indicates whether a shadow must be drawn around the patch
+        self._has_shadow = False
 
         self._image = None                      # Image file to be loaded
-        self._image_size = (24, 24)             # Image size in pixels; values are (width, height)
-        self._image_position = (4, 2)           # Image position inside the patch area; values are (x, y)
+        # Image size in pixels; values are (width, height)
+        self._image_size = (24, 24)
+        # Image position inside the patch area; values are (x, y)
+        self._image_position = (4, 2)
 
         self.__image_file = None
         self.__image_time = 0
@@ -144,7 +152,8 @@ class BL_UI_Patch(BL_UI_Widget):
         self.__image_file = rel_filepath
         self.__image_time = time.time()
         try:
-            self._image = bpy.data.images.load(self.__image_file, check_existing=True)
+            self._image = bpy.data.images.load(
+                self.__image_file, check_existing=True)
             self._image.gl_load()
             self._image.pack(as_png=True)
         except Exception as e:

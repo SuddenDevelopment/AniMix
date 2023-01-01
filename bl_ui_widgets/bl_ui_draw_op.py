@@ -17,6 +17,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # --- ### Header
+from bpy.types import Operator
+import sys
+import bpy
 bl_info = {"name": "BL UI Widgets",
            "description": "UI Widgets to draw in the 3D view",
            "author": "Marcelo M. Marques (fork of Jayanam's original project)",
@@ -65,10 +68,6 @@ bl_info = {"name": "BL UI Widgets",
 # Chang: Renamed some local variables so that those become restricted to this class only.
 
 # --- ### Imports
-import bpy
-import sys
-
-from bpy.types import Operator
 
 
 class BL_UI_OT_draw_operator(Operator):
@@ -78,7 +77,8 @@ class BL_UI_OT_draw_operator(Operator):
     bl_options = {'REGISTER'}
 
     handlers = []
-    region_pointer = 0  # Uniquely identifies the region that this (drag_panel) operator instance has been invoked()
+    # Uniquely identifies the region that this (drag_panel) operator instance has been invoked()
+    region_pointer = 0
 
     def __init__(self):
         self.widgets = []
@@ -95,7 +95,8 @@ class BL_UI_OT_draw_operator(Operator):
             properties under the hood. When the instance of the Blender operator is no longer required its RNA is trashed.
             Using 'repr()' avoids using a try catch clause. Would be keen to find out if there is a nicer way to check for this.
         """
-        invalids = [(type, op, context, handler) for type, op, context, handler in cls.handlers if repr(op).endswith("invalid>")]
+        invalids = [(type, op, context, handler) for type, op, context,
+                    handler in cls.handlers if repr(op).endswith("invalid>")]
         valid = not(invalids)
         while invalids:
             type, op, context, handler = invalids.pop()
@@ -139,8 +140,10 @@ class BL_UI_OT_draw_operator(Operator):
 
     def register_handlers(self, args, context):
         BL_UI_OT_draw_operator.handlers = []
-        BL_UI_OT_draw_operator.handlers.append(('H', self, context, bpy.types.SpaceView3D.draw_handler_add(self.draw_callback_px, args, 'WINDOW', 'POST_PIXEL')))
-        BL_UI_OT_draw_operator.handlers.append(('T', self, context, context.window_manager.event_timer_add(0.1, window=context.window)))
+        BL_UI_OT_draw_operator.handlers.append(('H', self, context, bpy.types.SpaceView3D.draw_handler_add(
+            self.draw_callback_px, args, 'WINDOW', 'POST_PIXEL')))
+        BL_UI_OT_draw_operator.handlers.append(
+            ('T', self, context, context.window_manager.event_timer_add(0.1, window=context.window)))
         # Was as below before implementing the 'lost handler detection logic'
         # self.__draw_handle = bpy.types.SpaceView3D.draw_handler_add(self.draw_callback_px, args, "WINDOW", "POST_PIXEL")
         # self.__draw_events = context.window_manager.event_timer_add(0.1, window=context.window)
@@ -192,11 +195,12 @@ class BL_UI_OT_draw_operator(Operator):
             valid = False
         elif event.type != 'TIMER':
             # Check whether it is drawing on the same region where the panel was initially opened
-            mouse_region, abend = get_region(context, event.mouse_x, event.mouse_y)
+            mouse_region, abend = get_region(
+                context, event.mouse_x, event.mouse_y)
             if abend:
                 self.finish()
                 valid = False
-            else:    
+            else:
                 if mouse_region is None or mouse_region.as_pointer() != self.get_region_pointer():
                     # Not the same region, so skip handling events at this time, but do not finish
                     valid = False
@@ -234,8 +238,8 @@ class BL_UI_OT_draw_operator(Operator):
         # -- personalized criteria for the Remote Control panel addon --
         # This is a temporary workaround till I figure out how to signal to
         # the N-panel coding that the remote control panel has been finished.
-        bpy.context.scene.var.RemoVisible = False
-        bpy.context.scene.var.btnRemoText = "Open Remote Control"
+        bpy.context.window_manager.KEY_UI.RemoVisible = False
+        bpy.context.window_manager.KEY_UI.btnRemoText = "Show Remote Control"
         # -- end of the personalized criteria for the given addon --
 
         self.unregister_handlers(bpy.context)
@@ -244,7 +248,7 @@ class BL_UI_OT_draw_operator(Operator):
     def cancel(self, context):
         # Called when Blender cancels the modal operator
         self.finish()
-        
+
     # Draw handler to paint onto the screen
     def draw_callback_px(self, op, context):
         # Check whether handles are still valid
@@ -253,8 +257,8 @@ class BL_UI_OT_draw_operator(Operator):
                 # -- personalized criteria for the Remote Control panel addon --
                 # This is a temporary workaround till I figure out how to signal to
                 # the N-panel coding that the remote control panel has been finished.
-                bpy.context.scene.var.RemoVisible = False
-                bpy.context.scene.var.btnRemoText = "Open Remote Control"
+                bpy.context.window_manager.KEY_UI.RemoVisible = False
+                bpy.context.window_manager.KEY_UI.btnRemoText = "Show Remote Control"
                 # -- end of the personalized criteria for the given addon --
             except:
                 pass
@@ -283,7 +287,7 @@ def get_region(context, x, y):
                 if (x >= region.x and
                     y >= region.y and
                     x < region.width + region.x and
-                    y < region.height + region.y):
+                        y < region.height + region.y):
                     return (region, abend)
     except Exception as e:
         if __package__.find(".") != -1:
@@ -291,10 +295,12 @@ def get_region(context, x, y):
         else:
             package = __package__
         print("**WARNING** " + package + " addon issue:")
-        print("  +--> unexpected result in 'get_region' function of bl_ui_draw_op.py module!")
+        print(
+            "  +--> unexpected result in 'get_region' function of bl_ui_draw_op.py module!")
         print("       " + e)
         abend = True
     return (None, abend)
+
 
 def get_3d_area_and_region(prefs=None):
     abend = False

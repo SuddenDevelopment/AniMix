@@ -2,7 +2,7 @@ import bpy
 import requests
 import json
 
-URL = 'https://anthonyaragues.com/stopmotion_checky.json'
+URL = 'https://anthonyaragues.com/stopmotion_check.json'
 PROP = 'KEY_message'
 
 

@@ -4,10 +4,6 @@ from .bl_ui_widgets.bl_ui_drag_panel import BL_UI_Drag_Panel
 from .bl_ui_widgets.bl_ui_draw_op import BL_UI_OT_draw_operator
 from .bl_ui_widgets.bl_ui_tooltip import BL_UI_Tooltip
 from .bl_ui_widgets.bl_ui_button import BL_UI_Button
-from .bl_ui_widgets.bl_ui_textbox import BL_UI_Textbox
-from .bl_ui_widgets.bl_ui_slider import BL_UI_Slider
-from .bl_ui_widgets.bl_ui_checkbox import BL_UI_Checkbox
-from .bl_ui_widgets.bl_ui_patch import BL_UI_Patch
 from .bl_ui_widgets.bl_ui_label import BL_UI_Label
 import os
 import time
@@ -42,7 +38,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
             return False
         # Prevents multiple instances of panel
         try:
-            if context.scene.var.RemoVisible and int(time.time()) - context.scene.var.btnRemoTime <= 1:
+            if context.window_manager.KEY_UI.RemoVisible and int(time.time()) - context.window_manager.KEY_UI.btnRemoTime <= 1:
                 return False
         except:
             return False
@@ -72,66 +68,79 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 # ==========
         objButtonDefaults = {
             "bg_color": (0, 0, 0, 0),
+            "text": "",
             "outline_color": (1, 1, 1, 0.4),
             "roundness": 0.4,
             "corner_radius": 10,
             "has_shadow": True,
             "rounded_corners": (0, 0, 0, 0),
             "iconFile": 'add_asset',
-            "imageSize": (32, 32),
-            "imagePosition": (6, 5)
+            "imageSize": (44, 44),
+            "imagePosition": (3, 3)
         }
         # group buttons and give overrides
         self.arrButtonGroups = [
             {
                 "name": 'keys',
                 "buttons": {
-                    "insert_key": {},
-                    "remove_key": {},
-                    "insert_blank_key": {},
+                    "insert_key": {"description": "Adds a single keyframe to the right of the timeline indicators playhead."},
+                    "remove_key": {"description": "Removes a single keyframe to the right of the timeline indicators playhead."},
+                    "insert_blank_key": {"description": "Inserts a single blank keyframe to the right of the timeline indicators playhead."},
                 },
             }, {
                 "name": 'duplicate',
                 "buttons":
                     {
-                        "clone_key": {},
-                        "clone_unique_key": {},
-                        "clone_object": {},
-                        "clone_object_blank_keys": {},
+                        "clone_key": {"description": "Duplicates the current keyframe to the right of the current active keyframe/s."},
+                        "clone_unique_key": {"description": "Duplicates the current keyframe to the right of the current active keyframe/s with a unique id."},
+                        "clone_object": {"description": "Duplicates the object/s and the current keyframes with a unique id."},
+                        "clone_object_blank_keys": {"description": "Duplicates the object/s with blank keyframes."},
                     },
             },  {
                 "name": 'frames',
                 "buttons": {
-                    "add_space": {},
-                    "remove_space": {},
-                    "set_space": {}
+                    "add_space": {
+                        "description": "Adds a single extra space between selected keyframes.",
+                        "text": "ADD",
+                        "textwo": "SPACE"
+                    },
+                    "remove_space": {
+                        "description": "Subtracts a single between selected keyframes. A cumulative behavior till there are no more spaces between keyframes.",
+                        "text": "REMOVE",
+                        "textwo": "SPACE"
+                    },
+                    "set_space": {
+                        "description": "Removes all space between selected keyframes",
+                        "text": "NO",
+                        "textwo": "SPACE"
+                    }
                 }
             }, {
                 "name": 'objects',
                 "buttons":
                     {
-                        "separate_objects": {},
-                        "combine_objects": {}
+                        "separate_objects": {"description": "Separates and converts the currently active selection in edit mode to a new object."},
+                        "combine_objects": {"description": "Combines the selected object with the active merging keyframe data"}
                     },
             }, {
                 "name": 'geometry',
                 "buttons": {
-                    "copy_geo": {},
-                    "cut_geo": {},
-                    "paste_geo": {},
+                    "copy_data": {"description": "Copies object data."},
+                    "cut_data": {"description": "Cuts object data."},
+                    "paste_data": {"description": "Paste object data."},
                 },
             }, {
                 "name": 'selected',
                 "buttons":
                     {
-                        "add_asset": {},
+                        "add_asset": {"description": "Create assets out of what is selected. Object & Edit mode and Keyframe data is supported."},
                     }
             }
         ]
         # layout settings
         intGroupSpacing = 10
         intButtonSpacing = 5
-        intButtonSize = 42
+        intButtonSize = 50
 
         # flywheel values
         intPositionX = 0
@@ -156,7 +165,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 # get the position and size
                 intPositionX += intButtonSpacing
                 # set up the button with defaults
-                objNewBtn = BL_UI_Patch(
+                objNewBtn = BL_UI_Button(
                     intPositionX, intPositionY, intButtonSize, intButtonSize)
                 intPositionX += intButtonSize
                 for strProp in objButtonSettings:
@@ -171,12 +180,17 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                             objButtonSettings[strProp])
                     else:
                         setattr(objNewBtn, strProp, objButtonSettings[strProp])
+                try:
+                    # see if there is a matching click operator setup
+                    objNewBtn.set_mouse_up(getattr(self, f'{strButton}_click'))
+                except:
+                    pass
                 # add the btn to "self"
                 setattr(self, strButton, objNewBtn)
-        self.insert_key.set_mouse_up(self.insert_key_click)
         intPositionX += intGroupSpacing
+        # (panX, panY, panW, panH)
         self.panel = BL_UI_Drag_Panel(
-            intButtonSize, intButtonSize, intPositionX, 70)
+            intButtonSize, intButtonSize*2, intPositionX, 80)
         # Options are: {HEADER,PANEL,SUBPANEL,TOOLTIP,NONE}
         self.panel.style = 'PANEL'
         self.panel.bg_color = (0, 0, 0, 0.5)
@@ -225,12 +239,12 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
             self.panel.set_location(self.panel.x, self.panel.y)
 
         # This statement is necessary so that the remote panel stays open when called by Blender's <F3> menu
-        bpy.context.scene.var.RemoVisible = True
+        bpy.context.window_manager.KEY_UI.RemoVisible = True
 
     # -- Helper function
     def terminate_execution(self, area, region, event):
         if self.panel.quadview and area is None:
-            bpy.context.scene.var.RemoVisible = False
+            bpy.context.window_manager.KEY_UI.RemoVisible = False
         else:
             if not area is None:
                 if area.type == 'VIEW_3D':
@@ -238,19 +252,66 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     is_quadview = (
                         len(area.spaces.active.region_quadviews) > 0)
                     if self.panel.quadview != is_quadview:
-                        bpy.context.scene.var.RemoVisible = False
+                        bpy.context.window_manager.KEY_UI.RemoVisible = False
 
-        if event.type == 'TIMER' and bpy.context.scene.var.RemoVisible:
+        if event.type == 'TIMER' and bpy.context.window_manager.KEY_UI.RemoVisible:
             # Update the remote panel "clock marker". This marker is used to keep track if the remote panel is
-            # actually opened and active. In the case that bpy.context.scene.var.RemoVisible state gets misleading
+            # actually opened and active. In the case that bpy.context.window_manager.KEY_UI.RemoVisible state gets misleading
             # the panel will be automatically closed when this clock marker has not been updated for more than 1 sec
-            bpy.context.scene.var.btnRemoTime = int(time.time())
+            bpy.context.window_manager.KEY_UI.btnRemoTime = int(time.time())
 
-        return (not bpy.context.scene.var.RemoVisible)
+        return (not bpy.context.window_manager.KEY_UI.RemoVisible)
+# -------------------DEFINE OPERATORS----------------------
 
     def insert_key_click(self, widget, event, x, y):
         bpy.ops.key.insert()
 
+    def remove_key_click(self, widget, event, x, y):
+        print('remove_key_click')
+
+    def insert_blank_key_click(self, widget, event, x, y):
+        print('insert_blank_key_click')
+
+    def clone_key_click(self, widget, event, x, y):
+        print('clone_key_click')
+
+    def clone_unique_key_click(self, widget, event, x, y):
+        print('clone_unique_key_click')
+
+    def clone_object_click(self, widget, event, x, y):
+        print('clone_object_click')
+
+    def clone_object_blank_keys_click(self, widget, event, x, y):
+        print('clone_object_blank_keys_click')
+
+    def add_space_click(self, widget, event, x, y):
+        print('add_space_click')
+
+    def remove_space_click(self, widget, event, x, y):
+        print('remove_space_click')
+
+    def set_space_click(self, widget, event, x, y):
+        print('set_space_click')
+
+    def separate_objects_click(self, widget, event, x, y):
+        print('separate_objects_click')
+
+    def combine_objects_click(self, widget, event, x, y):
+        print('combine_objects_click')
+
+    def copy_data_click(self, widget, event, x, y):
+        print('copy_data_click')
+
+    def cut_data_click(self, widget, event, x, y):
+        print('cut_data_click')
+
+    def paste_data_click(self, widget, event, x, y):
+        print('paste_data_click')
+
+    def add_asset_click(self, widget, event, x, y):
+        print('add_asset_click', widget, event, x, y)
+
+# -----------------------------------------
 # -Register/unregister processes
 
 
