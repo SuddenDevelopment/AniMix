@@ -10,12 +10,12 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "StopMotion",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (0, 9, 9),
+    "version": (1, 0, 0),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
     "warning": "",
-    "website": "https://blendermarket.com/products/lily-gizmos",
+    "website": "https://blendermarket.com/products/stopmotion",
     "category": "Animation",
 }
 ####|| CREDIT ||####
@@ -73,7 +73,7 @@ class KEY_PT_Main(bpy.types.Panel):
         row = layout.row()
         row.operator("key.merge")
         row = layout.row()
-        row.operator("key.remove")
+        row.operator("key.remove_keys")
         if context.space_data.type == 'VIEW_3D':
             remoteVisible = (context.window_manager.KEY_UI.RemoVisible and int(
                 time.time()) - context.window_manager.KEY_UI.btnRemoTime <= 1)
@@ -142,7 +142,7 @@ class KEY_OT_Show_Panel(bpy.types.Operator):
 
 class KEY_OT_Remove(bpy.types.Operator):
     """Create a Key for the current object, type of ket is determined by what you edit"""
-    bl_idname = "key.remove"
+    bl_idname = "key.remove_keys"
     bl_label = "Remove Key Data"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -152,7 +152,7 @@ class KEY_OT_Remove(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            actions.removeAllKeyData(obj)
+            actions.remove_keys(obj)
         return {'FINISHED'}
 
 

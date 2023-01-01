@@ -210,13 +210,16 @@ def removeObject(obj):
         bpy.data.meshes.remove(obj.data)
 
 
-def removeAllKeyData(obj):
+def redraw(arrAreas=[]):
+    for area in bpy.context.screen.areas:
+        if len(arrAreas) == 0 or area.type in arrAreas:
+            for region in area.regions:
+                region.tag_redraw()
+
+
+def remove_keys(obj):
     keyframes.removeKeyframes(obj, '["key_object_id"]')
-    intGroupID = obj.get('key_id')
-    if intGroupID is not None:
-        for objTmp in bpy.data.objects:
-            if objTmp.get('key_id') == intGroupID and objTmp.name_full.startswith(f'{config.PREFIX}_'):
-                removeObject(obj)
+    redraw(['DOPESHEET_EDITOR', 'GRAPH_EDITOR'])
     return
 
 
@@ -225,7 +228,7 @@ def exposeSelectedFrameObjects(obj, remove=False):
     obj.select_set(False)
     objCollection = obj.users_collection[0]
     # get the selected keyframes array
-    arrKeyframes = keyframes.getSelectedFrames(obj)
+    arrKeyframes = keyframes.getSelectedFrames(obj, '["key_object_id"]')
     for intFrame in arrKeyframes:
         # get the object for that keyframe
         intSwapObjectId = keyframes.getKeyframeValue(

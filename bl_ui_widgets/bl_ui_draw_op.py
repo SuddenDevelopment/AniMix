@@ -263,13 +263,6 @@ class BL_UI_OT_draw_operator(Operator):
             except:
                 pass
             return
-        # Check whether it is drawing on the same region where the panel was initially opened
-        for region in [region for region in context.area.regions if region.type == 'WINDOW']:
-            if context.region == region:
-                if region.as_pointer() != self.get_region_pointer():
-                    # Not the same region, so skip drawing there
-                    return
-                break
         # This is to detect when user moved into an undesired 'bpy.context.mode'
         # and it will check also the programmer's defined suppress_rendering function
         if valid_display_mode(self.valid_modes, self.suppress_rendering):

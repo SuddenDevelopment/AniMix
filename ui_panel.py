@@ -268,6 +268,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def remove_key_click(self, widget, event, x, y):
         print('remove_key_click')
+        bpy.ops.key.remove_keys()
 
     def insert_blank_key_click(self, widget, event, x, y):
         print('insert_blank_key_click')

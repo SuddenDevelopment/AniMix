@@ -44,16 +44,6 @@ def setFrameSpacing(obj, intSpacing):
     return
 
 
-def getSelectedFrames(obj, inDataBlock=False):
-    arrFrames = []
-    arrFCurves = getFCurves(obj, inDataBlock)
-    for i, fcurve in enumerate(arrFCurves):
-        for ii, keyframe_point in enumerate(fcurve.keyframe_points):
-            if keyframe_point.select_control_point == True:
-                arrFrames.append(int(keyframe_point.co.x))
-    return arrFrames
-
-
 def setNewFrames(obj, dicFrames, intLastFrame, intPushFrames, inDataBlock=False):
     arrFCurves = getFCurves(obj, inDataBlock)
     print(dicFrames)
@@ -94,11 +84,26 @@ def getKeyframeValue(obj, strPath, intFrame, mode):
     return intFrameId
 
 
-def removeKeyframes(obj, strPath):
-    arrFcurves = getFCurves(obj)
-    for fcurve in arrFcurves:
+def getSelectedFrames(obj, strPath, inDataBlock=False):
+    arrFrames = []
+    arrFCurves = getFCurves(obj, inDataBlock)
+    for i, fcurve in enumerate(arrFCurves):
         if fcurve.data_path == strPath:
-            obj.animation_data.action.fcurves.remove(fcurve)
+            for ii, keyframe_point in enumerate(fcurve.keyframe_points):
+                if keyframe_point.select_control_point == True:
+                    arrFrames.append(int(keyframe_point.co.x))
+    return arrFrames
+
+
+def removeKeyframes(obj, strPath, inDataBlock=False):
+    arrFrames = []
+    arrFCurves = getFCurves(obj, inDataBlock)
+    for i, fcurve in enumerate(arrFCurves):
+        if fcurve.data_path == strPath:
+            for ii, keyframe in enumerate(fcurve.keyframe_points):
+                if keyframe.select_control_point == True:
+                    fcurve.keyframe_points.remove(keyframe, fast=True)
+    return
 
 
 def nudgeFrames(obj, intStart, intMove, inDataBlock=False):

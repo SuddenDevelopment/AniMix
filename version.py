@@ -30,6 +30,7 @@ def check_version(bl_info):
         intCurrent = getIntVersion(objVersion["version"])
         intInstalled = getIntVersion(str(bl_info["version"]))
         if intCurrent > intInstalled:
+            # print(f'version: {intInstalled} < {intCurrent}')
             show_message(objVersion["message"], bl_info)
     else:
         show_message("couldn't check version", bl_info)
