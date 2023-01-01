@@ -2,6 +2,7 @@ import bpy
 import time
 import sys
 from . import actions
+from . import keyframes
 
 # --- ### Helper functions
 
@@ -139,7 +140,8 @@ class KEY_OT_AddSpace(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            print('Add Keyframe Space op')
+            keyframes.nudgeFrames(obj, context.scene.frame_current, 1, True)
+            keyframes.nudgeFrames(obj, context.scene.frame_current, 1, False)
         return {'FINISHED'}
 
 
@@ -154,7 +156,8 @@ class KEY_OT_RemoveSpace(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            print('Remove Keyframe Space op')
+            keyframes.nudgeFrames(obj, context.scene.frame_current, -1, True)
+            keyframes.nudgeFrames(obj, context.scene.frame_current, -1, False)
         return {'FINISHED'}
 
 
@@ -169,7 +172,8 @@ class KEY_OT_SetSpace(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            print('Set Keyframe Space op')
+            keyframes.setFrameSpacing(obj, 1, True)
+            keyframes.setFrameSpacing(obj, 1, False)
         return {'FINISHED'}
 
 

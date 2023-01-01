@@ -270,7 +270,6 @@ def clone_object(context, obj):
     for intFrame in arrFrames:
         intFrame = int(intFrame)
         # get the frame IDs
-        print(getSwapObjectName(getSwapId(obj), intFrame))
         objFrame = getObject(getSwapObjectName(getSwapId(obj), intFrame))
         if objFrame:
             objNewFrame = getObjectCopy(objFrame)
@@ -284,8 +283,9 @@ def exposeSelectedFrameObjects(obj, remove=False):
     obj.select_set(False)
     objCollection = obj.users_collection[0]
     # get the selected keyframes array
-    arrKeyframes = keyframes.getSelectedFrames(obj, '["key_object_id"]')
+    arrKeyframes = keyframes.getSelectedFrames(obj, '["key_object_id"]', 'x')
     for intFrame in arrKeyframes:
+        intFrame = int(intFrame)
         # get the object for that keyframe
         intSwapObjectId = keyframes.getKeyframeValue(
             obj, '["key_object_id"]', intFrame, '=')
