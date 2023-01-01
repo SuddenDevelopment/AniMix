@@ -239,6 +239,18 @@ def clone_key(context, obj, intFrame):
         setSwapKey(obj, intSwapObjectId, intFrame+1, update=False)
 
 
+def clone_unique_key(context, obj, intFrame):
+    # Push keyframes to make room for duplicate
+    keyframes.nudgeFrames(obj, intFrame+1, 1)
+    # get the current frame object
+    intSwapObjectId = keyframes.getKeyframeValue(
+        obj, '["key_object_id"]', intFrame, '=')
+    strFrameObject = getSwapObjectName(obj, intSwapObjectId)
+    objFrame = getObject(strFrameObject)
+    # copy the current frame object to a new one
+    addSwapObjects(context, [objFrame], obj)
+
+
 def exposeSelectedFrameObjects(obj, remove=False):
     # unselect the parent object
     obj.select_set(False)

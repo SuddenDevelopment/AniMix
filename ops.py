@@ -94,7 +94,7 @@ class KEY_OT_CloneUniqueKey(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            print('Duplicate Unique Key op')
+            actions.clone_unique_key(context, obj, context.scene.frame_current)
         return {'FINISHED'}
 
 
