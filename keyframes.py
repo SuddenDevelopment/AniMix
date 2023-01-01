@@ -114,22 +114,23 @@ def nudgeFrames(obj, intStart, intMove, inDataBlock=False):
     return
 
 
-def getFrames(obj, strPath, intFrame, intCount, mode):
+def getFrames(obj, strPath, intFrame, direction, mode='y', intCount=False):
+    # mode = x for frame number, mode = y for value
     arrFrames = []
     arrFcurves = getFCurves(obj)
     for fcurve in arrFcurves:
         if fcurve.data_path == strPath:
             for keyframe_point in fcurve.keyframe_points:
-                if mode == '<' and keyframe_point.co.x < intFrame:
-                    arrFrames.append(keyframe_point.co.x)
-                elif mode == '>' and keyframe_point.co.x > intFrame:
-                    arrFrames.append(keyframe_point.co.x)
+                if direction == '<' and keyframe_point.co.x < intFrame:
+                    arrFrames.append(getattr(keyframe_point.co, mode))
+                elif direction == '>' and keyframe_point.co.x > intFrame:
+                    arrFrames.append(getattr(keyframe_point.co, mode))
             break
-    if len(arrFrames) > intCount:
-        if mode == '<':
+    if intCount is not False and len(arrFrames) > intCount:
+        if direction == '<':
             arrFrames = arrFrames[-intCount]
             # reverse the array
             arrFrames = arrFrames[::-1]
-        elif mode == '>':
+        elif direction == '>':
             arrFrames = arrFrames[0:intCount]
     return arrFrames

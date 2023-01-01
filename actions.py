@@ -33,12 +33,11 @@ def setSwapKey(obj, intObjectId, intFrame, update=True):
                 keyframe_point.interpolation = 'CONSTANT'
 
 
-def getSwapObjectName(obj, intFrame):
+def getSwapObjectName(intSwapId, intSwapObjectId):
     # container/placeholder id + frame created
     # frame created doesn't need to be the only frame used. you can copy and past the key to reuse
-    intSwapId = obj.get("key_id")
-    if intSwapId is not None:
-        return f'{config.PREFIX}_{intSwapId}_{intFrame}'
+    if intSwapId is not None and intSwapObjectId is not None:
+        return f'{config.PREFIX}_{intSwapId}_{intSwapObjectId}'
 
 
 def getObject(strName):
@@ -48,11 +47,15 @@ def getObject(strName):
     return None
 
 
-def copyData(objTarget, objReference):
-    objTarget.data = objReference.data.copy()
-    if objReference.animation_data is not None:
-        objTarget.animation_data = objReference.animation_data.copy()
-    objTarget["key_object"] = objReference.name_full
+def getObjectCopy(obj):
+    if obj is not None:
+        objNew = obj.copy()
+        objNew.data = obj.data.copy()
+        if obj.animation_data is not None and obj.animation_data.action is not None:
+            objNew.animation_data.action = obj.animation_data.action.copy()
+        if obj.data.animation_data is not None and obj.data.animation_data.action is not None:
+            objNew.data.animation_data.action = obj.data.animation_data.action.copy()
+        return objNew
 
 
 def swapData(objTarget, objReference):
@@ -64,7 +67,7 @@ def swapData(objTarget, objReference):
 
 def getFrameObject(obj, intObjectId):
     if intObjectId is not None:
-        strSwapObject = getSwapObjectName(obj, intObjectId)
+        strSwapObject = getSwapObjectName(obj.get("key_id"), intObjectId)
         objFrame = getObject(strSwapObject)
         if objFrame is not None:
             return objFrame
@@ -176,7 +179,7 @@ def setSwapObject(context, obj, intFrame):
         context.view_layer.objects.active = obj
     intSwapId = getSwapId(obj)
     intSwapObjectId = getSwapObjectId(obj, intFrame)
-    strFrame = getSwapObjectName(obj, intSwapObjectId)
+    strFrame = getSwapObjectName(obj.get("key_id"), intSwapObjectId)
     obj["key_object"] = strFrame
     # make sure a frame object doesn't already exist
     setFrameObject(obj, strFrame, intSwapId)
@@ -194,7 +197,7 @@ def addSwapObjects(context, arrSelected, obj):
         keyframes.nudgeFrames(obj, intInsertFrame, 1)
         intSwapObjectId = getSwapObjectId(obj, intInsertFrame)
         # get the frame object name based on the target object
-        strFrame = getSwapObjectName(obj, intSwapObjectId)
+        strFrame = getSwapObjectName(obj.get("key_id"), intSwapObjectId)
         # but the objects being copied are the selected ones
         setFrameObject(objSelected, strFrame, intSwapId)
         # set swap key, but dont change current key, because we are nudging frames not changing frames
@@ -245,10 +248,35 @@ def clone_unique_key(context, obj, intFrame):
     # get the current frame object
     intSwapObjectId = keyframes.getKeyframeValue(
         obj, '["key_object_id"]', intFrame, '=')
-    strFrameObject = getSwapObjectName(obj, intSwapObjectId)
+    strFrameObject = getSwapObjectName(obj.get("key_id"), intSwapObjectId)
     objFrame = getObject(strFrameObject)
     # copy the current frame object to a new one
     addSwapObjects(context, [objFrame], obj)
+    return
+
+
+def clone_object(context, obj):
+    # copy the primary object
+    objNew = getObjectCopy(obj)
+    objNew['key_id'] = None
+    # change the swap id
+    setSwapObject(context, objNew, context.scene.frame_current)
+    objCollection = obj.users_collection[0]
+    objCollection.objects.link(objNew)
+    # copy all of the frames associated, using the new swap id, but SAME frame object id
+    intSwapId = getSwapId(objNew)
+    arrFrames = keyframes.getFrames(obj, '["key_object_id"]', -1, '>')
+    arrFrames = list(set(arrFrames))
+    for intFrame in arrFrames:
+        intFrame = int(intFrame)
+        # get the frame IDs
+        print(getSwapObjectName(getSwapId(obj), intFrame))
+        objFrame = getObject(getSwapObjectName(getSwapId(obj), intFrame))
+        if objFrame:
+            objNewFrame = getObjectCopy(objFrame)
+            objNewFrame.name = getSwapObjectName(intSwapId, intFrame)
+            objNewFrame['key_id'] = intSwapId
+    return
 
 
 def exposeSelectedFrameObjects(obj, remove=False):
@@ -261,7 +289,7 @@ def exposeSelectedFrameObjects(obj, remove=False):
         # get the object for that keyframe
         intSwapObjectId = keyframes.getKeyframeValue(
             obj, '["key_object_id"]', intFrame, '=')
-        strFrameObject = getSwapObjectName(obj, intSwapObjectId)
+        strFrameObject = getSwapObjectName(obj.get("key_id"), intSwapObjectId)
         objFrame = getObject(strFrameObject)
         # link the object to the same collection as parent
         if objFrame is not None:

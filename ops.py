@@ -109,7 +109,7 @@ class KEY_OT_CloneObject(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            print('Duplicate Object op')
+            actions.clone_object(context, obj)
         return {'FINISHED'}
 
 
