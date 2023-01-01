@@ -46,7 +46,6 @@ def setFrameSpacing(obj, intSpacing):
 
 def setNewFrames(obj, dicFrames, intLastFrame, intPushFrames, inDataBlock=False):
     arrFCurves = getFCurves(obj, inDataBlock)
-    print(dicFrames)
     for i, fcurve in enumerate(arrFCurves):
         for ii, keyframe_point in enumerate(fcurve.keyframe_points):
             intFrame = keyframe_point.co.x

@@ -211,6 +211,7 @@ def removeObject(obj):
 
 
 def redraw(arrAreas=[]):
+    # redraw(['DOPESHEET_EDITOR', 'GRAPH_EDITOR'])
     for area in bpy.context.screen.areas:
         if len(arrAreas) == 0 or area.type in arrAreas:
             for region in area.regions:
@@ -221,6 +222,21 @@ def remove_keys(obj):
     keyframes.removeKeyframes(obj, '["key_object_id"]')
     redraw(['DOPESHEET_EDITOR', 'GRAPH_EDITOR'])
     return
+
+
+def insert_blank(obj, intFrame):
+    print('not sure what to do here, BLANK is not a keyframe concept?')
+
+
+def clone_key(context, obj, intFrame):
+    # Push keyframes to make room for duplicate
+    keyframes.nudgeFrames(obj, intFrame+1, 1)
+    # get current key
+    intSwapObjectId = keyframes.getKeyframeValue(
+        obj, '["key_object_id"]', intFrame, '=')
+    if intSwapObjectId is not None:
+        # Duplicate key in next frame
+        setSwapKey(obj, intSwapObjectId, intFrame+1, update=False)
 
 
 def exposeSelectedFrameObjects(obj, remove=False):

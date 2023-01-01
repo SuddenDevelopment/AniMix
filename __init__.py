@@ -1,6 +1,7 @@
 import bpy
 import time
 import sys
+from . import ops
 from . import actions
 from . import prefs
 from . import ui_panel
@@ -35,20 +36,6 @@ class PanelProps(bpy.types.PropertyGroup):
     btnRemoText: bpy.props.StringProperty(default="Open Demo Panel")
     btnRemoTime: bpy.props.IntProperty(default=0)
 
-# --- ### Helper functions
-
-
-def is_quadview_region(context):
-    """ Identifies whether screen is in QuadView mode and if yes returns the corresponding area and region
-    """
-    for area in context.screen.areas:
-        if area.type == 'VIEW_3D':
-            if len(area.spaces.active.region_quadviews) > 0:
-                region = [
-                    region for region in area.regions if region.type == 'WINDOW'][3]
-                return (True, area, region)
-    return (False, None, None)
-
 
 class KEY_PT_Main(bpy.types.Panel):
     bl_label = "StopMotion"
@@ -61,30 +48,44 @@ class KEY_PT_Main(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         row = layout.row()
-        row.label(text="ctrl + shift + A")
+        row.label(text="StopMotion Keys")
+        row = layout.column_flow(columns=2)
+        row.operator("key.insert_key", text="Insert")
+        row.operator("key.remove_key", text="Remove")
+        # row.operator("key.blank_key", text="BLA")
         row = layout.row()
-        row.operator("key.insert")
+        row.label(text="Duplicate")
+        row = layout.column_flow(columns=4)
+        row.operator("key.clone_key", text="KEY")
+        row.operator("key.clone_unique_key", text="UNI")
+        row.operator("key.clone_object", text="OBJ")
+        row.operator("key.clone_object_blank_keys", text="BLA")
         row = layout.row()
-        row.operator("key.add_selected")
+        row.label(text="Frame Spacing")
+        row = layout.column_flow(columns=3)
+        row.operator("key.add_space", text="ADD")
+        row.operator("key.remove_space", text="DEL")
+        row.operator("key.set_space", text="SET")
         row = layout.row()
-        row.operator("key.copy_selected")
+        row.label(text="Frame Objects")
+        row = layout.column_flow(columns=3)
+        row.operator("key.separate_objects", text="SEP")
+        row.operator("key.combine_objects", text="COM")
+        row.operator("key.merge_data", text="MER")
         row = layout.row()
-        row.operator("key.separate_selected")
-        row = layout.row()
-        row.operator("key.merge")
-        row = layout.row()
-        row.operator("key.remove_keys")
+        row.operator("key.add_asset")
+
         if context.space_data.type == 'VIEW_3D':
             remoteVisible = (context.window_manager.KEY_UI.RemoVisible and int(
                 time.time()) - context.window_manager.KEY_UI.btnRemoTime <= 1)
             # -- remote control switch button
             if remoteVisible:
                 op = self.layout.operator(
-                    KEY_OT_Show_Panel.bl_idname, text="Hide Viewport Panel")
+                    'key.viewport_panel', text="Hide Viewport Panel")
             else:
                 # Make sure the button starts turned off every time
                 op = self.layout.operator(
-                    KEY_OT_Show_Panel.bl_idname, text="Show Viewport Panel")
+                    'key.viewport_panel', text="Show Viewport Panel")
         if bpy.context.window_manager.KEY_message != "":
             box = layout.box()
             row = box.row(align=True)
@@ -95,147 +96,6 @@ class KEY_PT_Main(bpy.types.Panel):
                 'wm.url_open', text="Product Page", icon="URL").url = bl_info['website']
         return None
 
-
-class KEY_OT_Show_Panel(bpy.types.Operator):
-    ''' Opens/Closes the remote control demo panel '''
-    bl_idname = "object.set_demo_panel"
-    bl_label = "Open Demo Panel"
-    bl_description = "Turns the remote control demo panel on/off"
-
-    # --- Blender interface methods
-    @classmethod
-    def poll(cls, context):
-        return True
-
-    def invoke(self, context, event):
-        # input validation:
-        return self.execute(context)
-
-    def execute(self, context):
-        if context.window_manager.KEY_UI.RemoVisible and int(time.time()) - context.window_manager.KEY_UI.btnRemoTime <= 1:
-            # If it is active then set its visible status to False so that it be closed and reset the button label
-            context.window_manager.KEY_UI.btnRemoText = "Show Viewport Panel"
-            context.window_manager.KEY_UI.RemoVisible = False
-        else:
-            # If it is not active then set its visible status to True so that it be opened and reset the button label
-            context.window_manager.KEY_UI.btnRemoText = "Hide Viewport Panel"
-            context.window_manager.KEY_UI.RemoVisible = True
-            is_quadview, area, region = is_quadview_region(context)
-            if is_quadview:
-                override = bpy.context.copy()
-                override["area"] = area
-                override["region"] = region
-            # Had to put this "try/except" statement because when user clicked repeatedly too fast
-            # on the operator's button it would crash the call due to a context incorrect situation
-            try:
-                if is_quadview:
-                    context.window_manager.KEY_UI.objRemote = bpy.ops.object.dp_ot_draw_operator(
-                        override, 'INVOKE_DEFAULT')
-                else:
-                    context.window_manager.KEY_UI.objRemote = bpy.ops.object.dp_ot_draw_operator(
-                        'INVOKE_DEFAULT')
-            except:
-                return {'CANCELLED'}
-
-        return {'FINISHED'}
-
-
-class KEY_OT_Remove(bpy.types.Operator):
-    """Create a Key for the current object, type of ket is determined by what you edit"""
-    bl_idname = "key.remove_keys"
-    bl_label = "Remove Key Data"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @ classmethod
-    def poll(cls, context):
-        return context.selected_objects is not None
-
-    def execute(self, context):
-        for obj in context.selected_objects:
-            actions.remove_keys(obj)
-        return {'FINISHED'}
-
-
-class KEY_OT_Insert(bpy.types.Operator):
-    """Create a Stop Motion Key for the current object"""
-    bl_idname = "key.insert"
-    bl_label = "Insert Stop Motion Key"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @ classmethod
-    def poll(cls, context):
-        return context.selected_objects is not None
-
-    def execute(self, context):
-        if context.active_object.data is not None and hasattr(context.active_object.data, 'animation_data') and hasattr(context.active_object.data.animation_data, 'action'):
-            self.report(
-                {'ERROR'}, "This object has data block animation data that will not survive data block swapping")
-        actions.setSwapObject(context, context.active_object,
-                              context.scene.frame_current)
-        return {'FINISHED'}
-
-
-class KEY_OT_AddSelected(bpy.types.Operator):
-    """add selected objects as keyframe objects in active_object"""
-    bl_idname = "key.add_selected"
-    bl_label = "Add Selected to Active"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @ classmethod
-    def poll(cls, context):
-        return context.selected_objects is not None and context.active_object is not None
-
-    def execute(self, context):
-        actions.addSwapObjects(
-            context, context.selected_objects, context.active_object)
-        return {'FINISHED'}
-
-
-class KEY_OT_CopySelected(bpy.types.Operator):
-    """copy selected frames to be their own object"""
-    bl_idname = "key.copy_selected"
-    bl_label = "Copy Selected Frames"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @ classmethod
-    def poll(cls, context):
-        return context.active_object is not None
-
-    def execute(self, context):
-        actions.exposeSelectedFrameObjects(context.active_object, False)
-        return {'FINISHED'}
-
-
-class KEY_OT_SeparateSelected(bpy.types.Operator):
-    """remove selected frames from active object to be their own objects in a collection"""
-    bl_idname = "key.separate_selected"
-    bl_label = "Separate Selected Frames"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @ classmethod
-    def poll(cls, context):
-        return context.active_object is not None
-
-    def execute(self, context):
-        actions.exposeSelectedFrameObjects(context.active_object, True)
-        return {'FINISHED'}
-
-
-class KEY_OT_Merge(bpy.types.Operator):
-    """merge selected objects to the current frame of active object"""
-    bl_idname = "key.merge"
-    bl_label = "Merge Selected to Active"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @ classmethod
-    def poll(cls, context):
-        return context.active_object is not None and context.selected_objects is not None
-
-    def execute(self, context):
-        bpy.ops.object.join()
-        actions.setSwapObject(context, context.active_object,
-                              context.scene.frame_current)
-        return {'FINISHED'}
 
 ####|| HANDLER ||####
 
@@ -252,13 +112,6 @@ def onFrame_handler(scene: bpy.types.Scene):
 ####|| CLASS MAINTENANCE ||####
 arrClasses = [
     KEY_PT_Main,
-    KEY_OT_Insert,
-    KEY_OT_AddSelected,
-    KEY_OT_CopySelected,
-    KEY_OT_SeparateSelected,
-    KEY_OT_Merge,
-    KEY_OT_Remove,
-    KEY_OT_Show_Panel,
     PanelProps
 ]
 
@@ -291,6 +144,7 @@ def register():
     bpy.types.WindowManager.KEY_UI = bpy.props.PointerProperty(type=PanelProps)
     bpy.types.WindowManager.KEY_message = bpy.props.StringProperty(
         name="Info", default="")
+    ops.register()
     ui_panel.register()
     prefs.register()
     version.check_version(bl_info)
@@ -308,9 +162,6 @@ def unregister():
     addon_keymaps.clear()
     ui_panel.unregister()
     prefs.unregister()
+    ops.unregister()
     del bpy.types.WindowManager.KEY_UI
     del bpy.types.WindowManager.KEY_message
-
-
-if __name__ == "__main__":
-    register()

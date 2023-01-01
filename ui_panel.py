@@ -85,7 +85,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons": {
                     "insert_key": {"description": "Adds a single keyframe to the right of the timeline indicators playhead."},
                     "remove_key": {"description": "Removes a single keyframe to the right of the timeline indicators playhead."},
-                    "insert_blank_key": {"description": "Inserts a single blank keyframe to the right of the timeline indicators playhead."},
+                    "blank_key": {"description": "Inserts a single blank keyframe to the right of the timeline indicators playhead."},
                 },
             }, {
                 "name": 'duplicate',
@@ -126,11 +126,9 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'geometry',
                 "buttons": {
                     "copy_data": {"description": "Copies object data."},
-                    "cut_data": {"description": "Cuts object data."},
-                    "paste_data": {"description": "Paste object data."},
                 },
             }, {
-                "name": 'selected',
+                "name": 'asset library',
                 "buttons":
                     {
                         "add_asset": {"description": "Create assets out of what is selected. Object & Edit mode and Keyframe data is supported."},
@@ -264,53 +262,46 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 # -------------------DEFINE OPERATORS----------------------
 
     def insert_key_click(self, widget, event, x, y):
-        bpy.ops.key.insert()
+        bpy.ops.key.insert_key()
 
     def remove_key_click(self, widget, event, x, y):
-        print('remove_key_click')
-        bpy.ops.key.remove_keys()
+        bpy.ops.key.remove_key()
 
     def insert_blank_key_click(self, widget, event, x, y):
-        print('insert_blank_key_click')
+        bpy.ops.key.blank_key()
 
     def clone_key_click(self, widget, event, x, y):
-        print('clone_key_click')
+        bpy.ops.key.clone_key()
 
     def clone_unique_key_click(self, widget, event, x, y):
-        print('clone_unique_key_click')
+        bpy.ops.key.clone_unique_key()
 
     def clone_object_click(self, widget, event, x, y):
-        print('clone_object_click')
+        bpy.ops.key.clone_object()
 
     def clone_object_blank_keys_click(self, widget, event, x, y):
-        print('clone_object_blank_keys_click')
+        bpy.ops.key.clone_object_blank_keys()
 
     def add_space_click(self, widget, event, x, y):
-        print('add_space_click')
+        bpy.ops.key.add_space()
 
     def remove_space_click(self, widget, event, x, y):
-        print('remove_space_click')
+        bpy.ops.key.remove_space()
 
     def set_space_click(self, widget, event, x, y):
-        print('set_space_click')
+        bpy.ops.key.set_space()
 
     def separate_objects_click(self, widget, event, x, y):
-        print('separate_objects_click')
+        bpy.ops.key.separate_objects()
 
     def combine_objects_click(self, widget, event, x, y):
-        print('combine_objects_click')
+        bpy.ops.key.combine_objects()
 
     def copy_data_click(self, widget, event, x, y):
-        print('copy_data_click')
-
-    def cut_data_click(self, widget, event, x, y):
-        print('cut_data_click')
-
-    def paste_data_click(self, widget, event, x, y):
-        print('paste_data_click')
+        bpy.ops.key.merge_data()
 
     def add_asset_click(self, widget, event, x, y):
-        print('add_asset_click', widget, event, x, y)
+        bpy.ops.key.add_asset()
 
 # -----------------------------------------
 # -Register/unregister processes
