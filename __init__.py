@@ -49,10 +49,10 @@ class KEY_PT_Main(bpy.types.Panel):
         layout = self.layout
         row = layout.row()
         row.label(text="StopMotion Keys")
-        row = layout.column_flow(columns=2)
-        row.operator("key.insert_key", text="Insert")
-        row.operator("key.remove_key", text="Remove")
-        # row.operator("key.blank_key", text="BLA")
+        row = layout.column_flow(columns=3)
+        row.operator("key.insert_key", text="ADD")
+        row.operator("key.remove_key", text="DEL")
+        row.operator("key.blank_key", text="BLA")
         row = layout.row()
         row.label(text="Duplicate")
         row = layout.column_flow(columns=3)
@@ -75,7 +75,8 @@ class KEY_PT_Main(bpy.types.Panel):
         row.operator("key.merge_data", text="MER")
         row = layout.row()
         row.operator("key.add_asset")
-
+        row = layout.row()
+        row.separator()
         if context.space_data.type == 'VIEW_3D':
             remoteVisible = (context.window_manager.KEY_UI.RemoVisible and int(
                 time.time()) - context.window_manager.KEY_UI.btnRemoTime <= 1)

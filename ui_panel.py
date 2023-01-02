@@ -83,16 +83,17 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
             {
                 "name": 'StopMotion Keys',
                 "buttons": {
-                    "insert_key": {"description": "Adds a single keyframe to the right of the timeline indicators playhead."},
-                    "remove_key": {"description": "Removes a single keyframe to the right of the timeline indicators playhead."},
+                    "insert_key": {"description": "Add a single keyframe to the right of the timeline indicators playhead."},
+                    "remove_key": {"description": "Remove a single keyframe to the right of the timeline indicators playhead."},
+                    "blank_key": {"description": "Insert a single blank keyframe to the right of the timeline indicators playhead."},
                 },
             }, {
                 "name": 'Duplicate',
                 "buttons":
                     {
-                        "clone_key": {"description": "Duplicates the current keyframe to the right of the current active keyframe/s."},
-                        "clone_unique_key": {"description": "Duplicates the current keyframe to the right of the current active keyframe/s with a unique id."},
-                        "clone_object": {"description": "Duplicates the object/s and the current keyframes with a unique id."},
+                        "clone_key": {"description": "Duplicate the current keyframe to the right of the current active keyframe/s."},
+                        "clone_unique_key": {"description": "Duplicate the current keyframe to the right of the current active keyframe/s with a unique id."},
+                        "clone_object": {"description": "Duplicate the object/s and the current keyframes with a unique id."},
                     },
             },  {
                 "name": 'Frame Spacing',
@@ -271,8 +272,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
     def remove_key_click(self, widget, event, x, y):
         bpy.ops.key.remove_key()
 
-    # def insert_blank_key_click(self, widget, event, x, y):
-    #    bpy.ops.key.blank_key()
+    def blank_key_click(self, widget, event, x, y):
+        bpy.ops.key.blank_key()
 
     def clone_key_click(self, widget, event, x, y):
         bpy.ops.key.clone_key()
