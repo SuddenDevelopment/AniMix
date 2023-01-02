@@ -278,6 +278,25 @@ def clone_object(context, obj):
     return
 
 
+def setCollection(strCollection):
+    if strCollection in bpy.data.collections:
+        setCollection(f'{strCollection}_KEYS')
+    else:
+        return bpy.data.collections.new(name=strCollection)
+
+
+def add_asset(obj):
+    # separate copy the selected frame objects
+    exposeSelectedFrameObjects(obj, remove=False)
+    # put them all in the new collection
+    objCollection = setCollection(obj.name)
+    for objSelected in bpy.context.selected_objects:
+        objCollection.objects.link(objSelected)
+    # set the collection as an asset .asset_mark()
+    objCollection.asset_mark()
+    # delete the collection
+
+
 def exposeSelectedFrameObjects(obj, remove=False):
     # unselect the parent object
     obj.select_set(False)

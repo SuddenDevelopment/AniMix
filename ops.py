@@ -251,7 +251,9 @@ class KEY_OT_AddAsset(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        print('add asset op')
+        # create a collection with the name of the object
+        for obj in context.selected_objects:
+            actions.add_asset(obj)
         return {'FINISHED'}
 
 
