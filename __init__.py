@@ -66,6 +66,8 @@ class KEY_PT_Main(bpy.types.Panel):
         row.operator("key.remove_space", text="DEL")
         row.operator("key.set_space", text="SET")
         row = layout.row()
+        row.prop(context.scene, "KEY_frameSpace")
+        row = layout.row()
         row.label(text="Frame Objects")
         row = layout.column_flow(columns=3)
         row.operator("key.separate_objects", text="SEP")
@@ -138,8 +140,10 @@ def register():
         km = wm.keyconfigs.addon.keymaps.new(
             name='3D View', space_type='VIEW_3D')
         kmi = km.keymap_items.new(
-            "key.insert", type="A", value="PRESS", shift=True, ctrl=True)
+            "key.insert_key", type="A", value="PRESS", shift=True, ctrl=True)
         addon_keymaps.append((km, kmi))
+    bpy.types.Scene.KEY_frameSpace = bpy.props.IntProperty(
+        name="Frame Space", default=2, min=1, max=100)
     bpy.types.WindowManager.KEY_UI = bpy.props.PointerProperty(type=PanelProps)
     bpy.types.WindowManager.KEY_message = bpy.props.StringProperty(
         name="Info", default="")
@@ -162,5 +166,6 @@ def unregister():
     ui_panel.unregister()
     prefs.unregister()
     ops.unregister()
+    del bpy.types.Scene.KEY_frameSpace
     del bpy.types.WindowManager.KEY_UI
     del bpy.types.WindowManager.KEY_message

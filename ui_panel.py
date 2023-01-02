@@ -81,13 +81,13 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         # group buttons and give overrides
         self.arrButtonGroups = [
             {
-                "name": 'keys',
+                "name": 'StopMotion Keys',
                 "buttons": {
                     "insert_key": {"description": "Adds a single keyframe to the right of the timeline indicators playhead."},
                     "remove_key": {"description": "Removes a single keyframe to the right of the timeline indicators playhead."},
                 },
             }, {
-                "name": 'duplicate',
+                "name": 'Duplicate',
                 "buttons":
                     {
                         "clone_key": {"description": "Duplicates the current keyframe to the right of the current active keyframe/s."},
@@ -95,7 +95,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "clone_object": {"description": "Duplicates the object/s and the current keyframes with a unique id."},
                     },
             },  {
-                "name": 'frames',
+                "name": 'Frame Spacing',
                 "buttons": {
                     "add_space": {
                         "description": "Adds a single extra space between selected keyframes.",
@@ -114,19 +114,19 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     }
                 }
             }, {
-                "name": 'objects',
+                "name": 'Compose Frames',
                 "buttons":
                     {
                         "separate_objects": {"description": "Separates and converts the currently active selection in edit mode to a new object."},
                         "combine_objects": {"description": "Combines the selected object with the active merging keyframe data"}
                     },
             }, {
-                "name": 'geometry',
+                "name": 'Geo',
                 "buttons": {
                     "copy_data": {"description": "Copies object data."},
                 },
             }, {
-                "name": 'asset library',
+                "name": 'Assets',
                 "buttons":
                     {
                         "add_asset": {"description": "Create assets out of what is selected. Object & Edit mode and Keyframe data is supported."},
@@ -144,6 +144,15 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         for objButtonGroup in self.arrButtonGroups:
             intPositionX += intGroupSpacing
             intButtonCount = len(objButtonGroup['buttons'])
+            # create the group label
+            objLabel = BL_UI_Label(
+                intPositionX+intGroupSpacing, 15,
+                intButtonCount*(intButtonSpacing+intButtonSize), 18)
+            objLabel.style = 'TITLE'
+            objLabel.size = 14
+            objLabel.text = objButtonGroup["name"]
+            strGroupID = objButtonGroup["name"].replace(" ", "_")
+            setattr(self, strGroupID, objLabel)
             for i, strButton in enumerate(objButtonGroup['buttons']):
                 # combine the defaults and overrides into one object to apply
                 objButtonSettings = objButtonDefaults.copy()
@@ -191,17 +200,14 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         self.panel.style = 'PANEL'
         self.panel.bg_color = (0, 0, 0, 0.5)
 
-        self.label1 = BL_UI_Label(5, 12, intPositionX, 18)
-        self.label1.style = 'TITLE'
-        self.label1.text = "StopMotion Actions"
-        self.label1.size = 14
-
     def on_invoke(self, context, event):
         # Add your widgets here (TODO: perhaps a better, more automated solution?)
         # --------------------------------------------------------------------------------------------------
         widgets_panel = [self.panel]
-        widgets_items = [self.label1]
+        widgets_items = []
         for objGroup in self.arrButtonGroups:
+            widgets_items.append(
+                getattr(self, objGroup["name"].replace(" ", "_")))
             for strButton in objGroup['buttons']:
                 widgets_items.append(getattr(self, strButton))
         widgets_items.append(self.tooltip)

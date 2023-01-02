@@ -286,15 +286,17 @@ def setCollection(strCollection):
 
 
 def add_asset(obj):
-    # separate copy the selected frame objects
-    exposeSelectedFrameObjects(obj, remove=False)
-    # put them all in the new collection
-    objCollection = setCollection(obj.name)
-    for objSelected in bpy.context.selected_objects:
-        objCollection.objects.link(objSelected)
+    # get a list of the the objects
+    arrFrames = keyframes.getSelectedFrames(obj, '["key_object_id"]', 'y')
+    arrFrames = list(set(arrFrames))
     # set the collection as an asset .asset_mark()
-    objCollection.asset_mark()
-    # delete the collection
+    for intFrame in arrFrames:
+        intFrame = int(intFrame)
+        strFrameObject = getSwapObjectName(obj.get("key_id"), intFrame)
+        objFrame = getObject(strFrameObject)
+        if objFrame:
+            objFrame.asset_mark()
+            objFrame.asset_generate_preview()
 
 
 def exposeSelectedFrameObjects(obj, remove=False):
