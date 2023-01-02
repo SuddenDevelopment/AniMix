@@ -67,12 +67,24 @@ class KEY_OT_BlankKey(bpy.types.Operator):
         for obj in context.selected_objects:
             keyframes.nudgeFrames(
                 obj, context.scene.frame_current, 1, False)
+            # could definitely refactor some stuff here to not repeat
             if obj.type == 'CURVE':
                 intSwapId = obj.get('key_id')
                 intSwapObjectID = actions.getNextSwapObjectId(obj)
                 strNewObjName = actions.getSwapObjectName(
                     intSwapId, intSwapObjectID)
                 objData = bpy.data.curves.new(name=strNewObjName, type='CURVE')
+                objTmp = bpy.data.objects.new(strNewObjName, objData)
+                objTmp.data.use_fake_user = True
+                objTmp["key_id"] = intSwapId
+                actions.setSwapKey(obj, intSwapObjectID,
+                                   context.scene.frame_current+1, update=False)
+            elif obj.type == 'MESH':
+                intSwapId = obj.get('key_id')
+                intSwapObjectID = actions.getNextSwapObjectId(obj)
+                strNewObjName = actions.getSwapObjectName(
+                    intSwapId, intSwapObjectID)
+                objData = bpy.data.meshes.new(name=strNewObjName, type='MESH')
                 objTmp = bpy.data.objects.new(strNewObjName, objData)
                 objTmp.data.use_fake_user = True
                 objTmp["key_id"] = intSwapId
