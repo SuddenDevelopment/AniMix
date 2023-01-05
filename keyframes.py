@@ -105,9 +105,14 @@ def removeKeyframes(obj, strPath, inDataBlock=False):
 def nudgeFrames(obj, intStart, intMove, inDataBlock=False):
     arrFCurves = getFCurves(obj, inDataBlock)
     for i, fcurve in enumerate(arrFCurves):
+        intX = 0
         for ii, keyframe_point in enumerate(fcurve.keyframe_points):
             if keyframe_point.co.x >= intStart:
-                keyframe_point.co.x = keyframe_point.co.x + intMove
+                # lets make sure we aren't overwriting a keyframe_point
+                intNewX = keyframe_point.co.x + intMove
+                if intNewX > intX and intNewX > intStart:
+                    keyframe_point.co.x = intNewX
+                intX = keyframe_point.co.x
     return
 
 
