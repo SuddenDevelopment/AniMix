@@ -56,13 +56,6 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         # Note: Leave it empty, e.g. self.valid_modes = {}, for no restrictions to be applied.
         self.valid_modes = {}
 
-        # From Preferences/Themes/User Interface/"State"
-        # theme = bpy.context.preferences.themes[0]
-        # ui = theme.user_interface
-        # widget_style = getattr(ui, "wcol_state")
-        # status_color = tuple(widget_style.inner_changed) + (0.3,)
-        # -----------
-
         # This is for displaying the widgets tooltips. Only need one instance!
         self.tooltip = BL_UI_Tooltip()
 # ==========

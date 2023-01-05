@@ -216,7 +216,7 @@ class KEY_OT_SeparateObjects(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        actions.exposeSelectedFrameObjects(context.active_object, True)
+        actions.exposeSelectedFrameObjects(context.active_object, False)
         return {'FINISHED'}
 
 
