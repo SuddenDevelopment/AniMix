@@ -155,6 +155,21 @@ def getSwapObjectId(obj, intFrame):
     return intSwapObjectId
 
 
+def removeGeo(obj):
+    if obj.type == 'CURVE':
+        for i, spline in enumerate(obj.data.splines):
+            try:
+                obj.data.splines.remove(spline)
+            except:
+                pass
+    elif obj.type == 'MESH':
+        for i, vert in enumerate(obj.data.vertices):
+            try:
+                obj.data.vertices.remove(vert)
+            except:
+                pass
+
+
 def setFrameObject(obj, strFrame, intSwapId):
     objFrame = getObject(strFrame)
     if objFrame is None:
@@ -165,8 +180,8 @@ def setFrameObject(obj, strFrame, intSwapId):
         objFrame["key_id"] = intSwapId
     else:
         objFrame.data = obj.data.copy()
-    if obj.animation_data is not None and hasattr(obj.animation_data, 'copy'):
-        objFrame.animation_data = obj.animation_data.copy()
+    # if obj.animation_data is not None and hasattr(obj.animation_data, 'copy'):
+    #    objFrame.animation_data = obj.animation_data.copy()
     if obj.data.animation_data is not None and hasattr(obj.data.animation_data, 'copy'):
         objFrame.data.animation_data = obj.data.animation_data.copy()
 
