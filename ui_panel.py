@@ -103,7 +103,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     },
                     "set_space": {
                         "description": "Removes all space between selected keyframes",
-                        "text": "NO",
+                        "text": "SET",
                         "textwo": "SPACE"
                     }
                 }

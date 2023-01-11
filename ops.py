@@ -35,6 +35,10 @@ class KEY_OT_InsertKey(bpy.types.Operator):
                 {'ERROR'}, "This object has data block animation data that will not survive data block swapping")
         actions.setSwapObject(context, context.active_object,
                               context.scene.frame_current)
+        # auto advance the the playhead to the next frame after inserting
+        intNextframe = context.scene.frame_current+1
+        context.scene.frame_set(intNextframe)
+        actions.setSwapObject(context, context.active_object, intNextframe)
         return {'FINISHED'}
 
 
@@ -50,7 +54,7 @@ class KEY_OT_RemoveKey(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            actions.remove_keys(obj)
+            actions.remove_keys(obj, context.scene.frame_current)
         return {'FINISHED'}
 
 

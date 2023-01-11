@@ -236,8 +236,11 @@ def redraw(arrAreas=[]):
                 region.tag_redraw()
 
 
-def remove_keys(obj):
-    keyframes.removeKeyframes(obj, '["key_object_id"]')
+def remove_keys(obj, intFrame):
+    keyframes.removeKeyframe(obj, '["key_object_id"]', intFrame)
+    # pull keyframes left by one
+    keyframes.nudgeFrames(
+        obj, intFrame, -1, False)
     redraw(['DOPESHEET_EDITOR', 'GRAPH_EDITOR'])
     return
 

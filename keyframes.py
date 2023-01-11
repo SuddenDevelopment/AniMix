@@ -91,14 +91,31 @@ def getSelectedFrames(obj, strPath, mode='y', inDataBlock=False):
     return arrFrames
 
 
-def removeKeyframes(obj, strPath, inDataBlock=False):
+def removeSelectedKeyframe(obj, strPath, inDataBlock=False):
     arrFrames = []
     arrFCurves = getFCurves(obj, inDataBlock)
     for i, fcurve in enumerate(arrFCurves):
         if fcurve.data_path == strPath:
             for ii, keyframe in enumerate(fcurve.keyframe_points):
                 if keyframe.select_control_point == True:
-                    fcurve.keyframe_points.remove(keyframe, fast=True)
+                    try:
+                        fcurve.keyframe_points.remove(keyframe, fast=True)
+                    except:
+                        pass
+    return
+
+
+def removeKeyframe(obj, strPath, intFrame, inDataBlock=False):
+    arrFrames = []
+    arrFCurves = getFCurves(obj, inDataBlock)
+    for i, fcurve in enumerate(arrFCurves):
+        if fcurve.data_path == strPath:
+            for ii, keyframe in enumerate(fcurve.keyframe_points):
+                if keyframe.co.x == intFrame:
+                    try:
+                        fcurve.keyframe_points.remove(keyframe, fast=True)
+                    except:
+                        pass
     return
 
 
