@@ -258,6 +258,9 @@ def clone_key(context, obj, intFrame):
     if intSwapObjectId is not None:
         # Duplicate key in next frame
         setSwapKey(obj, intSwapObjectId, intFrame+1, update=False)
+        keyframes.setKeyType(obj, '["key_object_id"]',
+                             intFrame+1, 'MOVING_HOLD')
+        # bpy.context.active_object.animation_data.action.fcurves[0].keyframe_points[0].type = 'KEYFRAME'
 
 
 def clone_unique_key(context, obj, intFrame):

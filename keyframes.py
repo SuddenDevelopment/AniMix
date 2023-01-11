@@ -118,6 +118,21 @@ def removeKeyframe(obj, strPath, intFrame, inDataBlock=False):
                         pass
     return
 
+# keyframes.setKeyType(obj, '["key_object_id"]', intFrame+1, 'MOVING_HOLD')
+
+
+def setKeyType(obj, strPath, intFrame, strType, inDataBlock=False):
+    arrFCurves = getFCurves(obj, inDataBlock)
+    for i, fcurve in enumerate(arrFCurves):
+        if fcurve.data_path == strPath:
+            for ii, keyframe in enumerate(fcurve.keyframe_points):
+                if keyframe.co.x == intFrame:
+                    try:
+                        keyframe.type = strType
+                    except:
+                        pass
+    return
+
 
 def nudgeFrames(obj, intStart, intMove, inDataBlock=False):
     arrFCurves = getFCurves(obj, inDataBlock)
