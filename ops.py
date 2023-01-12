@@ -156,9 +156,9 @@ class KEY_OT_AddSpace(bpy.types.Operator):
     def execute(self, context):
         for obj in context.selected_objects:
             keyframes.nudgeFrames(
-                obj, context.scene.frame_current, 1, True)
+                obj, context.scene.frame_current+1, 1, True)
             keyframes.nudgeFrames(
-                obj, context.scene.frame_current, 1, False)
+                obj, context.scene.frame_current+1, 1, False)
         return {'FINISHED'}
 
 
