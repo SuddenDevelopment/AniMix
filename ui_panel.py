@@ -5,6 +5,7 @@ from .bl_ui_widgets.bl_ui_draw_op import BL_UI_OT_draw_operator
 from .bl_ui_widgets.bl_ui_tooltip import BL_UI_Tooltip
 from .bl_ui_widgets.bl_ui_button import BL_UI_Button
 from .bl_ui_widgets.bl_ui_label import BL_UI_Label
+from .bl_ui_widgets.bl_ui_slider import BL_UI_Slider
 import os
 import time
 import bpy
@@ -76,6 +77,11 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
             {
                 "name": 'StopMotion Keys',
                 "buttons": {
+                    "clear_key": {"description": "Clear a single keyframe to the right of the timeline indicators playhead."},
+                },
+            }, {
+                "name": '',
+                "buttons": {
                     "insert_key": {"description": "Add a single keyframe to the right of the timeline indicators playhead."},
                     "remove_key": {"description": "Remove a single keyframe to the right of the timeline indicators playhead."},
                     "blank_key": {"description": "Insert a single blank keyframe to the right of the timeline indicators playhead."},
@@ -90,21 +96,22 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     },
             },  {
                 "name": 'Frame Spacing',
+                "setPosition": True,
                 "buttons": {
                     "add_space": {
                         "description": "Adds a single extra space between selected keyframes.",
-                        "text": "ADD",
-                        "textwo": "SPACE"
+                        "imageSize": (44, 22),
+                        "buttonSize": (50, 28)
                     },
                     "remove_space": {
                         "description": "Subtracts a single between selected keyframes. A cumulative behavior till there are no more spaces between keyframes.",
-                        "text": "REMOVE",
-                        "textwo": "SPACE"
+                        "imageSize": (44, 22),
+                        "buttonSize": (50, 28)
                     },
-                    "set_space": {
+                    "no_space": {
                         "description": "Removes all space between selected keyframes",
-                        "text": "SET",
-                        "textwo": "SPACE"
+                        "imageSize": (44, 22),
+                        "buttonSize": (50, 28)
                     }
                 }
             }, {
@@ -146,6 +153,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
             objLabel.size = 14
             objLabel.text = objButtonGroup["name"]
             strGroupID = objButtonGroup["name"].replace(" ", "_")
+            setattr(self, strGroupID+'Position', (intPositionX, intPositionY))
             setattr(self, strGroupID, objLabel)
             for i, strButton in enumerate(objButtonGroup['buttons']):
                 # combine the defaults and overrides into one object to apply
@@ -164,8 +172,11 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 # get the position and size
                 intPositionX += intButtonSpacing
                 # set up the button with defaults
+                if 'buttonSize' not in objButtonSettings:
+                    objButtonSettings['buttonSize'] = (
+                        intButtonSize, intButtonSize)
                 objNewBtn = BL_UI_Button(
-                    intPositionX, intPositionY, intButtonSize, intButtonSize)
+                    intPositionX, intPositionY, objButtonSettings['buttonSize'][0], objButtonSettings['buttonSize'][1])
                 intPositionX += intButtonSize
                 for strProp in objButtonSettings:
                     if strProp == 'iconFile':
@@ -186,6 +197,19 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     pass
                 # add the btn to "self"
                 setattr(self, strButton, objNewBtn)
+        # outside the button groups
+        objSlider = BL_UI_Slider(
+            self.Frame_SpacingPosition[0] + intButtonSpacing, self.Frame_SpacingPosition[1]+32, 105, 18)
+        objSlider.style = 'NUMBER_CLICK'
+        objSlider.text = 'Frame Space'
+        objSlider.value = 2
+        objSlider.min = 1
+        objSlider.max = 10
+        objSlider.precision = 0
+        objSlider.description = 'set the value for frame spacing'
+        objSlider.set_value_updated(self.frame_space_slider_update)
+        setattr(self, 'frame_space_slider', objSlider)
+
         intPositionX += intGroupSpacing
         # (panX, panY, panW, panH)
         self.panel = BL_UI_Drag_Panel(
@@ -198,7 +222,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         # Add your widgets here (TODO: perhaps a better, more automated solution?)
         # --------------------------------------------------------------------------------------------------
         widgets_panel = [self.panel]
-        widgets_items = []
+        #widgets_items = [self.frame_space_slider]
+        widgets_items = [self.frame_space_slider]
         for objGroup in self.arrButtonGroups:
             widgets_items.append(
                 getattr(self, objGroup["name"].replace(" ", "_")))
@@ -258,6 +283,14 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
         return (not bpy.context.window_manager.KEY_UI.RemoVisible)
 # -------------------DEFINE OPERATORS----------------------
+
+    def frame_space_slider_update(self, widget, value):
+        intValue = round(value)
+        self.value = intValue
+        bpy.context.scene.KEY_frameSpace = round(intValue)
+
+    def clear_key_click(self, widget, event, x, y):
+        pass
 
     def insert_key_click(self, widget, event, x, y):
         bpy.ops.key.insert_key()
