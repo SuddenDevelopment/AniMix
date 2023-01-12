@@ -203,6 +203,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         objSlider.style = 'NUMBER_CLICK'
         objSlider.text = 'Frame Space'
         objSlider.value = 2
+        objSlider.step = 1
         objSlider.min = 1
         objSlider.max = 10
         objSlider.precision = 0
@@ -287,7 +288,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
     def frame_space_slider_update(self, widget, value):
         intValue = round(value)
         self.value = intValue
-        bpy.context.scene.KEY_frameSpace = round(intValue)
+        print(intValue)
+        bpy.context.scene.KEY_frameSpace = intValue
 
     def clear_key_click(self, widget, event, x, y):
         bpy.ops.key.clear_key()
