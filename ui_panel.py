@@ -290,7 +290,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         bpy.context.scene.KEY_frameSpace = round(intValue)
 
     def clear_key_click(self, widget, event, x, y):
-        pass
+        bpy.ops.key.clear_key()
 
     def insert_key_click(self, widget, event, x, y):
         bpy.ops.key.insert_key()

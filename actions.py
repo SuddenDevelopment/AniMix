@@ -163,11 +163,10 @@ def removeGeo(obj):
             except:
                 pass
     elif obj.type == 'MESH':
-        for i, vert in enumerate(obj.data.vertices):
-            try:
-                obj.data.vertices.remove(vert)
-            except:
-                pass
+        try:
+            obj.data.vertices.data.clear_geometry()
+        except:
+            pass
 
 
 def setFrameObject(obj, strFrame, intSwapId):

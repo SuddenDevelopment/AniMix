@@ -19,6 +19,22 @@ def is_quadview_region(context):
     return (False, None, None)
 
 
+class KEY_OT_ClearKey(bpy.types.Operator):
+    """remove all geo on current frame for active object"""
+    bl_idname = "key.clear_key"
+    bl_label = "Clear Key"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @ classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        actions.removeGeo(context.active_object)
+        bpy.ops.object.mode_set(mode='EDIT')
+        return {'FINISHED'}
+
+
 class KEY_OT_InsertKey(bpy.types.Operator):
     """Create a Stop Motion Key for the current object"""
     bl_idname = "key.insert_key"
@@ -338,6 +354,7 @@ class KEY_OT_Show_Panel(bpy.types.Operator):
 
 
 arrClasses = [
+    KEY_OT_ClearKey,
     KEY_OT_InsertKey,
     KEY_OT_RemoveKey,
     KEY_OT_BlankKey,

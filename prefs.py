@@ -119,26 +119,6 @@ class BL_UI_Widget_Preferences(AddonPreferences):
         splot = splat.split(factor=0.455, align=True)
         splot.operator(Reset_Coords.bl_idname)
 
-        layout.separator()
-        box = layout.box()
-        row = box.row(align=True)
-        box.scale_y = 0.5
-        box.label(text=" Additional information and Acknowledge:")
-        box.label(text="")
-        box.label(
-            text=" - This addon prepared and packaged by Marcelo M Marques (mmmrqs@gmail.com)")
-        box.label(text="   (updates at https://github.com/mmmrqs/bl_ui_widgets)")
-        box.label(
-            text=" - BL UI Widgets original project by Jayanam (jayanam.games@gmail.com)")
-        box.label(
-            text="   (download it from https://github.com/jayanam/bl_ui_widgets)")
-        box.label(text="")
-        box.label(
-            text=" Special thanks to: @batFINGER, Shane Ambler (sambler), vananders, and many others,")
-        box.label(
-            text=" for their posts on the community forums, which have been crucial for making this addon.")
-        box.label(text="")
-
 
 class Reset_Coords(bpy.types.Operator):
     bl_idname = "object.reset_coords"
