@@ -319,8 +319,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
     def remove_space_click(self, widget, event, x, y):
         bpy.ops.key.remove_space()
 
-    def set_space_click(self, widget, event, x, y):
-        bpy.ops.key.set_space()
+    def no_space_click(self, widget, event, x, y):
+        bpy.ops.key.no_space()
 
     def separate_objects_click(self, widget, event, x, y):
         bpy.ops.key.separate_objects()

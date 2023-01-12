@@ -197,6 +197,22 @@ class KEY_OT_SetSpace(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class KEY_OT_NoSpace(bpy.types.Operator):
+    bl_idname = "key.no_space"
+    bl_label = "Remove Keyframe Space"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @ classmethod
+    def poll(cls, context):
+        return context.selected_objects is not None
+
+    def execute(self, context):
+        for obj in context.selected_objects:
+            keyframes.setFrameSpacing(obj, 1, True)
+            keyframes.setFrameSpacing(obj, 1, False)
+        return {'FINISHED'}
+
+
 class KEY_OT_SeparateObjects(bpy.types.Operator):
     """remove selected frames from active object to be their own objects in a collection"""
     bl_idname = "key.separate_objects"
@@ -332,6 +348,7 @@ arrClasses = [
     KEY_OT_AddSpace,
     KEY_OT_RemoveSpace,
     KEY_OT_SetSpace,
+    KEY_OT_NoSpace,
     KEY_OT_SeparateObjects,
     KEY_OT_CombineObjects,
     KEY_OT_MergeData,
