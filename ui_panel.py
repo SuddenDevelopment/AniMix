@@ -289,52 +289,97 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         intValue = round(value)
         self.value = intValue
         print(intValue)
-        bpy.context.scene.KEY_frameSpace = intValue
+        try:
+            bpy.context.scene.KEY_frameSpace = intValue
+        except:
+            pass
 
     def clear_key_click(self, widget, event, x, y):
-        bpy.ops.key.clear_key()
+        try:
+            bpy.ops.key.clear_key()
+        except:
+            pass
 
     def insert_key_click(self, widget, event, x, y):
-        bpy.ops.key.insert_key()
+        try:
+            bpy.ops.key.insert_key()
+        except:
+            pass
 
     def remove_key_click(self, widget, event, x, y):
-        bpy.ops.key.remove_key()
+        try:
+            bpy.ops.key.remove_key()
+        except:
+            pass
 
     def blank_key_click(self, widget, event, x, y):
-        bpy.ops.key.blank_key()
+        try:
+            bpy.ops.key.blank_key()
+        except:
+            pass
 
     def clone_key_click(self, widget, event, x, y):
-        bpy.ops.key.clone_key()
+        try:
+            bpy.ops.key.clone_key()
+        except:
+            pass
 
     def clone_unique_key_click(self, widget, event, x, y):
-        bpy.ops.key.clone_unique_key()
+        try:
+            bpy.ops.key.clone_unique_key()
+        except:
+            pass
 
     def clone_object_click(self, widget, event, x, y):
-        bpy.ops.key.clone_object()
+        try:
+            bpy.ops.key.clone_object()
+        except:
+            pass
 
     # def clone_object_blank_keys_click(self, widget, event, x, y):
     #    bpy.ops.key.clone_object_blank_keys()
 
     def add_space_click(self, widget, event, x, y):
-        bpy.ops.key.add_space()
+        try:
+            bpy.ops.key.add_space()
+        except:
+            pass
 
     def remove_space_click(self, widget, event, x, y):
-        bpy.ops.key.remove_space()
+        try:
+            bpy.ops.key.remove_space()
+        except:
+            pass
 
     def no_space_click(self, widget, event, x, y):
-        bpy.ops.key.no_space()
+        try:
+            bpy.ops.key.no_space()
+        except:
+            pass
 
     def separate_objects_click(self, widget, event, x, y):
-        bpy.ops.key.separate_objects()
+        try:
+            bpy.ops.key.separate_objects()
+        except:
+            pass
 
     def combine_objects_click(self, widget, event, x, y):
-        bpy.ops.key.combine_objects()
+        try:
+            bpy.ops.key.combine_objects()
+        except:
+            pass
 
     def copy_data_click(self, widget, event, x, y):
-        bpy.ops.key.merge_data()
+        try:
+            bpy.ops.key.merge_data()
+        except:
+            pass
 
     def add_asset_click(self, widget, event, x, y):
-        bpy.ops.key.add_asset()
+        try:
+            bpy.ops.key.add_asset()
+        except:
+            pass
 
 # -----------------------------------------
 # -Register/unregister processes
