@@ -37,13 +37,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         # Show this panel in View_3D only
         if context.space_data.type != 'VIEW_3D':
             return False
-        # Prevents multiple instances of panel
-        try:
-            if context.window_manager.KEY_UI.RemoVisible and int(time.time()) - context.window_manager.KEY_UI.btnRemoTime <= 1:
-                return False
-        except:
-            return False
-        return True
+        else:
+            return True
 
     def __init__(self):
 
@@ -91,7 +86,6 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons":
                     {
                         "clone_key": {"description": "Duplicate the current keyframe to the right of the current active keyframe/s."},
-                        "clone_unique_key": {"description": "Duplicate the current keyframe to the right of the current active keyframe/s with a unique id."},
                         "clone_object": {"description": "Duplicate the object/s and the current keyframes with a unique id."},
                         "clone_object_blank_keys": {"description": "Clone the Object withe keys, but nothing is in them"},
                         "copy_frame_object": {"description": "Copy the frame object to it's own object"},
@@ -116,14 +110,6 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "buttonSize": (50, 28)
                     }
                 }
-            }, {
-                "name": 'Data Clipboard',
-                "buttons":
-                    {
-                        "cut_data": {"description": "cut"},
-                        "copy_data": {"description": "copy"},
-                        "paste_data": {"description": "paste"}
-                    },
             }, {
                 "name": 'Assets',
                 "buttons":
@@ -225,6 +211,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         # Options are: {HEADER,PANEL,SUBPANEL,TOOLTIP,NONE}
         self.panel.style = 'PANEL'
         self.panel.bg_color = (0, 0, 0, 0.5)
+        self.panel.rounded_corners = (1, 1, 1, 1)
 
     def on_invoke(self, context, event):
         # Add your widgets here (TODO: perhaps a better, more automated solution?)
@@ -344,7 +331,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def clone_object_blank_keys_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.clone_blank_keys()
+            bpy.ops.key.clone_object_blank_keys()
         except:
             pass
 

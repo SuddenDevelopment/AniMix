@@ -32,6 +32,8 @@ class KEY_OT_ClearKey(bpy.types.Operator):
     def execute(self, context):
         actions.removeGeo(context.active_object)
         bpy.ops.object.mode_set(mode='EDIT')
+        actions.setSwapObject(context, context.active_object,
+                              context.scene.frame_current)
         return {'FINISHED'}
 
 
@@ -153,11 +155,12 @@ class KEY_OT_CloneObjectBlankKeys(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return context.active_object is not None
 
     def execute(self, context):
-        for obj in context.selected_objects:
-            print('Duplicate Object Blank Keys op')
+        objNew = actions.clone_object(context, context.active_object, True)
+        actions.removeGeo(objNew)
+        actions.removeGeo(actions.getTmp(objNew))
         return {'FINISHED'}
 
 

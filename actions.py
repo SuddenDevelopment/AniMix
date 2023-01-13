@@ -275,7 +275,7 @@ def clone_unique_key(context, obj, intFrame):
     return
 
 
-def clone_object(context, obj):
+def clone_object(context, obj, blank=False):
     # copy the primary object
     objNew = getObjectCopy(obj)
     objNew['key_id'] = None
@@ -295,7 +295,9 @@ def clone_object(context, obj):
             objNewFrame = getObjectCopy(objFrame)
             objNewFrame.name = getSwapObjectName(intSwapId, intFrame)
             objNewFrame['key_id'] = intSwapId
-    return
+            if blank == True:
+                removeGeo(objNewFrame)
+    return objNew
 
 
 def setCollection(strCollection):
