@@ -61,9 +61,9 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         self.tooltip = BL_UI_Tooltip()
 # ==========
         objButtonDefaults = {
-            "bg_color": (0, 0, 0, 0),
+            "bg_color": (0.5, 0.5, 0.5, 0.3),
             "text": "",
-            "outline_color": (1, 1, 1, 0.4),
+            "outline_color": (0, 0, 0, 0),
             "roundness": 0.4,
             "corner_radius": 10,
             "has_shadow": True,
@@ -93,6 +93,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "clone_key": {"description": "Duplicate the current keyframe to the right of the current active keyframe/s."},
                         "clone_unique_key": {"description": "Duplicate the current keyframe to the right of the current active keyframe/s with a unique id."},
                         "clone_object": {"description": "Duplicate the object/s and the current keyframes with a unique id."},
+                        "clone_object_blank_keys": {"description": "Clone the Object withe keys, but nothing is in them"},
+                        "copy_frame_object": {"description": "Copy the frame object to it's own object"},
                     },
             },  {
                 "name": 'Frame Spacing',
@@ -115,17 +117,13 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     }
                 }
             }, {
-                "name": 'Compose Frames',
+                "name": 'Data Clipboard',
                 "buttons":
                     {
-                        "separate_objects": {"description": "Separates and converts the currently active selection in edit mode to a new object."},
-                        "combine_objects": {"description": "Combines the selected object with the active merging keyframe data"}
+                        "cut_data": {"description": "cut"},
+                        "copy_data": {"description": "copy"},
+                        "paste_data": {"description": "paste"}
                     },
-            }, {
-                "name": 'Geo',
-                "buttons": {
-                    "copy_data": {"description": "Copies object data."},
-                },
             }, {
                 "name": 'Assets',
                 "buttons":
@@ -201,15 +199,24 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         objSlider = BL_UI_Slider(
             self.Frame_SpacingPosition[0] + intButtonSpacing, self.Frame_SpacingPosition[1]+32, 105, 18)
         objSlider.style = 'NUMBER_CLICK'
-        objSlider.text = 'Frame Space'
-        objSlider.value = 2
+        objSlider.text = 'space = '
+        objSlider.value = bpy.context.scene.KEY_frameSpace
         objSlider.step = 1
         objSlider.min = 1
         objSlider.max = 10
         objSlider.precision = 0
         objSlider.description = 'set the value for frame spacing'
+        objSlider.rounded_corners = (1, 1, 0, 0)
         objSlider.set_value_updated(self.frame_space_slider_update)
         setattr(self, 'frame_space_slider', objSlider)
+
+        objBtn = BL_UI_Button(
+            self.Frame_SpacingPosition[0] + 115, self.Frame_SpacingPosition[1]+32, 50, 18)
+        objBtn.text = "set"
+        objBtn.text_size = 14
+        objBtn.rounded_corners = (0, 0, 1, 1)
+        objBtn.set_mouse_up(self.set_space_click)
+        setattr(self, 'set_space', objBtn)
 
         intPositionX += intGroupSpacing
         # (panX, panY, panW, panH)
@@ -224,7 +231,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         # --------------------------------------------------------------------------------------------------
         widgets_panel = [self.panel]
         #widgets_items = [self.frame_space_slider]
-        widgets_items = [self.frame_space_slider]
+        widgets_items = [self.frame_space_slider, self.set_space]
         for objGroup in self.arrButtonGroups:
             widgets_items.append(
                 getattr(self, objGroup["name"].replace(" ", "_")))
@@ -287,8 +294,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def frame_space_slider_update(self, widget, value):
         intValue = round(value)
-        self.value = intValue
-        print(intValue)
+        widget.value = intValue
         try:
             bpy.context.scene.KEY_frameSpace = intValue
         except:
@@ -336,6 +342,12 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         except:
             pass
 
+    def clone_object_blank_keys_click(self, widget, event, x, y):
+        try:
+            bpy.ops.key.clone_blank_keys()
+        except:
+            pass
+
     # def clone_object_blank_keys_click(self, widget, event, x, y):
     #    bpy.ops.key.clone_object_blank_keys()
 
@@ -357,7 +369,13 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         except:
             pass
 
-    def separate_objects_click(self, widget, event, x, y):
+    def set_space_click(self, widget, event, x, y):
+        try:
+            bpy.ops.key.set_space()
+        except:
+            pass
+
+    def copy_frame_object_click(self, widget, event, x, y):
         try:
             bpy.ops.key.separate_objects()
         except:
