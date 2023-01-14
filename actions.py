@@ -258,6 +258,8 @@ def clone_key(context, obj, intFrame):
         # Duplicate key in next frame
         setSwapKey(obj, intSwapObjectId, intFrame+1, update=False)
         keyframes.setKeyType(obj, '["key_object_id"]',
+                             intFrame, 'MOVING_HOLD')
+        keyframes.setKeyType(obj, '["key_object_id"]',
                              intFrame+1, 'MOVING_HOLD')
         # bpy.context.active_object.animation_data.action.fcurves[0].keyframe_points[0].type = 'KEYFRAME'
 
