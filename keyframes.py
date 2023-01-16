@@ -54,27 +54,28 @@ def setNewFrames(obj, dicFrames, intLastFrame, intPushFrames, inDataBlock=False)
     return
 
 
-def getKeyframeValue(obj, strPath, intFrame, mode):
+def getKeyframeValue(obj, strPath, intFrame, mode, value='y'):
     intFrameId = None
     arrFcurves = getFCurves(obj)
     for fcurve in arrFcurves:
         if fcurve.data_path == strPath:
             for keyframe_point in fcurve.keyframe_points:
+                intValue = getattr(keyframe_point.co, value)
                 if mode == '<':
                     if keyframe_point.co.x < intFrame or (intFrameId is None and keyframe_point.co.x != intFrame):
-                        intFrameId = keyframe_point.co.y
+                        intFrameId = intValue
                 elif mode == '=':
                     if keyframe_point.co.x == intFrame:
-                        intFrameId = keyframe_point.co.y
+                        intFrameId = intValue
                         break
                 elif mode == '<=':
                     if keyframe_point.co.x <= intFrame or intFrameId is None:
-                        intFrameId = keyframe_point.co.y
+                        intFrameId = intValue
                 elif mode == 'max':
                     if intFrameId is None:
                         intFrameId = 0
                     if keyframe_point.co.y > intFrameId or intFrameId is None:
-                        intFrameId = keyframe_point.co.y
+                        intFrameId = intValue
     if intFrameId != None:
         intFrameId = int(intFrameId)
     return intFrameId

@@ -323,12 +323,16 @@ def add_asset(obj):
             objFrame.asset_generate_preview()
 
 
-def exposeSelectedFrameObjects(obj, remove=False):
+def exposeSelectedFrameObjects(obj, intFrame, remove=False):
     # unselect the parent object
     obj.select_set(False)
     objCollection = obj.users_collection[0]
     # get the selected keyframes array
     arrKeyframes = keyframes.getSelectedFrames(obj, '["key_object_id"]', 'x')
+    if arrKeyframes is None:
+        intFrame = keyframes.getKeyframeValue(
+            obj, '["key_object_id"]', intFrame, '<=', 'x')
+        arrKeyframes[intFrame]
     for intFrame in arrKeyframes:
         intFrame = int(intFrame)
         # get the object for that keyframe
