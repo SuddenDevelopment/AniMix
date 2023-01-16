@@ -155,7 +155,7 @@ class KEY_OT_CloneObjectBlankKeys(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return context.active_object and context.selected_objects is not None
 
     def execute(self, context):
         objNew = actions.clone_object(context, context.active_object, True)
