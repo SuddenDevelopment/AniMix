@@ -45,18 +45,19 @@ class KEY_OT_InsertKey(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return context.selected_objects is not None and context.active_object is not None
 
     def execute(self, context):
         if context.active_object.data is not None and hasattr(context.active_object.data, 'animation_data') and hasattr(context.active_object.data.animation_data, 'action'):
             self.report(
                 {'ERROR'}, "This object has data block animation data that will not survive data block swapping")
-        actions.setSwapObject(context, context.active_object,
-                              context.scene.frame_current)
-        # auto advance the the playhead to the next frame after inserting
-        intNextframe = context.scene.frame_current+1
-        context.scene.frame_set(intNextframe)
-        actions.setSwapObject(context, context.active_object, intNextframe)
+        if context.selected_objects is not None:
+            actions.setSwapObject(context, context.active_object,
+                                  context.scene.frame_current)
+            # auto advance the the playhead to the next frame after inserting
+            intNextframe = context.scene.frame_current+1
+            context.scene.frame_set(intNextframe)
+            actions.setSwapObject(context, context.active_object, intNextframe)
         return {'FINISHED'}
 
 
@@ -158,9 +159,10 @@ class KEY_OT_CloneObjectBlankKeys(bpy.types.Operator):
         return context.active_object and context.selected_objects is not None
 
     def execute(self, context):
-        objNew = actions.clone_object(context, context.active_object, True)
-        actions.removeGeo(objNew)
-        actions.removeGeo(actions.getTmp(objNew))
+        if context.selected_objects is not None and context.active_object is not None:
+            objNew = actions.clone_object(context, context.active_object, True)
+            actions.removeGeo(objNew)
+            actions.removeGeo(actions.getTmp(objNew))
         return {'FINISHED'}
 
 
