@@ -45,13 +45,13 @@ class KEY_OT_InsertKey(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None and context.active_object is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         if context.active_object.data is not None and hasattr(context.active_object.data, 'animation_data') and hasattr(context.active_object.data.animation_data, 'action'):
             self.report(
                 {'ERROR'}, "This object has data block animation data that will not survive data block swapping")
-        if context.selected_objects is not None:
+        if len(context.selected_objects) > 0:
             # see if there's a key here already
             intCurrentKeyValue = keyframes.getKeyframeValue(
                 context.active_object, '["key_object_id"]', context.scene.frame_current, '=', value='y')
