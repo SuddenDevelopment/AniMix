@@ -55,7 +55,6 @@ class KEY_OT_InsertKey(bpy.types.Operator):
             # see if there's a key here already
             intCurrentKeyValue = keyframes.getKeyframeValue(
                 context.active_object, '["key_object_id"]', context.scene.frame_current, '=', value='y')
-            print('existing key', intCurrentKeyValue)
             if intCurrentKeyValue is not None:
                 intNextFrame = context.scene.frame_current+1
                 intNextKeyValue = keyframes.getKeyframeValue(
@@ -73,7 +72,6 @@ class KEY_OT_InsertKey(bpy.types.Operator):
                         context, context.active_object, intNextFrame)
             else:
                 # no key here, insert and dont move
-                print('set key')
                 actions.setSwapObject(
                     context, context.active_object, context.scene.frame_current)
         return {'FINISHED'}
@@ -174,13 +172,14 @@ class KEY_OT_CloneObjectBlankKeys(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.active_object and context.selected_objects is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
-        if context.selected_objects is not None and context.active_object is not None:
-            objNew = actions.clone_object(context, context.active_object, True)
-            actions.removeGeo(objNew)
-            actions.removeGeo(actions.getTmp(objNew))
+        if len(context.selected_objects) > 0:
+            for obj in context.selected_objects:
+                objNew = actions.clone_object(context, obj, True)
+                actions.removeGeo(objNew)
+                actions.removeGeo(actions.getTmp(objNew))
         return {'FINISHED'}
 
 
