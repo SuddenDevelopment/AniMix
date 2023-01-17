@@ -105,8 +105,12 @@ class KEY_OT_BlankKey(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            keyframes.nudgeFrames(
-                obj, context.scene.frame_current+1, 1, False)
+            intNextFrame = context.scene.frame_current+1
+            intNextKeyValue = keyframes.getKeyframeValue(
+                context.active_object, '["key_object_id"]', intNextFrame, '=', value='y')
+            if intNextKeyValue is None:
+                keyframes.nudgeFrames(
+                    obj, intNextFrame, 1, False)
             intSwapId = obj.get('key_id')
             intSwapObjectID = actions.getNextSwapObjectId(obj)
             strNewObjName = actions.getSwapObjectName(
@@ -116,7 +120,8 @@ class KEY_OT_BlankKey(bpy.types.Operator):
             objTmp["key_id"] = intSwapId
             actions.removeGeo(objTmp)
             actions.setSwapKey(obj, intSwapObjectID,
-                               context.scene.frame_current+1, update=False)
+                               intNextFrame, update=False)
+            context.scene.frame_set(intNextFrame)
         return {'FINISHED'}
 
 
