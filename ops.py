@@ -52,12 +52,30 @@ class KEY_OT_InsertKey(bpy.types.Operator):
             self.report(
                 {'ERROR'}, "This object has data block animation data that will not survive data block swapping")
         if context.selected_objects is not None:
-            actions.setSwapObject(context, context.active_object,
-                                  context.scene.frame_current)
-            # auto advance the the playhead to the next frame after inserting
-            intNextframe = context.scene.frame_current+1
-            context.scene.frame_set(intNextframe)
-            actions.setSwapObject(context, context.active_object, intNextframe)
+            # see if there's a key here already
+            intCurrentKeyValue = keyframes.getKeyframeValue(
+                context.active_object, '["key_object_id"]', context.scene.frame_current, '=', value='y')
+            print('existing key', intCurrentKeyValue)
+            if intCurrentKeyValue is not None:
+                intNextFrame = context.scene.frame_current+1
+                intNextKeyValue = keyframes.getKeyframeValue(
+                    context.active_object, '["key_object_id"]', intNextFrame, '=', value='y')
+                if intNextKeyValue is not None:
+                    # keyframe at current AND next
+                    keyframes.nudgeFrames(
+                        context.active_object, context.scene.frame_current, 1, False)
+                    actions.setSwapObject(
+                        context, context.active_object, intNextFrame)
+                else:
+                    # keyframe at current but NOT next
+                    context.scene.frame_set(intNextFrame)
+                    actions.setSwapObject(
+                        context, context.active_object, intNextFrame)
+            else:
+                # no key here, insert and dont move
+                print('set key')
+                actions.setSwapObject(
+                    context, context.active_object, context.scene.frame_current)
         return {'FINISHED'}
 
 
@@ -234,6 +252,22 @@ class KEY_OT_NoSpace(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class KEY_OT_CopyObjects(bpy.types.Operator):
+    """remove selected frames from active object to be their own objects in a collection"""
+    bl_idname = "key.copy_objects"
+    bl_label = "Copy Selected Frames"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @ classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        actions.exposeSelectedFrameObjects(
+            context.active_object, context.scene.frame_current, False)
+        return {'FINISHED'}
+
+
 class KEY_OT_SeparateObjects(bpy.types.Operator):
     """remove selected frames from active object to be their own objects in a collection"""
     bl_idname = "key.separate_objects"
@@ -246,7 +280,7 @@ class KEY_OT_SeparateObjects(bpy.types.Operator):
 
     def execute(self, context):
         actions.exposeSelectedFrameObjects(
-            context.active_object, context.scene.frame_current, False)
+            context.active_object, context.scene.frame_current, True)
         return {'FINISHED'}
 
 
@@ -372,6 +406,7 @@ arrClasses = [
     KEY_OT_RemoveSpace,
     KEY_OT_SetSpace,
     KEY_OT_NoSpace,
+    KEY_OT_CopyObjects,
     KEY_OT_SeparateObjects,
     KEY_OT_CombineObjects,
     KEY_OT_MergeData,

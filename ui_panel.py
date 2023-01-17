@@ -88,7 +88,6 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "clone_key": {"description": "Duplicate the current keyframe to the right of the current active keyframe/s."},
                         "clone_object": {"description": "Duplicate the object/s and the current keyframes with a unique id."},
                         "clone_object_blank_keys": {"description": "Clone the Object withe keys, but nothing is in them"},
-                        "copy_frame_object": {"description": "Copy the frame object to it's own object"},
                     },
             },  {
                 "name": 'Frame Spacing',
@@ -110,6 +109,14 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "buttonSize": (50, 28)
                     }
                 }
+            }, {
+                "name": 'Frame Objects',
+                "buttons":
+                    {
+                        "separate_objects": {"description": "move out frame objects to be independent"},
+                        "copy_objects": {"description": "copy out frame objects to be independent"},
+                        "combine_objects": {"description": "add selected objects in as Frame Objects"},
+                    }
             }, {
                 "name": 'Assets',
                 "buttons":
@@ -362,7 +369,13 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         except:
             pass
 
-    def copy_frame_object_click(self, widget, event, x, y):
+    def copy_objects_click(self, widget, event, x, y):
+        try:
+            bpy.ops.key.copy_objects()
+        except:
+            pass
+
+    def separate_objects_click(self, widget, event, x, y):
         try:
             bpy.ops.key.separate_objects()
         except:
