@@ -59,11 +59,15 @@ def getObjectCopy(obj):
 
 
 def swapData(objTarget, objReference, updateProp=True):
-    objTarget.data = objReference.data
-    if objReference.animation_data is not None:
-        objTarget.animation_data = objReference.animation_data
-    if updateProp == True:
-        objTarget["key_object"] = objReference.name_full
+    if objTarget and objReference:
+        objTarget.data = objReference.data
+        if objReference.animation_data is not None:
+            try:
+                objTarget.animation_data = objReference.animation_data
+            except:
+                pass
+        if updateProp == True:
+            objTarget["key_object"] = objReference.name_full
 
 
 def getFrameObject(obj, intObjectId):
@@ -83,26 +87,51 @@ def getTmp(objTarget):
         if objTmp is not None:
             return objTmp
         else:
-            return setTmp(intSwapId, objTarget)
+            return setTmp(objTarget)
 
 
-def setTmp(objTarget):
-    intSwapId = objTarget.get("key_id")
+def setDataBlock(objTarget, objReference):
+    objDataBlock = objTarget.data
+    objTarget.data = objReference.data.copy()
+    if objTarget.type == 'CURVE':
+        bpy.data.curves.remove(objDataBlock)
+    elif objTarget.type == 'MESH':
+        bpy.data.meshes.remove(objDataBlock)
+
+
+def setTmp(obj):
+    intSwapId = obj.get("key_id")
     strTmp = f'{config.PREFIX}_{intSwapId}_tmp'
     objTmp = getObject(strTmp)
     if objTmp is not None:
-        # get the old data block so we can remove it
-        objDataBlock = objTmp.data
-        objTmp.data = objTarget.data.copy()
-        if objTmp.type == 'CURVE':
-            bpy.data.curves.remove(objDataBlock)
-        elif objTmp.type == 'MESH':
-            bpy.data.meshes.remove(objDataBlock)
+        setDataBlock(objTmp, obj)
     else:
-        objTmp = bpy.data.objects.new(strTmp, objTarget.data.copy())
+        objTmp = bpy.data.objects.new(strTmp, obj.data.copy())
         objTmp.data.use_fake_user = True
         objTmp["key_id"] = intSwapId
     return objTmp
+
+
+def getDataSum(obj):
+    # an attempt to get the cheapest data compare possible for equal or not
+    intSum = 0
+    if obj:
+        if obj.type == 'MESH':
+            intSum += len(obj.data.vertices)
+            for vert in obj.data.vertices:
+                intSum += vert.co.x + vert.co.y + vert.co.z
+        elif obj.type == 'CURVE':
+            intSum += len(obj.data.splines)
+            for spline in obj.data.splines:
+                intSum += len(spline.points)
+                intSum += len(spline.bezier_points)
+                for point in spline.points:
+                    intSum += point.co.x + point.co.y + point.co.z
+                for point in spline.bezier_points:
+                    intSum += point.co.x + point.co.y + point.co.z
+        print(obj.name, intSum)
+        return intSum
+    return None
 
 
 def onFrame(scene):
@@ -121,13 +150,20 @@ def onFrame(scene):
         intObjectId = keyframes.getKeyframeValue(
             obj, '["key_object_id"]', scene.frame_current, '<=')
         if intObjectId is not None:
+            intObjectId = int(intObjectId)
             objFrame = getFrameObject(obj, intObjectId)
+            # if in edit mode and tmp was updated need to write those changes back to the frame object
+            if objFrame is not None and obj.get("key_object") == objFrame.name_full:
+                if strMode == 'EDIT':
+                    intSumTmp = getDataSum(objTmp)
+                    intSumFrame = getDataSum(objFrame)
+                    if intSumTmp != intSumFrame:
+                        setDataBlock(objFrame, objTmp)
             if objFrame is not None and obj.get("key_object") != objFrame.name_full:
                 # override tmp data block
                 swapData(obj, objFrame)
                 objTmp = setTmp(objFrame)
                 swapData(obj, objTmp, False)
-
     if strMode == 'EDIT':
         bpy.ops.object.mode_set(mode='EDIT')
 
