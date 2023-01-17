@@ -58,11 +58,12 @@ def getObjectCopy(obj):
         return objNew
 
 
-def swapData(objTarget, objReference):
+def swapData(objTarget, objReference, updateProp=True):
     objTarget.data = objReference.data
     if objReference.animation_data is not None:
         objTarget.animation_data = objReference.animation_data
-    objTarget["key_object"] = objReference.name_full
+    if updateProp == True:
+        objTarget["key_object"] = objReference.name_full
 
 
 def getFrameObject(obj, intObjectId):
@@ -125,7 +126,7 @@ def onFrame(scene):
                 # override tmp data block
                 swapData(obj, objFrame)
                 objTmp = setTmp(objFrame)
-                swapData(obj, objTmp)
+                swapData(obj, objTmp, False)
 
     if strMode == 'EDIT':
         bpy.ops.object.mode_set(mode='EDIT')
@@ -292,10 +293,14 @@ def clone_object(context, obj, blank=False):
     for intFrame in arrFrames:
         intFrame = int(intFrame)
         # get the frame IDs
-        objFrame = getObject(getSwapObjectName(getSwapId(obj), intFrame))
+        strFrame = getSwapObjectName(getSwapId(obj), intFrame)
+        objFrame = getObject(strFrame)
         if objFrame:
-            objNewFrame = getObjectCopy(objFrame)
-            objNewFrame.name = getSwapObjectName(intSwapId, intFrame)
+            strNewFrame = getSwapObjectName(intSwapId, intFrame)
+            objNewFrame = getObject(strNewFrame)
+            if objNewFrame is None:
+                objNewFrame = getObjectCopy(objFrame)
+                objNewFrame.name = strNewFrame
             objNewFrame['key_id'] = intSwapId
             if blank == True:
                 removeGeo(objNewFrame)
