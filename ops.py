@@ -27,13 +27,14 @@ class KEY_OT_ClearKey(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
-        actions.removeGeo(context.active_object)
-        bpy.ops.object.mode_set(mode='EDIT')
-        actions.setSwapObject(context, context.active_object,
-                              context.scene.frame_current)
+        if len(context.selected_objects) > 0:
+            actions.removeGeo(context.active_object)
+            bpy.ops.object.mode_set(mode='EDIT')
+            actions.setSwapObject(context, context.active_object,
+                                  context.scene.frame_current)
         return {'FINISHED'}
 
 
@@ -85,7 +86,7 @@ class KEY_OT_RemoveKey(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return len(context.selected_objects) > 0 is not None
 
     def execute(self, context):
         for obj in context.selected_objects:
