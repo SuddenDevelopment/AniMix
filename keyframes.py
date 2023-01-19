@@ -135,12 +135,12 @@ def setKeyType(obj, strPath, intFrame, strType, inDataBlock=False):
     return
 
 
-def nudgeFrames(obj, intStart, intMove, inDataBlock=False):
+def nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None):
     arrFCurves = getFCurves(obj, inDataBlock)
     for i, fcurve in enumerate(arrFCurves):
         intX = 0
         for ii, keyframe_point in enumerate(fcurve.keyframe_points):
-            if keyframe_point.co.x >= intStart:
+            if keyframe_point.co.x >= intStart and (intStop == None or intStop >= keyframe_point.co.x):
                 # lets make sure we aren't overwriting a keyframe_point
                 intNewX = keyframe_point.co.x + intMove
                 if intNewX > intX and intNewX >= intStart:
@@ -149,7 +149,7 @@ def nudgeFrames(obj, intStart, intMove, inDataBlock=False):
     return
 
 
-def getKeyframeVacancy(obj, strpath, intFrame):
+def getKeyframeVacancy(obj, strpath, intFrame, intNextFrame):
     # if current frame is open
     intCurrentKeyValue = getKeyframeValue(
         obj, strpath, intFrame, '=', value='y')
@@ -157,7 +157,7 @@ def getKeyframeVacancy(obj, strpath, intFrame):
         return 'CURRENT'
     # if this frame has a key but next one is open
     intNextKeyValue = getKeyframeValue(
-        obj, strpath, intFrame+1, '=', value='y')
+        obj, strpath, intNextFrame, '=', value='y')
     if intNextKeyValue is None:
         return 'NEXT'
     # if this frame has a key and next one has a key

@@ -48,6 +48,15 @@ class KEY_OT_InsertKey(bpy.types.Operator):
     bl_label = "Insert Stop Motion Key"
     bl_options = {'REGISTER', 'UNDO'}
 
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
+
     @ classmethod
     def poll(cls, context):
         return len(context.selected_objects) > 0
@@ -59,9 +68,12 @@ class KEY_OT_InsertKey(bpy.types.Operator):
         if len(context.selected_objects) > 0:
             obj = context.active_object
             intFrame = context.scene.frame_current
-            intNextFrame = intFrame+1
+            intDirection = 1
+            if self.ctrl_pressed == True:
+                intDirection = -1
+            intNextFrame = intFrame+intDirection
             strAction = keyframes.getKeyframeVacancy(
-                obj, '["key_object_id"]', intFrame)
+                obj, '["key_object_id"]', intFrame, intNextFrame)
             if strAction == 'CURRENT':
                 actions.setSwapObject(
                     context, obj, intFrame)
@@ -70,8 +82,13 @@ class KEY_OT_InsertKey(bpy.types.Operator):
                 actions.setSwapObject(
                     context, obj, intNextFrame)
             else:
+                intStartFrame = intFrame
+                intStopFrame = None
+                if intDirection == -1:
+                    intStartFrame = 0
+                    intStopFrame = intFrame
                 keyframes.nudgeFrames(
-                    obj, intFrame, 1, False)
+                    obj, intStartFrame, intDirection, False, intStopFrame)
                 actions.setSwapObject(
                     context, obj, intFrame)
 
@@ -99,28 +116,44 @@ class KEY_OT_BlankKey(bpy.types.Operator):
     bl_idname = "key.blank_key"
     bl_label = "Insert Blank Key"
     bl_options = {'REGISTER', 'UNDO'}
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
 
     @ classmethod
     def poll(cls, context):
         return context.selected_objects is not None
 
     def execute(self, context):
+        intDirection = 1
+        if self.ctrl_pressed == True:
+            intDirection = -1
+        intNextFrame = context.scene.frame_current+intDirection
         for obj in context.selected_objects:
-            intNextFrame = context.scene.frame_current+1
             objBlank = actions.getBlankFrameObject(obj)
             intSwapObjectID = objBlank.get('key_object_id')
             strAction = keyframes.getKeyframeVacancy(
-                obj, '["key_object_id"]', context.scene.frame_current)
+                obj, '["key_object_id"]', context.scene.frame_current, intNextFrame)
             if strAction == 'CURRENT':
                 actions.setSwapKey(obj, intSwapObjectID,
-                                   context.scene.frame_current, update=True)
+                                   context.scene.frame_current, update=True, )
             elif strAction == 'NEXT':
                 context.scene.frame_set(intNextFrame)
                 actions.setSwapKey(obj, intSwapObjectID,
                                    intNextFrame, update=False)
             else:
+                intStartFrame = context.scene.frame_current
+                intStopFrame = None
+                if intDirection == -1:
+                    intStartFrame = 0
+                    intStopFrame = context.scene.frame_current
                 keyframes.nudgeFrames(
-                    obj, intNextFrame, 1, False)
+                    obj, intStartFrame, intDirection, False, intStopFrame)
                 actions.setSwapKey(obj, intSwapObjectID,
                                    context.scene.frame_current, update=False)
         return {'FINISHED'}
