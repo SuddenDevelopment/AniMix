@@ -31,10 +31,14 @@ class KEY_OT_ClearKey(bpy.types.Operator):
 
     def execute(self, context):
         if len(context.selected_objects) > 0:
+            strMode = context.object.mode
+            # object swapping for key feature
+            if strMode == 'EDIT':
+                bpy.ops.object.mode_set(mode='OBJECT')
             actions.removeGeo(context.active_object)
-            bpy.ops.object.mode_set(mode='EDIT')
-            actions.setSwapObject(context, context.active_object,
-                                  context.scene.frame_current)
+            if strMode == 'EDIT':
+                bpy.ops.object.mode_set(mode='EDIT')
+            # actions.setSwapObject(context, context.active_object, context.scene.frame_current)
         return {'FINISHED'}
 
 
@@ -69,7 +73,7 @@ class KEY_OT_InsertKey(bpy.types.Operator):
                 keyframes.nudgeFrames(
                     obj, intFrame, 1, False)
                 actions.setSwapObject(
-                    context, obj, intNextFrame)
+                    context, obj, intFrame)
 
         return {'FINISHED'}
 
@@ -118,7 +122,7 @@ class KEY_OT_BlankKey(bpy.types.Operator):
                 keyframes.nudgeFrames(
                     obj, intNextFrame, 1, False)
                 actions.setSwapKey(obj, intSwapObjectID,
-                                   intNextFrame, update=False)
+                                   context.scene.frame_current, update=False)
         return {'FINISHED'}
 
 

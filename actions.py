@@ -248,6 +248,8 @@ def setSwapObject(context, obj, intFrame):
     setSwapKey(obj, intSwapObjectId, intFrame)
     bpy.app.handlers.frame_change_post.clear()
     bpy.app.handlers.frame_change_post.append(onFrame)
+    bpy.app.handlers.frame_change_pre.clear()
+    bpy.app.handlers.frame_change_pre.append(onFramePre)
 
 
 # take all selected objects, and assign them to active object as keyframes from current position
