@@ -113,9 +113,9 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'Frame Objects',
                 "buttons":
                     {
-                        "separate_objects": {"description": "move out frame objects to be independent"},
-                        "copy_objects": {"description": "copy out frame objects to be independent"},
-                        "combine_objects": {"description": "add selected objects in as Frame Objects"},
+                        "separate_objects": {"description": "Move out frame objects to be independent"},
+                        "copy_objects": {"description": "Copy out frame objects to be independent"},
+                        "combine_objects": {"description": "Add selected objects in as Frame Objects"},
                     }
             }, {
                 "name": 'Assets',

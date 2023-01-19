@@ -149,6 +149,21 @@ def nudgeFrames(obj, intStart, intMove, inDataBlock=False):
     return
 
 
+def getKeyframeVacancy(obj, strpath, intFrame):
+    # if current frame is open
+    intCurrentKeyValue = getKeyframeValue(
+        obj, strpath, intFrame, '=', value='y')
+    if intCurrentKeyValue is None:
+        return 'CURRENT'
+    # if this frame has a key but next one is open
+    intNextKeyValue = getKeyframeValue(
+        obj, strpath, intFrame+1, '=', value='y')
+    if intNextKeyValue is None:
+        return 'NEXT'
+    # if this frame has a key and next one has a key
+    return 'MOVE'
+
+
 def getFrames(obj, strPath, intFrame, direction, mode='y', intCount=False):
     # mode = x for frame number, mode = y for value
     arrFrames = []

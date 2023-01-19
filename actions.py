@@ -129,9 +129,28 @@ def getDataSum(obj):
                     intSum += point.co.x + point.co.y + point.co.z
                 for point in spline.bezier_points:
                     intSum += point.co.x + point.co.y + point.co.z
-        print(obj.name, intSum)
         return intSum
     return None
+
+
+def onFramePre(scene):
+    context = bpy.context
+    strMode = 'OBJECT'
+    if context.active_object is not None:
+        strMode = context.object.mode
+    # object swapping for key feature
+    if strMode == 'EDIT':
+        bpy.ops.object.mode_set(mode='OBJECT')
+        for obj in scene.objects:
+            strFrame = obj.get("key_object")
+            objFrame = getObject(strFrame)
+            objTmp = getTmp(obj)
+            if objFrame is not None and obj.get("key_object") == objFrame.name:
+                intSumTmp = getDataSum(objTmp)
+                intSumFrame = getDataSum(objFrame)
+                if intSumTmp != intSumFrame:
+                    setDataBlock(objFrame, objTmp)
+        bpy.ops.object.mode_set(mode='EDIT')
 
 
 def onFrame(scene):
@@ -152,15 +171,7 @@ def onFrame(scene):
         if intObjectId is not None:
             intObjectId = int(intObjectId)
             objFrame = getFrameObject(obj, intObjectId)
-            # if in edit mode and tmp was updated need to write those changes back to the frame object
-            if objFrame is not None and obj.get("key_object") == objFrame.name_full:
-                if strMode == 'EDIT':
-                    intSumTmp = getDataSum(objTmp)
-                    intSumFrame = getDataSum(objFrame)
-                    if intSumTmp != intSumFrame:
-                        setDataBlock(objFrame, objTmp)
             if objFrame is not None and obj.get("key_object") != objFrame.name_full:
-                # override tmp data block
                 swapData(obj, objFrame)
                 objTmp = setTmp(objFrame)
                 swapData(obj, objTmp, False)
@@ -262,6 +273,19 @@ def removeObject(obj):
         bpy.data.curves.remove(obj.data)
     elif strType == 'MESH':
         bpy.data.meshes.remove(obj.data)
+
+
+def getBlankFrameObject(obj):
+    intSwapId = obj.get('key_id')
+    intSwapObjectID = getNextSwapObjectId(obj)
+    strNewObjName = getSwapObjectName(
+        intSwapId, intSwapObjectID)
+    objTmp = bpy.data.objects.new(strNewObjName, obj.data.copy())
+    objTmp.data.use_fake_user = True
+    objTmp["key_object_id"] = intSwapObjectID
+    objTmp["key_id"] = intSwapId
+    removeGeo(objTmp)
+    return objTmp
 
 
 def redraw(arrAreas=[]):

@@ -53,28 +53,24 @@ class KEY_OT_InsertKey(bpy.types.Operator):
             self.report(
                 {'ERROR'}, "This object has data block animation data that will not survive data block swapping")
         if len(context.selected_objects) > 0:
-            # see if there's a key here already
-            intCurrentKeyValue = keyframes.getKeyframeValue(
-                context.active_object, '["key_object_id"]', context.scene.frame_current, '=', value='y')
-            if intCurrentKeyValue is not None:
-                intNextFrame = context.scene.frame_current+1
-                intNextKeyValue = keyframes.getKeyframeValue(
-                    context.active_object, '["key_object_id"]', intNextFrame, '=', value='y')
-                if intNextKeyValue is not None:
-                    # keyframe at current AND next
-                    keyframes.nudgeFrames(
-                        context.active_object, context.scene.frame_current, 1, False)
-                    actions.setSwapObject(
-                        context, context.active_object, intNextFrame)
-                else:
-                    # keyframe at current but NOT next
-                    context.scene.frame_set(intNextFrame)
-                    actions.setSwapObject(
-                        context, context.active_object, intNextFrame)
-            else:
-                # no key here, insert and dont move
+            obj = context.active_object
+            intFrame = context.scene.frame_current
+            intNextFrame = intFrame+1
+            strAction = keyframes.getKeyframeVacancy(
+                obj, '["key_object_id"]', intFrame)
+            if strAction == 'CURRENT':
                 actions.setSwapObject(
-                    context, context.active_object, context.scene.frame_current)
+                    context, obj, intFrame)
+            elif strAction == 'NEXT':
+                context.scene.frame_set(intNextFrame)
+                actions.setSwapObject(
+                    context, obj, intNextFrame)
+            else:
+                keyframes.nudgeFrames(
+                    obj, intFrame, 1, False)
+                actions.setSwapObject(
+                    context, obj, intNextFrame)
+
         return {'FINISHED'}
 
 
@@ -86,7 +82,7 @@ class KEY_OT_RemoveKey(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return len(context.selected_objects) > 0 is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         for obj in context.selected_objects:
@@ -107,22 +103,22 @@ class KEY_OT_BlankKey(bpy.types.Operator):
     def execute(self, context):
         for obj in context.selected_objects:
             intNextFrame = context.scene.frame_current+1
-            intNextKeyValue = keyframes.getKeyframeValue(
-                context.active_object, '["key_object_id"]', intNextFrame, '=', value='y')
-            if intNextKeyValue is None:
+            objBlank = actions.getBlankFrameObject(obj)
+            intSwapObjectID = objBlank.get('key_object_id')
+            strAction = keyframes.getKeyframeVacancy(
+                obj, '["key_object_id"]', context.scene.frame_current)
+            if strAction == 'CURRENT':
+                actions.setSwapKey(obj, intSwapObjectID,
+                                   context.scene.frame_current, update=True)
+            elif strAction == 'NEXT':
+                context.scene.frame_set(intNextFrame)
+                actions.setSwapKey(obj, intSwapObjectID,
+                                   intNextFrame, update=False)
+            else:
                 keyframes.nudgeFrames(
                     obj, intNextFrame, 1, False)
-            intSwapId = obj.get('key_id')
-            intSwapObjectID = actions.getNextSwapObjectId(obj)
-            strNewObjName = actions.getSwapObjectName(
-                intSwapId, intSwapObjectID)
-            objTmp = bpy.data.objects.new(strNewObjName, obj.data.copy())
-            objTmp.data.use_fake_user = True
-            objTmp["key_id"] = intSwapId
-            actions.removeGeo(objTmp)
-            actions.setSwapKey(obj, intSwapObjectID,
-                               intNextFrame, update=False)
-            context.scene.frame_set(intNextFrame)
+                actions.setSwapKey(obj, intSwapObjectID,
+                                   intNextFrame, update=False)
         return {'FINISHED'}
 
 

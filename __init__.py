@@ -11,7 +11,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "StopMotion",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 0, 6),
+    "version": (1, 0, 7),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
@@ -107,7 +107,9 @@ def onFrame_handler(scene: bpy.types.Scene):
     for obj in bpy.context.scene.objects:
         if obj.get("key_id"):
             bpy.app.handlers.frame_change_post.clear()
+            bpy.app.handlers.frame_change_pre.clear()
             bpy.app.handlers.frame_change_post.append(actions.onFrame)
+            bpy.app.handlers.frame_change_pre.append(actions.onFramePre)
             break
 
 
@@ -134,6 +136,8 @@ def register():
     bpy.app.handlers.load_post.append(onFrame_handler)
     bpy.app.handlers.frame_change_post.clear()
     bpy.app.handlers.frame_change_post.append(actions.onFrame)
+    bpy.app.handlers.frame_change_pre.clear()
+    bpy.app.handlers.frame_change_pre.append(actions.onFramePre)
     # Add the hotkey
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
@@ -180,6 +184,7 @@ def unregister():
         bpy.utils.unregister_class(i)
     bpy.app.handlers.load_post.remove(onFrame_handler)
     bpy.app.handlers.frame_change_post.clear()
+    bpy.app.handlers.frame_change_pre.clear()
     # Remove the hotkey
     for km, kmi in addon_keymaps:
         km.keymap_items.remove(kmi)
