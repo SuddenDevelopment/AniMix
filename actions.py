@@ -129,7 +129,7 @@ def getDataSum(obj):
                     intSum += point.co.x + point.co.y + point.co.z
                 for point in spline.bezier_points:
                     intSum += point.co.x + point.co.y + point.co.z
-        print(obj.name, intSum)
+            print(obj.name, intSum)
         return intSum
     return None
 
