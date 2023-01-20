@@ -1,16 +1,18 @@
 #  StopMotion
-StopMotion Addon successor to the experimental addon "KeyMesh". So far we have tested that this addon works with meshes and curves.
-This is primarly a keyframe oriented addon for switching objects out.
+StopMotion Addon is the successor to the experimental addon "KeyMesh". This addon was designed to expose object data blocks. This allows simple data block information to be switched with simple keyframing.
 
 
 Compatability
-Blender versions 3.3 and above
+Blender versions 3.4.1 and above
 Project status: Beta
 
 # Features
-    1. Swtiching objects out on the fly offering a stopmotion/ cutout animation behaviour.
-    2. Adding and Removing keys for animation.
-    3. Remove technicalities for animators to help create a more fluid experience while animating.
+    1. Swtiching objects out that have a data block on the fly
+    2. Stop motion/ Cutout animation behaviour.
+    2. Improve keyframe handling.
+    3. Asset libray create
+    4. Remove technicalities
+    5. A more fluid experience while animating.
     
     
 # Install
