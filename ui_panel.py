@@ -223,6 +223,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
     def on_invoke(self, context, event):
         # Add your widgets here (TODO: perhaps a better, more automated solution?)
         # --------------------------------------------------------------------------------------------------
+
         widgets_panel = [self.panel]
         #widgets_items = [self.frame_space_slider]
         widgets_items = [self.frame_space_slider, self.set_space]
@@ -302,7 +303,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def insert_key_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.insert_key()
+            bpy.ops.key.insert_key('INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 
@@ -314,7 +315,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def blank_key_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.blank_key()
+            bpy.ops.key.blank_key('INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 
