@@ -114,8 +114,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons":
                     {
                         "separate_objects": {"description": "Move out frame objects to be independent"},
-                        "copy_objects": {"description": "Copy out frame objects to be independent"},
                         "combine_objects": {"description": "Add selected objects in as Frame Objects"},
+                        "pin_frames": {"description": "pin selected frames on active object to the screen, they will be unselectable references."}
                     }
             }, {
                 "name": 'Assets',
@@ -309,7 +309,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def remove_key_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.remove_key()
+            bpy.ops.key.remove_key('INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 
@@ -321,7 +321,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def clone_key_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.clone_key()
+            bpy.ops.key.clone_key('INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 
@@ -385,6 +385,13 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
     def combine_objects_click(self, widget, event, x, y):
         try:
             bpy.ops.key.combine_objects()
+        except:
+            pass
+
+    def pin_frames_click(self, widget, event, x, y):
+        try:
+            bpy.ops.key.pin_frames(
+                'INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 

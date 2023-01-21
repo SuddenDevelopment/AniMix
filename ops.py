@@ -100,6 +100,14 @@ class KEY_OT_RemoveKey(bpy.types.Operator):
     bl_idname = "key.remove_key"
     bl_label = "Remove Key Data"
     bl_options = {'REGISTER', 'UNDO'}
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
 
     @ classmethod
     def poll(cls, context):
@@ -163,14 +171,28 @@ class KEY_OT_CloneKey(bpy.types.Operator):
     bl_idname = "key.clone_key"
     bl_label = "Duplicate Key"
     bl_options = {'REGISTER', 'UNDO'}
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
 
     @ classmethod
     def poll(cls, context):
         return context.selected_objects is not None
 
     def execute(self, context):
+        intDirection = 1
+        if self.ctrl_pressed == True:
+            intDirection = -1
+        intNextFrame = context.scene.frame_current + intDirection
         for obj in context.selected_objects:
-            actions.clone_key(context, obj, context.scene.frame_current)
+            actions.clone_key(
+                context, obj, context.scene.frame_current, intNextFrame)
+        context.scene.frame_set(intNextFrame)
         return {'FINISHED'}
 
 
@@ -338,6 +360,32 @@ class KEY_OT_CombineObjects(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class KEY_OT_PinFrames(bpy.types.Operator):
+    bl_idname = "key.pin_frames"
+    bl_label = "Pin Frames"
+    bl_options = {'REGISTER', 'UNDO'}
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
+
+    @ classmethod
+    def poll(cls, context):
+        return len(context.selected_objects) > 0 and context.active_object is not None
+
+    def execute(self, context):
+        if self.ctrl_pressed:
+            actions.unpinFrames()
+        else:
+            actions.pinFrames(context.active_object,
+                              context.scene.frame_current)
+        return {'FINISHED'}
+
+
 class KEY_OT_MergeData(bpy.types.Operator):
     """merge selected objects to the current frame of active object"""
     bl_idname = "key.merge_data"
@@ -352,21 +400,6 @@ class KEY_OT_MergeData(bpy.types.Operator):
         bpy.ops.object.join()
         actions.setSwapObject(context, context.active_object,
                               context.scene.frame_current)
-        return {'FINISHED'}
-
-
-class KEY_OT_CopySelected(bpy.types.Operator):
-    """copy selected frames to be their own object"""
-    bl_idname = "key.copy_selected"
-    bl_label = "Copy Selected Frames"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @ classmethod
-    def poll(cls, context):
-        return context.active_object is not None
-
-    def execute(self, context):
-        actions.exposeSelectedFrameObjects(context.active_object, False)
         return {'FINISHED'}
 
 
@@ -447,8 +480,8 @@ arrClasses = [
     KEY_OT_CopyObjects,
     KEY_OT_SeparateObjects,
     KEY_OT_CombineObjects,
+    KEY_OT_PinFrames,
     KEY_OT_MergeData,
-    KEY_OT_CopySelected,
     KEY_OT_AddAsset,
     KEY_OT_Show_Panel
 ]

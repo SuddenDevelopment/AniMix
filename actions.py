@@ -314,19 +314,25 @@ def insert_blank(obj, intFrame):
     print('not sure what to do here, BLANK is not a keyframe concept?')
 
 
-def clone_key(context, obj, intFrame):
+def clone_key(context, obj, intFrame, intNextFrame):
+    intStartFrame = intNextFrame
+    intStopFrame = None
+    if intNextFrame < intFrame:
+        intStartFrame = 0
+        intStopFrame = intStopFrame
     # Push keyframes to make room for duplicate
-    keyframes.nudgeFrames(obj, intFrame+1, 1)
+    keyframes.nudgeFrames(obj, intStartFrame,
+                          intStopFrame, False, intStopFrame)
     # get current key
     intSwapObjectId = keyframes.getKeyframeValue(
         obj, '["key_object_id"]', intFrame, '=')
     if intSwapObjectId is not None:
         # Duplicate key in next frame
-        setSwapKey(obj, intSwapObjectId, intFrame+1, update=False)
+        setSwapKey(obj, intSwapObjectId, intNextFrame, update=False)
         keyframes.setKeyType(obj, '["key_object_id"]',
                              intFrame, 'MOVING_HOLD')
         keyframes.setKeyType(obj, '["key_object_id"]',
-                             intFrame+1, 'MOVING_HOLD')
+                             intNextFrame, 'MOVING_HOLD')
         # bpy.context.active_object.animation_data.action.fcurves[0].keyframe_points[0].type = 'KEYFRAME'
 
 
@@ -394,6 +400,7 @@ def add_asset(obj):
 
 
 def exposeSelectedFrameObjects(obj, intFrame, remove=False):
+    arrNewObjects = []
     # unselect the parent object
     obj.select_set(False)
     objCollection = obj.users_collection[0]
@@ -421,9 +428,45 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False):
                 objFrame.select_set(True)
                 # remove keyframes from old object
                 keyframes.actKeyframe(obj, intFrame, 'remove')
+                arrNewObjects.append(objFrame)
             elif remove == False:
                 # make a copy
                 objNew = bpy.data.objects.new(
                     strFrameName, objFrame.data.copy())
                 objCollection.objects.link(objNew)
                 objNew.select_set(True)
+                arrNewObjects.append(objNew)
+    return arrNewObjects
+
+
+def getMaterial(strMaterial):
+    objMaterial = None
+    if strMaterial in bpy.data.materials.keys():
+        objMaterial = bpy.data.materials[strMaterial]
+    else:
+        objMaterial = bpy.data.materials.new(name=strMaterial)
+        objMaterial.use_nodes = True
+        objMaterial.blend_method = 'BLEND'
+        objMaterial.node_tree.nodes["Principled BSDF"].inputs['Alpha'].default_value = 0.2
+    return objMaterial
+
+
+def pinFrames(obj, intFrame):
+    arrFrameObjects = exposeSelectedFrameObjects(obj, intFrame, remove=False)
+    for objFrame in arrFrameObjects:
+        # set custom property as pinned so we can quickly remove later
+        objFrame["key_object_type"] = 'pinned'
+        # remove the materials
+        objFrame.data.materials.clear()
+        # set them as unselectable
+        objFrame.hide_select = True
+        # give them a transparent material
+        objMaterial = getMaterial('KEY_OnionSkin')
+        if objMaterial is not None:
+            objFrame.data.materials.append(objMaterial)
+
+
+def unpinFrames():
+    for obj in bpy.data.objects:
+        if obj.get("key_object_type") == 'pinned':
+            bpy.data.objects.remove(obj)
