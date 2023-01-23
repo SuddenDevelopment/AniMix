@@ -25,6 +25,15 @@ class KEY_OT_ClearKey(bpy.types.Operator):
     bl_label = "Clear Key"
     bl_options = {'REGISTER', 'UNDO'}
 
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
+
     @ classmethod
     def poll(cls, context):
         return len(context.selected_objects) > 0
@@ -32,15 +41,20 @@ class KEY_OT_ClearKey(bpy.types.Operator):
     def execute(self, context):
         if len(context.selected_objects) > 0:
             strMode = context.object.mode
+            obj = context.active_object
             # object swapping for key feature
             if strMode == 'EDIT':
-                obj = context.active_object
-                if obj.type == 'MESH':
-                    bpy.ops.mesh.delete(type='VERT')
-                elif obj.type == 'CURVE':
-                    bpy.ops.curve.delete(type='VERT')
+                if self.ctrl_pressed == True:
+                    if obj.type == 'MESH':
+                        bpy.ops.mesh.delete(type='VERT')
+                    elif obj.type == 'CURVE':
+                        bpy.ops.curve.delete(type='VERT')
+                else:
+                    bpy.ops.object.mode_set(mode='OBJECT')
+                    actions.removeGeo(obj)
+                    bpy.ops.object.mode_set(mode='EDIT')
             else:
-                actions.removeGeo(context.active_object)
+                actions.removeGeo(obj)
             # actions.setSwapObject(context, context.active_object, context.scene.frame_current)
         return {'FINISHED'}
 

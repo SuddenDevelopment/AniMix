@@ -325,7 +325,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def clear_key_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.clear_key()
+            bpy.ops.key.clear_key('INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 
