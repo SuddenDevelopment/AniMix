@@ -401,7 +401,7 @@ def add_asset(obj):
             objFrame.asset_generate_preview()
 
 
-def exposeSelectedFrameObjects(obj, intFrame, remove=False):
+def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
     arrNewObjects = []
     # unselect the parent object
     obj.select_set(False)
@@ -427,7 +427,7 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False):
                 objCollection.objects.link(objFrame)
                 objFrame['key_id'] = None
                 # leave the new object as selected.
-                objFrame.select_set(True)
+                objNew.select_set(select)
                 # remove keyframes from old object
                 keyframes.actKeyframe(obj, intFrame, 'remove')
                 arrNewObjects.append(objFrame)
@@ -436,8 +436,9 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False):
                 objNew = bpy.data.objects.new(
                     strFrameName, objFrame.data.copy())
                 objCollection.objects.link(objNew)
-                objNew.select_set(True)
+                objNew.select_set(select)
                 arrNewObjects.append(objNew)
+    obj.select_set(not select)
     return arrNewObjects
 
 
@@ -454,7 +455,8 @@ def getMaterial(strMaterial):
 
 
 def pinFrames(obj, intFrame):
-    arrFrameObjects = exposeSelectedFrameObjects(obj, intFrame, remove=False)
+    arrFrameObjects = exposeSelectedFrameObjects(
+        obj, intFrame, remove=False, select=False)
     for objFrame in arrFrameObjects:
         # set custom property as pinned so we can quickly remove later
         objFrame["key_object_type"] = 'pinned'
