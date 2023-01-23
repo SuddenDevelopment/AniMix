@@ -70,6 +70,10 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         # group buttons and give overrides
         self.arrButtonGroups = [
             {
+                "name": 'OnionSkin',
+                "buttons": {"pin_frames": {"description": "pin selected frames on active object to the screen, they will be unselectable references."}
+                            }
+            }, {
                 "name": 'StopMotion Keys',
                 "buttons": {
                     "clear_key": {"description": "Clear a single keyframe to the right of the timeline indicators playhead."},
@@ -113,9 +117,10 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'Frame Objects',
                 "buttons":
                     {
+
                         "separate_objects": {"description": "Move out frame objects to be independent"},
-                        "combine_objects": {"description": "Add selected objects in as Frame Objects"},
-                        "pin_frames": {"description": "pin selected frames on active object to the screen, they will be unselectable references."}
+                        "combine_objects": {"description": "Add selected objects in as Frame Objects"}
+
                     }
             }, {
                 "name": 'Assets',
