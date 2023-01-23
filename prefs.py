@@ -21,7 +21,7 @@ class BL_UI_Widget_Preferences(AddonPreferences):
         default=1.0,
         max=2.00,
         min=0.50,
-        soft_max=2.00,
+        soft_max=1.50,
         soft_min=0.50,
         step=1,
         precision=2,

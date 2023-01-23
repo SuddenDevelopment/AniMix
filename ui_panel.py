@@ -71,39 +71,58 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         self.arrButtonGroups = [
             {
                 "name": 'OnionSkin',
-                "buttons": {"pin_frames": {"description": "pin selected frames on active object to the screen, they will be unselectable references."}
-                            }
+                "buttons": {"pin_frames": {
+                    "description":
+                        "Pin Frame: Sets the selected object/s to be used as a reference object for working in and out of poses.\n" +
+                        "Button behaviors:\n" +
+                        "  Click: Pins the current selection\n" +
+                        "  Ctrl + Click: Removes all pin frames"}
+                }
             }, {
                 "name": 'StopMotion Keys',
                 "buttons": {
-                    "clear_key": {"description": "Clear a single keyframe to the right of the timeline indicators playhead."},
+                    "clear_key": {"description": "Clear keyframes: Keyframe is not removed(not deleted).\n" +
+                                  "  Clears the id data from the currently selected StopMotion object.\n" +
+                                  "  If the geometry is selected in edit mode only the current selection is removed from the StopMotion object."}
                 },
             }, {
                 "name": '',
                 "buttons": {
-                    "insert_key": {"description": "Add a single keyframe to the right of the timeline indicators playhead."},
-                    "remove_key": {"description": "Remove a single keyframe to the right of the timeline indicators playhead."},
-                    "blank_key": {"description": "Insert a single blank keyframe to the right of the timeline indicators playhead."},
+                    "insert_key": {"description": "Add Keyframe: Adds and inserts a single keyframe with a unique StopMotion Object id\n" +
+                                   "Button behaviors: \n" +
+                                   "  Click: Insert add / insert a keyframe to the Right of the timeline indicators playhead.\n" +
+                                   "  Ctrl + Click: Insert add / insert a keyframe to the Left of the timeline indicators playhead."},
+                    "remove_key": {"description": "Remove keyframe: Removes the current keyframe and pulls keyframes into the deleted keyframe position.\n" +
+                                   "Right & Left of the timeline indicators playhead. This is like deleting a keyframe.\n" +
+                                   "Button behaviors: \n" +
+                                   "  Click: Remove/Deletes insert a keyframe to the Right of the timeline indicators playhead.\n" +
+                                   "  Ctrl + Click: Remove/Deletes a keyframe to the Left of the timeline indicators playhead."},
+                    "blank_key": {"description": "Insert Blank Keyframe: Inserts a single blank keyframe to the right of the timeline indicators playhead.\n" +
+                                  "Button behaviors: \n" +
+                                  "Click: insert a blank keyframe to the Right of the timeline indicators playhead.\n" +
+                                  "Ctrl + Click: insert a blank keyframe to the Left of the timeline indicators playhead."},
                 },
             }, {
                 "name": 'Duplicate',
                 "buttons":
                     {
-                        "clone_key": {"description": "Duplicate the current keyframe to the right of the current active keyframe/s."},
-                        "clone_object": {"description": "Duplicate the object/s and the current keyframes with a unique id."},
-                        "clone_object_blank_keys": {"description": "Clone the Object withe keys, but nothing is in them"},
+                        "clone_key": {"description": "Duplicate Keyframe: Duplicates the current keyframe to the right of the current active keyframe/s."},
+                        "clone_object": {"description": "Duplicate Object With Keys: Duplicates the object/s and the current keyframes with a unique id."},
+                        "clone_object_blank_keys": {"description": "Duplicate Object With Blank Keys: Duplicates the object/s with blank keyframes."},
                     },
             },  {
                 "name": 'Frame Spacing',
                 "setPosition": True,
                 "buttons": {
                     "add_space": {
-                        "description": "Adds a single extra space between selected keyframes.",
+                        "description": "Frame Spacer: Add\n" +
+                        "Adds a single extra space between selected keyframes.",
                         "imageSize": (44, 22),
                         "buttonSize": (50, 28)
                     },
                     "remove_space": {
-                        "description": "Subtracts a single between selected keyframes. A cumulative behavior till there are no more spaces between keyframes.",
+                        "description": "Frame Spacer: Subtract\n" +
+                        "Subtracts a single space between selected keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys.",
                         "imageSize": (44, 22),
                         "buttonSize": (50, 28)
                     },
@@ -118,15 +137,15 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons":
                     {
 
-                        "separate_objects": {"description": "Move out frame objects to be independent"},
-                        "combine_objects": {"description": "Add selected objects in as Frame Objects"}
+                        "separate_objects": {"description": "Seperate Selection: Separates and converts the currently active selection in edit mode to a new object."},
+                        "combine_objects": {"description": "Combine With Active Object: Combines the selected object with the active merging keyframe data"}
 
                     }
             }, {
                 "name": 'Assets',
                 "buttons":
                     {
-                        "add_asset": {"description": "Create assets out of what is selected. Object & Edit mode and Keyframe data is supported."},
+                        "add_asset": {"description": "Asset Library: Create assets out of what is selected. Object & Edit mode and Keyframe data is supported."},
                     }
             }
         ]
@@ -211,6 +230,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         objBtn = BL_UI_Button(
             self.Frame_SpacingPosition[0] + 115, self.Frame_SpacingPosition[1]+32, 50, 18)
         objBtn.text = "set"
+        objBtn.description = "Frame Spacer: Set:**Applies the current number of spaces between keyframes."
         objBtn.text_size = 14
         objBtn.rounded_corners = (0, 0, 1, 1)
         objBtn.set_mouse_up(self.set_space_click)
