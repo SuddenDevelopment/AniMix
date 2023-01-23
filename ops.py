@@ -34,10 +34,13 @@ class KEY_OT_ClearKey(bpy.types.Operator):
             strMode = context.object.mode
             # object swapping for key feature
             if strMode == 'EDIT':
-                bpy.ops.object.mode_set(mode='OBJECT')
-            actions.removeGeo(context.active_object)
-            if strMode == 'EDIT':
-                bpy.ops.object.mode_set(mode='EDIT')
+                obj = context.active_object
+                if obj.type == 'MESH':
+                    bpy.ops.mesh.delete(type='VERT')
+                elif obj.type == 'CURVE':
+                    bpy.ops.curve.delete(type='VERT')
+            else:
+                actions.removeGeo(context.active_object)
             # actions.setSwapObject(context, context.active_object, context.scene.frame_current)
         return {'FINISHED'}
 
