@@ -119,7 +119,7 @@ class KEY_PT_Main(bpy.types.Panel):
 
         row = layout.row()
         row.label(text="Frame Objects")
-        row = layout.column_flow(columns=3)
+        row = layout.column_flow(columns=2)
         row.operator("key.separate_objects", text="SEP",
                      icon_value=icons_collection["separate_objects"].icon_id)
         row.operator("key.combine_objects", text="COM",
