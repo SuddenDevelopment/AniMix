@@ -2,10 +2,15 @@ import bpy
 import requests
 import json
 import textwrap
+import os
+
+# This fun little script created by Anthony Aragues:  https://AnthonyAragues.com
+# 1. Update the defaults and constants at the top
+# 2. add the register(bl_info) and unregister() in init chain
+# 3. call the draw function from the panel you want it to appear: version.draw_version_box(self, context)
 
 URL = 'https://anthonyaragues.com/stopmotion_check.json'
 PREFIX = 'key'
-VERSION_FILE = 'version.json'
 ALLOW_DISMISS_VERSION = True
 
 objDefault = {
@@ -18,7 +23,9 @@ objDefault = {
     "hide_message": False,
     "hide_version": False
 }
-
+# ----====|| EVERYTHING BELOW HERE SHOULD NOT NEED TO BE MODIFIED MANUALLY ||====----
+VERSION_FILE = os.path.join(os.path.dirname(
+    __file__), f'{PREFIX}_version.json')
 arrClasses = []
 
 
@@ -67,14 +74,19 @@ def getVersionFile():
         objVersion = json.load(objFile)
         objFile.close()
     except:
+        print('could not read file:', VERSION_FILE)
         objVersion = objDefault
     return objVersion
 
 
 def setVersionFile(objVersionFile):
-    objFile = open(VERSION_FILE, 'w')
-    objFile.write(json.dumps(objVersionFile))
-    objFile.close()
+    try:
+        objFile = open(VERSION_FILE, 'w')
+        objFile.write(json.dumps(objVersionFile))
+        objFile.close()
+    except:
+        print('could not write file:', VERSION_FILE)
+        pass
 
 
 def check_version(bl_info):
