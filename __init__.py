@@ -65,8 +65,11 @@ def load_icons():
     ]
     for strIcon in arrIcons:
         strFileName = f'{this_directory}/icons_16/{strIcon}.png'
-        icons_collection.load(strIcon, strFileName, "IMAGE")
-        print(this_directory, strFileName, icons_collection[strIcon].icon_id)
+        try:
+            icons_collection.load(strIcon, strFileName, "IMAGE")
+        except:
+            print("couldn't load:", strFileName)
+            pass
 
 
 class KEY_PT_Main(bpy.types.Panel):
@@ -239,4 +242,6 @@ def unregister():
     del bpy.types.Scene.KEY_frameSpace
     del bpy.types.WindowManager.KEY_UI
     del bpy.types.WindowManager.KEY_message
+    global icons_collection
+    icons_collection.clear()
     bpy.utils.previews.remove(icons_collection)

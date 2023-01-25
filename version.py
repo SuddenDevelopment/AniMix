@@ -5,38 +5,52 @@ import textwrap
 
 URL = 'https://anthonyaragues.com/stopmotion_check.json'
 PREFIX = 'key'
+VERSION_FILE = 'version.json'
+ALLOW_DISMISS_VERSION = True
+
+objDefault = {
+    "version": "0",
+    "ver_message": "Update Available",
+    "bm_url": "https://blendermarket.com/products/stopmotion",
+    "message": "",
+    "btn_name": "",
+    "url": "",
+    "hide_message": False,
+    "hide_version": False
+}
+
+arrClasses = []
 
 
-class KEY_Preferences(bpy.types.AddonPreferences):
-    bl_idname = __package__
-
-    json_message: bpy.props.StringProperty(
-        name="",
-        default=json.dumps(objDefault)
-    )
+def prefix_name(opClass):
+    opClass.__name__ = PREFIX.upper() + '_OT_' + opClass.__name__
+    arrClasses.append(opClass)
+    return opClass
 
 
-class KEY_OT_Hide_Version(bpy.types.Operator):
+@prefix_name
+class Hide_Version(bpy.types.Operator):
     bl_idname = f'{PREFIX}.hide_version_panel'
     bl_label = "x"
     bl_description = "Dismiss this version"
 
     def execute(self, context):
-        objPreferences = getPreferences()
-        objPreferences["hide_version"] = True
-        setPreferences(objPreferences)
+        objVersion = getVersionFile()
+        objVersion["hide_version"] = True
+        setVersionFile(objVersion)
         return {'FINISHED'}
 
 
-class KEY_OT_Hide_Message(bpy.types.Operator):
+@prefix_name
+class Hide_Message(bpy.types.Operator):
     bl_idname = f'{PREFIX}.hide_message_panel'
     bl_label = "x"
     bl_description = "Dismiss this message"
 
     def execute(self, context):
-        objPreferences = getPreferences()
-        objPreferences["hide_message"] = True
-        setPreferences(objPreferences, True)
+        objVersion = getVersionFile()
+        objVersion["hide_message"] = True
+        setVersionFile(objVersion)
         return {'FINISHED'}
 
 
@@ -46,28 +60,27 @@ def getIntVersion(strVersion):
     return int(strVersion.replace(".", "").replace(" ", ""))
 
 
-def getPreferences():
-    objPreferences = None
-    if bpy.context.preferences.addons[__package__].preferences.json_message != "":
-        try:
-            objPreferences = json.loads(
-                bpy.context.preferences.addons[__package__].preferences.json_message)
-        except:
-            pass
-    return objPreferences
+def getVersionFile():
+    objVersion = None
+    try:
+        objFile = open(VERSION_FILE)
+        objVersion = json.load(objFile)
+        objFile.close()
+    except:
+        objVersion = objDefault
+    return objVersion
 
 
-def setPreferences(objPreferences, saveMe=False):
-    bpy.context.preferences.addons[__package__].preferences.json_message = json.dumps(
-        objPreferences)
-    if saveMe == True:
-        bpy.ops.wm.save_userpref()
+def setVersionFile(objVersionFile):
+    objFile = open(VERSION_FILE, 'w')
+    objFile.write(json.dumps(objVersionFile))
+    objFile.close()
 
 
 def check_version(bl_info):
     objResponse = None
     objVersion = None
-    objPreference = getPreferences()
+    objPreference = getVersionFile()
     try:
         objResponse = requests.get(URL)
     except:
@@ -89,7 +102,7 @@ def check_version(bl_info):
                 objVersion["hide_message"] = False
             else:
                 objVersion["hide_message"] = objPreference["hide_message"]
-    setPreferences(objVersion)
+    setVersionFile(objVersion)
 
 
 def getTextArray(context, text):
@@ -101,24 +114,23 @@ def getTextArray(context, text):
 
 def draw_version_box(objPanel, context):
     # ---------------  VERSION CHECK PANEL -----------------
-    objVersion = None
+    objVersion = getVersionFile()
     layout = objPanel.layout
-    if context.preferences.addons[__package__].preferences.json_message != "":
-        objVersion = json.loads(
-            context.preferences.addons[__package__].preferences.json_message)
     if objVersion is not None and "hide_version" in objVersion.keys() and objVersion["hide_version"] != True:
         box = layout.box()
         row = box.row(align=True)
         row.alignment = 'EXPAND'
         row.label(icon="INFO", text=objVersion["ver_message"])
-        # uncomment to let user dismiss till version changes
-        # row.operator(f'{PREFIX}.hide_version_panel', text="", icon="X")
-        row = box.row()
-        row.operator(
-            'wm.url_open', text="Blender Market", icon="URL").url = objVersion["bm_url"]
-        row = box.row()
-        row.operator(
-            'wm.url_open', text="GumRoad", icon="URL").url = objVersion["gm_url"]
+        if ALLOW_DISMISS_VERSION:
+            row.operator(f'{PREFIX}.hide_version_panel', text="", icon="X")
+        if "bm_url" in objVersion.keys():
+            row = box.row()
+            row.operator(
+                'wm.url_open', text="Blender Market", icon="URL").url = objVersion["bm_url"]
+        if "gm_url" in objVersion.keys():
+            row = box.row()
+            row.operator(
+                'wm.url_open', text="GumRoad", icon="URL").url = objVersion["gm_url"]
     if objVersion is not None and "hide_message" in objVersion.keys() and objVersion["hide_message"] != True:
         box = layout.box()
         arrText = getTextArray(context, objVersion["message"])
@@ -131,13 +143,6 @@ def draw_version_box(objPanel, context):
             row = box.row(align=True)
             row.operator(
                 'wm.url_open', text=objVersion["btn_name"], icon="URL").url = objVersion["url"]
-
-
-arrClasses = [
-    KEY_Preferences,
-    KEY_OT_Hide_Version,
-    KEY_OT_Hide_Message
-]
 
 
 def register(bl_info):
