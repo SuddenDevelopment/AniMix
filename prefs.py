@@ -5,9 +5,25 @@ from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty, F
 
 from .bl_ui_widgets.bl_ui_draw_op import get_3d_area_and_region
 
+objDefault = {
+    "version": "0",
+    "ver_message": "Update Available",
+    "bm_url": "https://blendermarket.com/products/stopmotion",
+    "message": "",
+    "btn_name": "",
+    "url": "",
+    "hide_message": False,
+    "hide_version": False
+}
+
 
 class BL_UI_Widget_Preferences(AddonPreferences):
     bl_idname = __package__
+
+    json_message: bpy.props.StringProperty(
+        name="",
+        default=json.dumps(objDefault)
+    )
 
     RC_UI_BIND: BoolProperty(
         name="General scaling for 'Remote Control' panel",

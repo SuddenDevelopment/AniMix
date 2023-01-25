@@ -12,12 +12,11 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "StopMotion",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 1, 1),
+    "version": (1, 1, 2),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
     "warning": "",
-    "website": "https://blendermarket.com/products/stopmotion",
     "category": "Animation",
 }
 ####|| CREDIT ||####
@@ -141,14 +140,7 @@ class KEY_PT_Main(bpy.types.Panel):
                 # Make sure the button starts turned off every time
                 op = self.layout.operator(
                     'key.viewport_panel', text="Show Viewport Panel", icon_value=icons_collection["show_panel"].icon_id)
-        if bpy.context.window_manager.KEY_message != "":
-            box = layout.box()
-            row = box.row(align=True)
-            row.alignment = 'EXPAND'
-            row.label(icon="INFO", text=bpy.context.window_manager.KEY_message)
-            row = box.row()
-            row.operator(
-                'wm.url_open', text="Product Page", icon="URL").url = bl_info['website']
+        version.draw_version_box(self, context)
         return None
 
 
@@ -227,7 +219,7 @@ def register():
         0.64, 0, 1)
     bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_movehold_selected = (
         1, 0, 0)
-    version.check_version(bl_info)
+    version.register(bl_info)
 
 
 def unregister():
