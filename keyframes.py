@@ -21,21 +21,35 @@ def actKeyframe(obj, intFrame, strMode, inDataBlock=False):
 def setFrameSpacing(obj, intSpacing, inDataBlock=False):
     # get the selected range of frames for an object. Space the keyframe_points evenly by the input param
     # apply to object and data block animation_data
-    arrFrames = getSelectedFrames(obj, None, 'x', inDataBlock)
-    intFrameCount = len(arrFrames)
+    arrSelectedFrames = getSelectedFrames(
+        obj, None, 'x', inDataBlock, frames='selected')
+    arrUnSelectedFrames = getSelectedFrames(
+        obj, None, 'x', inDataBlock, frames='unSelected')
+    intFrameCount = len(arrSelectedFrames)
     if intFrameCount > 0:
         # ordered unique set of selected Frames to work with across obj and data block
-        arrFrames = list(set(arrFrames))
-        arrFrames.sort()
-        intFirstFrame = arrFrames[0]
-        intRange = arrFrames[intFrameCount-1]-intFirstFrame
+        arrSelectedFrames = list(set(arrSelectedFrames))
+        arrSelectedFrames.sort()
+        intFirstFrame = arrSelectedFrames[0]
+        intRange = arrSelectedFrames[intFrameCount-1]-intFirstFrame
         # anything after this frame needs to get pushed by the delta.
         intLastFrame = intFirstFrame+(intFrameCount*intSpacing)
         # need to know if new range is larger or smaller
         dicFrames = {}
         if intFrameCount > 1:
-            for i, intFrame in enumerate(arrFrames):
+            for i, intFrame in enumerate(arrSelectedFrames):
                 dicFrames[intFrame] = intFirstFrame+(i*intSpacing)
+        if len(arrUnSelectedFrames) > 0 and arrUnSelectedFrames[-1] > arrSelectedFrames[-1]:
+            # make room by moving the unselected frame outside the range used + space
+            arrFramesToMove = []
+            for intFrame in arrUnSelectedFrames:
+                if intFrame > arrSelectedFrames[-1]:
+                    arrFramesToMove.append(intFrame)
+            for i, intFrame in enumerate(arrFramesToMove):
+                intDistance = intFrame - arrSelectedFrames[-1]
+                # the new last position + the spacing being set + how many spaces ahead it was
+                dicFrames[intFrame] = dicFrames[arrSelectedFrames[-1]
+                                                ] + intDistance
         setNewFrames(obj, dicFrames, intLastFrame,
                      intRange, inDataBlock)
     return
@@ -81,13 +95,17 @@ def getKeyframeValue(obj, strPath, intFrame, mode, value='y'):
     return intFrameId
 
 
-def getSelectedFrames(obj, strPath, mode='y', inDataBlock=False):
+def getSelectedFrames(obj, strPath, mode='y', inDataBlock=False, frames='selected'):
     arrFrames = []
     arrFCurves = getFCurves(obj, inDataBlock)
     for i, fcurve in enumerate(arrFCurves):
         if strPath is None or fcurve.data_path == strPath:
             for ii, keyframe_point in enumerate(fcurve.keyframe_points):
-                if keyframe_point.select_control_point == True:
+                if frames == 'selected' and keyframe_point.select_control_point == True:
+                    arrFrames.append(getattr(keyframe_point.co, mode))
+                elif frames == 'unSelected' and keyframe_point.select_control_point == False:
+                    arrFrames.append(getattr(keyframe_point.co, mode))
+                elif frames == 'all':
                     arrFrames.append(getattr(keyframe_point.co, mode))
     return arrFrames
 
