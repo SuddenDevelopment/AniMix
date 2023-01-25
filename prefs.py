@@ -1,5 +1,5 @@
 import bpy
-
+import json
 from bpy.types import AddonPreferences, Operator
 from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty, FloatProperty, FloatVectorProperty
 
