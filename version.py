@@ -30,7 +30,7 @@ def prefix_name(opClass):
 
 @prefix_name
 class Hide_Version(bpy.types.Operator):
-    bl_idname = f'{PREFIX}.hide_version_panel'
+    bl_idname = f'{PREFIX.lower()}.hide_version_panel'
     bl_label = "x"
     bl_description = "Dismiss this version"
 
@@ -43,7 +43,7 @@ class Hide_Version(bpy.types.Operator):
 
 @prefix_name
 class Hide_Message(bpy.types.Operator):
-    bl_idname = f'{PREFIX}.hide_message_panel'
+    bl_idname = f'{PREFIX.lower()}.hide_message_panel'
     bl_label = "x"
     bl_description = "Dismiss this message"
 
