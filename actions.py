@@ -409,8 +409,7 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
     # get the selected keyframes array
     arrKeyframes = keyframes.getSelectedFrames(obj, '["key_object_id"]', 'x')
     if arrKeyframes is None:
-        intFrame = keyframes.getKeyframeValue(
-            obj, '["key_object_id"]', intFrame, '<=', 'x')
+        # intFrame = keyframes.getKeyframeValue(obj, '["key_object_id"]', intFrame, '<=', 'x')
         arrKeyframes[intFrame]
     for intFrame in arrKeyframes:
         intFrame = int(intFrame)
@@ -438,6 +437,8 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
                 objCollection.objects.link(objNew)
                 objNew.select_set(select)
                 arrNewObjects.append(objNew)
+        else:
+            print('stop motion could find frame object to separate', strFrameObject)
     obj.select_set(not select)
     return arrNewObjects
 

@@ -385,14 +385,23 @@ class KEY_OT_SeparateObjects(bpy.types.Operator):
     bl_idname = "key.separate_objects"
     bl_label = "Separate Selected Frames"
     bl_options = {'REGISTER', 'UNDO'}
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
 
     @ classmethod
     def poll(cls, context):
         return len(context.selected_objects) > 0
 
     def execute(self, context):
+        # exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True)
         actions.exposeSelectedFrameObjects(
-            context.active_object, context.scene.frame_current, True)
+            context.active_object, context.scene.frame_current, self.ctrl_pressed)
         return {'FINISHED'}
 
 

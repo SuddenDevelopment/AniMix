@@ -406,7 +406,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def separate_objects_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.separate_objects()
+            bpy.ops.key.separate_objects(
+                'INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 
