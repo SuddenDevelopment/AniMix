@@ -284,12 +284,13 @@ def getBlankFrameObject(obj):
     intSwapObjectID = getNextSwapObjectId(obj)
     strNewObjName = getSwapObjectName(
         intSwapId, intSwapObjectID)
-    objTmp = bpy.data.objects.new(strNewObjName, obj.data.copy())
-    objTmp.data.use_fake_user = True
-    objTmp["key_object_id"] = intSwapObjectID
-    objTmp["key_id"] = intSwapId
-    removeGeo(objTmp)
-    return objTmp
+    if strNewObjName:
+        objTmp = bpy.data.objects.new(strNewObjName, obj.data.copy())
+        objTmp.data.use_fake_user = True
+        objTmp["key_object_id"] = intSwapObjectID
+        objTmp["key_id"] = intSwapId
+        removeGeo(objTmp)
+        return objTmp
 
 
 def redraw(arrAreas=[]):

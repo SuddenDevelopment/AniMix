@@ -181,6 +181,7 @@ class KEY_OT_BlankKey(bpy.types.Operator):
                     obj, intStartFrame, intDirection, False, intStopFrame)
                 actions.setSwapKey(obj, intSwapObjectID,
                                    context.scene.frame_current, update=False)
+        actions.onFrame(context.scene)
         return {'FINISHED'}
 
 
