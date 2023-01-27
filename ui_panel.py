@@ -93,14 +93,14 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                                    "  Click: Insert add / insert a keyframe to the Right of the timeline indicators playhead.\n" +
                                    "  Ctrl + Click: Insert add / insert a keyframe to the Left of the timeline indicators playhead."},
                     "remove_key": {"description": "Remove keyframe: Removes the current keyframe and pulls keyframes into the deleted keyframe position.\n" +
-                                   "Right & Left of the timeline indicators playhead. This is like deleting a keyframe.\n" +
+                                   "This is like deleting a keyframe.\n" +
                                    "Button behaviors: \n" +
                                    "  Click: Remove/Deletes insert a keyframe to the Right of the timeline indicators playhead.\n" +
                                    "  Ctrl + Click: Remove/Deletes a keyframe to the Left of the timeline indicators playhead."},
-                    "blank_key": {"description": "Insert Blank Keyframe: Inserts a single blank keyframe to the right of the timeline indicators playhead.\n" +
+                    "blank_key": {"description": "Insert Blank Keyframe: Inserts a single blank keyframe to the right or the left of the timeline indicators playhead.\n" +
                                   "Button behaviors: \n" +
-                                  "Click: insert a blank keyframe to the Right of the timeline indicators playhead.\n" +
-                                  "Ctrl + Click: insert a blank keyframe to the Left of the timeline indicators playhead."},
+                                  "Click: Inserts a blank keyframe to the Right of the timeline indicators playhead.\n" +
+                                  "Ctrl + Click: Inserts a blank keyframe to the Left of the timeline indicators playhead."},
                 },
             }, {
                 "name": 'Duplicate',
@@ -116,14 +116,20 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons": {
                     "add_space": {
                         "description": "Frame Spacer: Add\n" +
-                        "Adds a single extra space between selected keyframes.",
+                        "Inserts a single space to either the Right or Left side of the current keyframes.",
+                        "Button behaviors: \n" +
+                        "Click: Inserts a single space to the Right of the current keyframes.\n" +
+                        "Ctrl + Click: Inserts a single space to the Left of the current keyframes."},
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
                     },
                     "remove_space": {
                         "description": "Frame Spacer: Subtract\n" +
-                        "Subtracts a single space between selected keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys.",
+                        "Removes a single space from either Right or Left side of the current keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys.",
+                        "Button behaviors: \n" +
+                        "Click: Removes a single space to the Right of the current keyframes.\n" +
+                        "Ctrl + Click: Removes a single space to the Left of the current keyframes."},
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
