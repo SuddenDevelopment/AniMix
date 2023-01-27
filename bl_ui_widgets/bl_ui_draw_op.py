@@ -143,7 +143,7 @@ class BL_UI_OT_draw_operator(Operator):
         BL_UI_OT_draw_operator.handlers.append(('H', self, context, bpy.types.SpaceView3D.draw_handler_add(
             self.draw_callback_px, args, 'WINDOW', 'POST_PIXEL')))
         BL_UI_OT_draw_operator.handlers.append(
-            ('T', self, context, context.window_manager.event_timer_add(0.1, window=context.window)))
+            ('T', self, context, context.window_manager.event_timer_add(1, window=context.window)))
         # Was as below before implementing the 'lost handler detection logic'
         # self.__draw_handle = bpy.types.SpaceView3D.draw_handler_add(self.draw_callback_px, args, "WINDOW", "POST_PIXEL")
         # self.__draw_events = context.window_manager.event_timer_add(0.1, window=context.window)

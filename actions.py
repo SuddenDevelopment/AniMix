@@ -131,7 +131,6 @@ def getDataSum(obj):
                     intSum += point.co.x + point.co.y + point.co.z
                     intSum += point.handle_left.x + point.handle_left.y + point.handle_left.z
                     intSum += point.handle_right.x + point.handle_right.y + point.handle_right.z
-            print(obj.name, intSum)
         return intSum
     return None
 

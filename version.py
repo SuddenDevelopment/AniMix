@@ -20,8 +20,8 @@ objDefault = {
     "message": "",
     "btn_name": "",
     "url": "",
-    "hide_message": False,
-    "hide_version": False
+    "hide_message": True,
+    "hide_version": True
 }
 # ----====|| EVERYTHING BELOW HERE SHOULD NOT NEED TO BE MODIFIED MANUALLY ||====----
 VERSION_FILE = os.path.join(os.path.dirname(
@@ -62,7 +62,6 @@ class Hide_Message(bpy.types.Operator):
 
 
 def getIntVersion(strVersion):
-    # expects bl_info as a string str(bl_info["version"])
     strVersion = strVersion.replace(",", ".").replace(")", "").replace("(", "")
     return int(strVersion.replace(".", "").replace(" ", ""))
 
@@ -73,20 +72,18 @@ def getVersionFile():
         objFile = open(VERSION_FILE)
         objVersion = json.load(objFile)
         objFile.close()
+        for strKey in objDefault.keys():
+            if strKey not in objVersion:
+                objVersion[strKey] = objDefault['strKey']
     except:
-        print('could not read file:', VERSION_FILE)
         objVersion = objDefault
     return objVersion
 
 
 def setVersionFile(objVersionFile):
-    try:
-        objFile = open(VERSION_FILE, 'w')
-        objFile.write(json.dumps(objVersionFile))
-        objFile.close()
-    except:
-        print('could not write file:', VERSION_FILE)
-        pass
+    objFile = open(VERSION_FILE, 'w')
+    objFile.write(json.dumps(objVersionFile))
+    objFile.close()
 
 
 def check_version(bl_info):
@@ -143,18 +140,6 @@ def draw_version_box(objPanel, context):
             row = box.row()
             row.operator(
                 'wm.url_open', text="GumRoad", icon="URL").url = objVersion["gm_url"]
-    if objVersion is not None and "hide_message" in objVersion.keys() and objVersion["hide_message"] != True:
-        box = layout.box()
-        arrText = getTextArray(context, objVersion["message"])
-        for i, strText in enumerate(arrText):
-            row = box.row()
-            row.label(text=strText)
-            if i == 0:
-                row.operator(f'{PREFIX}.hide_message_panel', text="", icon="X")
-        if objVersion["url"] != "":
-            row = box.row(align=True)
-            row.operator(
-                'wm.url_open', text=objVersion["btn_name"], icon="URL").url = objVersion["url"]
 
 
 def register(bl_info):

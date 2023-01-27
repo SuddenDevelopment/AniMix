@@ -17,6 +17,14 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # --- ### Header
+from . bl_ui_draw_op import get_3d_area_and_region, valid_display_mode
+from math import pi, cos, sin
+from gpu_extras.batch import batch_for_shader
+import time
+import blf
+import bgl
+import gpu
+import bpy
 bl_info = {"name": "BL UI Widgets",
            "description": "UI Widgets to draw in the 3D view",
            "author": "Marcelo M. Marques (fork of Jayanam's original project)",
@@ -69,22 +77,14 @@ bl_info = {"name": "BL UI Widgets",
 
 
 # --- ### Imports
-import bpy
-import gpu
-import bgl
-import blf
-import time
-
-from gpu_extras.batch import batch_for_shader
-from math import pi, cos, sin
-
-from . bl_ui_draw_op import get_3d_area_and_region, valid_display_mode
 
 
 class BL_UI_Widget():
 
-    g_tooltip_widget = None   # Widget object which mouse pointer is currently over (e.g. some button)
-    g_exclusive_mode = None   # Widget object which is undergoing an exclusive action (e.g. some textbox)
+    # Widget object which mouse pointer is currently over (e.g. some button)
+    g_tooltip_widget = None
+    # Widget object which is undergoing an exclusive action (e.g. some textbox)
+    g_exclusive_mode = None
 
     def __init__(self, x, y, width, height):
 
@@ -96,29 +96,40 @@ class BL_UI_Widget():
         self.height = height
         self.context = None
 
-        self._style = None              # widget color style option (vary per widget subclass type)
+        # widget color style option (vary per widget subclass type)
+        self._style = None
 
         self._tooltip_text = ""         # Text for the tooltip
         self._tooltip_shortcut = ""     # Shortcut for the tooltip
         self._tooltip_python = ""       # Python command for the tooltip
 
-        self._is_visible = True         # Indicates whether the object's draw function must be executed or not
-        self._is_enabled = True         # Indicates whether the object is enabled or not (useful for button states)
-        self._is_tooltip = False        # Indicates whether the object instance is of 'Tooltip' type
-        self._is_mslider = False        # Indicates whether the object instance is for drawing the middle section of a 'Slider'
+        # Indicates whether the object's draw function must be executed or not
+        self._is_visible = True
+        # Indicates whether the object is enabled or not (useful for button states)
+        self._is_enabled = True
+        # Indicates whether the object instance is of 'Tooltip' type
+        self._is_tooltip = False
+        # Indicates whether the object instance is for drawing the middle section of a 'Slider'
+        self._is_mslider = False
 
         self.__ui_scale = 0             # Saves the latest ui_scale value
         self.__area_height = 0          # Saves the latest area height value
         self.__area_width = 0           # Saves the latest area width value
-        self.__valid_modes = []         # List of 'bpy.context.mode' values for restricting panel display to these modes only
+        # List of 'bpy.context.mode' values for restricting panel display to these modes only
+        self.__valid_modes = []
 
         self.__tooltip_gotimer = 0      # Latest time when mouse entered widget area
-        self.__tooltip_current = False  # Indicates whether the tooltip is updated with the current widget data
-        self.__tooltip_shifted = False  # Indicates whether the container panel has been dragged to another position
+        # Indicates whether the tooltip is updated with the current widget data
+        self.__tooltip_current = False
+        # Indicates whether the container panel has been dragged to another position
+        self.__tooltip_shifted = False
 
-        self.__update_shaders = True    # Indicates whether all other shaders need to be updated for the next draw
-        self.__mouse_down = False       # Indicates whether mouse button is currently pressed by user
-        self.__inrect = False           # Indicates whether mouse pointer is currently over the widget area
+        # Indicates whether all other shaders need to be updated for the next draw
+        self.__update_shaders = True
+        # Indicates whether mouse button is currently pressed by user
+        self.__mouse_down = False
+        # Indicates whether mouse pointer is currently over the widget area
+        self.__inrect = False
 
     @property
     def style(self):
@@ -242,11 +253,14 @@ class BL_UI_Widget():
         widget_style = getattr(theme, style)
         style_size = widget_style.points
         if style == "panel_title":
-            factor = (style_size - 12) / 12  # Would be 11 for 'Deep Gray', 'Minimal Dark' and 'Modo' v2.93 themes
+            # Would be 11 for 'Deep Gray', 'Minimal Dark' and 'Modo' v2.93 themes
+            factor = (style_size - 12) / 12
         elif style == "widget":
-            factor = (style_size - 11) / 11  # Would be 10 for 'Minimal Dark' and 'Modo' v2.93 themes
+            # Would be 10 for 'Minimal Dark' and 'Modo' v2.93 themes
+            factor = (style_size - 11) / 11
         elif style == "widget_label":
-            factor = (style_size - 11) / 11  # Would be 10 for 'Minimal Dark' v2.93 theme
+            # Would be 10 for 'Minimal Dark' v2.93 theme
+            factor = (style_size - 11) / 11
         return int(round(text_size * (1 + factor)))
 
     def scaled_radius(self, radius, height):
@@ -257,8 +271,10 @@ class BL_UI_Widget():
             theme = bpy.context.preferences.themes[0]
             widget_style = getattr(theme.user_interface, self.my_style())
             roundness = widget_style.roundness
-        scaled_radius = self.ui_scale(radius) if self._is_tooltip else self.over_scale(radius)
-        scaled_height = self.ui_scale(height) if self._is_tooltip else self.over_scale(height)
+        scaled_radius = self.ui_scale(
+            radius) if self._is_tooltip else self.over_scale(radius)
+        scaled_height = self.ui_scale(
+            height) if self._is_tooltip else self.over_scale(height)
         scaled_radius = int(round(roundness * scaled_radius))
         if scaled_radius > int(scaled_height / 2.0):
             scaled_radius = int(scaled_height / 2.0)
@@ -298,7 +314,8 @@ class BL_UI_Widget():
         return style
 
     def tooltip_start(self, x, y):
-        base_class = super().__thisclass__.__mro__[-2]  # This stunt only to avoid hard coding the Base class name
+        # This stunt only to avoid hard coding the Base class name
+        base_class = super().__thisclass__.__mro__[-2]
         base_class.g_tooltip_widget = self
         self.__tooltip_gotimer = time.time()
         self.__tooltip_current = False
@@ -308,7 +325,8 @@ class BL_UI_Widget():
         self.__tooltip_current = False
 
     def set_exclusive_mode(self, value):
-        base_class = super().__thisclass__.__mro__[-2]  # This stunt only to avoid hard coding the Base class name
+        # This stunt only to avoid hard coding the Base class name
+        base_class = super().__thisclass__.__mro__[-2]
         base_class.g_exclusive_mode = value
 
     def set_location(self, x, y):
@@ -346,7 +364,8 @@ class BL_UI_Widget():
         if self._is_tooltip:
             base_class = super().__thisclass__.__mro__[-2]
             widget = base_class.g_tooltip_widget
-            if not self.prepare_tooltip_data(widget):  # This function in: bl_ui_tooltip.py
+            # This function in: bl_ui_tooltip.py
+            if not self.prepare_tooltip_data(widget):
                 return None
         else:
             self.x_screen = x
@@ -357,11 +376,15 @@ class BL_UI_Widget():
         # used to be: if scaled_radius == 0 or scaled_radius > 10 or self._rounded_corners == (0,0,0,0):
         # but unfortunately 'TRI_FAN' results in a worse smooth render
         if self.scaled_radius(self._radius, self.height) > 10:
-            vertices = self.calc_corners_for_trifan(self.x_screen, self.y_screen, self.width, self.height, self._radius, 'FULL')
-            self.batch_panel = batch_for_shader(self.shader, 'TRI_FAN', {"pos": vertices})
+            vertices = self.calc_corners_for_trifan(
+                self.x_screen, self.y_screen, self.width, self.height, self._radius, 'FULL')
+            self.batch_panel = batch_for_shader(
+                self.shader, 'TRI_FAN', {"pos": vertices})
         else:
-            vertices = self.calc_corners_for_lines(self.x_screen, self.y_screen, self.width, self.height, self._radius, 'FULL')
-            self.batch_panel = batch_for_shader(self.shader, 'LINES', {"pos": vertices})
+            vertices = self.calc_corners_for_lines(
+                self.x_screen, self.y_screen, self.width, self.height, self._radius, 'FULL')
+            self.batch_panel = batch_for_shader(
+                self.shader, 'LINES', {"pos": vertices})
 
         self.__update_shaders = True
 
@@ -383,13 +406,17 @@ class BL_UI_Widget():
                 if self.RC_SLIDE():
                     drag_offset_x = 0   # Want to keep same x_pos
                     drag_offset_y = 0   # Want to keep same y_pos
-                    self.update(self.x_screen - drag_offset_x, self.y_screen + drag_offset_y)
+                    self.update(self.x_screen - drag_offset_x,
+                                self.y_screen + drag_offset_y)
                 else:
                     # This is to prevent the panel to slide when user resizes screen viewport
                     if former_area_height > 0:
-                        drag_offset_x = 0   # Want to keep same x_pos (placeholder for future enhancements)
-                        drag_offset_y = (former_area_height - area_height) / self.over_scale(1)
-                        self.update(self.x_screen - drag_offset_x, self.y_screen - drag_offset_y)
+                        # Want to keep same x_pos (placeholder for future enhancements)
+                        drag_offset_x = 0
+                        drag_offset_y = (former_area_height -
+                                         area_height) / self.over_scale(1)
+                        self.update(self.x_screen - drag_offset_x,
+                                    self.y_screen - drag_offset_y)
 
     def halt_tooltip(self):
         # Check whether it is time to show the tooltip or not; delay is hard coded below as 1 (one) second
@@ -514,9 +541,12 @@ class BL_UI_Widget():
         if amount <= 0:
             output_color = input_color  # No changes
         else:
-            r = (1 + amount) * input_color[0]; r = 1 if r > 1 else r
-            g = (1 + amount) * input_color[1]; g = 1 if g > 1 else g
-            b = (1 + amount) * input_color[2]; b = 1 if b > 1 else b
+            r = (1 + amount) * input_color[0]
+            r = 1 if r > 1 else r
+            g = (1 + amount) * input_color[1]
+            g = 1 if g > 1 else g
+            b = (1 + amount) * input_color[2]
+            b = 1 if b > 1 else b
             output_color = (r, g, b, input_color[3])
         return output_color
 
@@ -553,10 +583,12 @@ class BL_UI_Widget():
             if self.state in {2, 4, 5}:  # Hover, Hover++ and Down++ states
                 # Take the "state 0" background color and "tint" it by either 20% or 10%
                 basecolor = color
-                color = self.tint_color(basecolor, (0.2 if basecolor[0] < 0.5 else 0.1))
+                color = self.tint_color(
+                    basecolor, (0.2 if basecolor[0] < 0.5 else 0.1))
                 if self.state in {4, 5}:  # Hover++ and Down++ states
                     # Has to tint the color twice the same factor values used for "state 0"
-                    color = self.tint_color(color, (0.2 if basecolor[0] < 0.5 else 0.1))
+                    color = self.tint_color(
+                        color, (0.2 if basecolor[0] < 0.5 else 0.1))
         except Exception as e:
             pass  # Because not all widget types have a 'state' property
 
@@ -579,12 +611,13 @@ class BL_UI_Widget():
                 y_screen = self.over_scale(self.y_screen)
                 width = self.over_scale(self.width)
                 height = self.over_scale(self.height)
-                vertices = ((x_screen        , y_screen),
+                vertices = ((x_screen, y_screen),
                             (x_screen + width, y_screen),
-                            (x_screen        , y_screen - height + 1),
+                            (x_screen, y_screen - height + 1),
                             (x_screen + width, y_screen - height + 1)
                             )
-                self.batch_outline = batch_for_shader(self.shader_outline, 'LINES', {"pos": vertices})
+                self.batch_outline = batch_for_shader(
+                    self.shader_outline, 'LINES', {"pos": vertices})
             self.batch_outline.draw(self.shader_outline)
         else:
             # used to be: if scaled_radius == 0 or scaled_radius > 10 or self._rounded_corners == (0, 0, 0, 0):
@@ -592,8 +625,10 @@ class BL_UI_Widget():
             if self.scaled_radius(self._radius, self.height) > 10:
                 bgl.glLineWidth(1)
                 if self.__update_shaders or not hasattr(self, 'batch_outline'):
-                    vertices = self.calc_corners_for_trifan(self.x_screen, self.y_screen, self.width, self.height, self._radius, 'FULL')
-                    self.batch_outline = batch_for_shader(self.shader_outline, 'LINE_LOOP', {"pos": vertices})
+                    vertices = self.calc_corners_for_trifan(
+                        self.x_screen, self.y_screen, self.width, self.height, self._radius, 'FULL')
+                    self.batch_outline = batch_for_shader(
+                        self.shader_outline, 'LINE_LOOP', {"pos": vertices})
                 self.batch_outline.draw(self.shader_outline)
             else:
                 # bgl.glPointSize(1)
@@ -606,8 +641,10 @@ class BL_UI_Widget():
                 # self.batch_outline.draw(self.shader_outline)
                 bgl.glLineWidth(1)
                 if self.__update_shaders or not hasattr(self, 'batch_outline'):
-                    vertices = self.calc_corners_for_lines(self.x_screen, self.y_screen, self.width, self.height, self._radius, 'OUTLINE-A')
-                    self.batch_outline = batch_for_shader(self.shader_outline, 'LINE_LOOP', {"pos": vertices})
+                    vertices = self.calc_corners_for_lines(
+                        self.x_screen, self.y_screen, self.width, self.height, self._radius, 'OUTLINE-A')
+                    self.batch_outline = batch_for_shader(
+                        self.shader_outline, 'LINE_LOOP', {"pos": vertices})
                 self.batch_outline.draw(self.shader_outline)
 
     def draw_shadow(self):
@@ -646,10 +683,11 @@ class BL_UI_Widget():
                 y_screen = self.over_scale(self.y_screen)
                 width = self.over_scale(self.width)
                 height = self.over_scale(self.height)
-                vertices = ((x_screen        , y_screen - height),
+                vertices = ((x_screen, y_screen - height),
                             (x_screen + width, y_screen - height)
                             )
-                self.batch_shadow1 = batch_for_shader(self.shader_shadow1, 'LINES', {"pos": vertices})
+                self.batch_shadow1 = batch_for_shader(
+                    self.shader_shadow1, 'LINES', {"pos": vertices})
             self.batch_shadow1.draw(self.shader_shadow1)
         else:
             # used to be: if scaled_radius == 0 or scaled_radius > 10 or self._rounded_corners == (0, 0, 0, 0):
@@ -657,19 +695,25 @@ class BL_UI_Widget():
             if self.scaled_radius(self._radius, self.height) > 10:
                 bgl.glLineWidth(1)
                 if self.__update_shaders or not hasattr(self, 'batch_shadow1'):
-                    vertices = self.calc_corners_for_trifan(self.x_screen, self.y_screen, self.width, self.height, self._radius, 'SHADOW')
-                    self.batch_shadow1 = batch_for_shader(self.shader_shadow1, 'LINE_STRIP', {"pos": vertices})
+                    vertices = self.calc_corners_for_trifan(
+                        self.x_screen, self.y_screen, self.width, self.height, self._radius, 'SHADOW')
+                    self.batch_shadow1 = batch_for_shader(
+                        self.shader_shadow1, 'LINE_STRIP', {"pos": vertices})
                 self.batch_shadow1.draw(self.shader_shadow1)
             else:
                 bgl.glPointSize(1)
                 if self.__update_shaders or not hasattr(self, 'batch_shadow1'):
-                    vertices = self.calc_corners_for_lines(self.x_screen, self.y_screen, self.width, self.height, self._radius, 'SHADOW-A')
-                    self.batch_shadow1 = batch_for_shader(self.shader_shadow1, 'POINTS', {"pos": vertices})
+                    vertices = self.calc_corners_for_lines(
+                        self.x_screen, self.y_screen, self.width, self.height, self._radius, 'SHADOW-A')
+                    self.batch_shadow1 = batch_for_shader(
+                        self.shader_shadow1, 'POINTS', {"pos": vertices})
                 self.batch_shadow1.draw(self.shader_shadow1)
                 bgl.glLineWidth(1)
                 if self.__update_shaders or not hasattr(self, 'batch_shadow2'):
-                    vertices = self.calc_corners_for_lines(self.x_screen, self.y_screen, self.width, self.height, self._radius, 'SHADOW-B')
-                    self.batch_shadow2 = batch_for_shader(self.shader_shadow2, 'LINES', {"pos": vertices})
+                    vertices = self.calc_corners_for_lines(
+                        self.x_screen, self.y_screen, self.width, self.height, self._radius, 'SHADOW-B')
+                    self.batch_shadow2 = batch_for_shader(
+                        self.shader_shadow2, 'LINES', {"pos": vertices})
                 self.batch_shadow2.draw(self.shader_shadow2)
                 # bgl.glLineWidth(1)
                 # vertices = self.calc_corners_for_lines(self.x_screen, self.y_screen, self.width, self.height, self._radius, 'SHADOW')
@@ -735,7 +779,8 @@ class BL_UI_Widget():
         x = (event.mouse_x - region.x)
         y = (event.mouse_y - region.y)
 
-        base_class = super().__thisclass__.__mro__[-2]  # This stunt only to avoid hard coding the Base class name
+        # This stunt only to avoid hard coding the Base class name
+        base_class = super().__thisclass__.__mro__[-2]
         exclusive_widget = base_class.g_exclusive_mode
         if exclusive_widget is not None:
             if exclusive_widget is not self:
@@ -827,7 +872,7 @@ class BL_UI_Widget():
         widget_x = self.over_scale(self.x_screen)
         widget_y = self.over_scale(self.y_screen)
         if ((widget_x <= x <= self.over_scale(self.x_screen + self.width)) and
-            (widget_y >= y >= self.over_scale(self.y_screen - self.height))):
+                (widget_y >= y >= self.over_scale(self.y_screen - self.height))):
             return True
 
         return False
@@ -913,8 +958,10 @@ class BL_UI_Widget():
 
         r = self.scaled_radius(radius, height)
 
-        width = self.ui_scale(width) if self._is_tooltip else self.over_scale(width)
-        height = self.ui_scale(height) if self._is_tooltip else self.over_scale(height)
+        width = self.ui_scale(
+            width) if self._is_tooltip else self.over_scale(width)
+        height = self.ui_scale(
+            height) if self._is_tooltip else self.over_scale(height)
 
         if r <= 0:
             r = 0
@@ -965,7 +1012,8 @@ class BL_UI_Widget():
             else:
                 corner_center = (x_screen + r, y_screen - r)
                 for c in reversed(newco):
-                    coords.append((corner_center[0] - c[0], corner_center[1] + c[1]))
+                    coords.append(
+                        (corner_center[0] - c[0], corner_center[1] + c[1]))
 
             # Top Right corners
             if rounded_corners[2] == 0:
@@ -973,7 +1021,8 @@ class BL_UI_Widget():
             else:
                 corner_center = (x_screen + w - r, y_screen - r)
                 for c in newco:
-                    coords.append((corner_center[0] + c[0], corner_center[1] + c[1]))
+                    coords.append(
+                        (corner_center[0] + c[0], corner_center[1] + c[1]))
 
         # Shadow right border starting point
         if selection == 'SHADOW':
@@ -991,9 +1040,11 @@ class BL_UI_Widget():
             for c in reversed(newco):
                 if selection == 'SHADOW':
                     # Apply an offset of some pixels
-                    coords.append((corner_center[0] + c[0] + 1, corner_center[1] - c[1] - 1))
+                    coords.append(
+                        (corner_center[0] + c[0] + 1, corner_center[1] - c[1] - 1))
                 else:
-                    coords.append((corner_center[0] + c[0], corner_center[1] - c[1]))
+                    coords.append(
+                        (corner_center[0] + c[0], corner_center[1] - c[1]))
 
         # Bottom Left corners
         if rounded_corners[0] == 0 or selection == 'SHADOW':
@@ -1006,7 +1057,8 @@ class BL_UI_Widget():
         else:
             corner_center = (x_screen + r, y_screen - h + r)
             for c in newco:
-                coords.append((corner_center[0] - c[0], corner_center[1] - c[1]))
+                coords.append(
+                    (corner_center[0] - c[0], corner_center[1] - c[1]))
 
         return coords
 
@@ -1027,8 +1079,10 @@ class BL_UI_Widget():
 
         r = self.scaled_radius(radius, height)
 
-        width = self.ui_scale(width) if self._is_tooltip else self.over_scale(width)
-        height = self.ui_scale(height) if self._is_tooltip else self.over_scale(height)
+        width = self.ui_scale(
+            width) if self._is_tooltip else self.over_scale(width)
+        height = self.ui_scale(
+            height) if self._is_tooltip else self.over_scale(height)
 
         x = x_screen
         y = y_screen
@@ -1101,9 +1155,9 @@ class BL_UI_Widget():
         if selection == 'SHADOW-B':
             # Determining the 2 borders lines to use with shadow contour corner
             shadow_lines = []
-            shadow_lines.append((o0[ 0][0] + 0, o0[ 0][1] - 1))
+            shadow_lines.append((o0[0][0] + 0, o0[0][1] - 1))
             shadow_lines.append((o3[-1][0] + 1, o3[-1][1] - 1))
-            shadow_lines.append((o3[ 0][0] + 1, o3[ 0][1] - 0))
+            shadow_lines.append((o3[0][0] + 1, o3[0][1] - 0))
             shadow_lines.append((o2[-1][0] + 1, y - (h/2) - 0))
             return shadow_lines
 
@@ -1115,15 +1169,19 @@ class BL_UI_Widget():
             for c in coords:
                 if c[1] != prior[1]:
                     cy = y - prior[1]
-                    offset = 0 if self._rounded_corners[1] == 0 else prior[0]  # Top Left corners
+                    # Top Left corners
+                    offset = 0 if self._rounded_corners[1] == 0 else prior[0]
                     lines.append((x + 0 + offset, cy))
-                    offset = 0 if self._rounded_corners[2] == 0 else prior[0]  # Top Right corners
+                    # Top Right corners
+                    offset = 0 if self._rounded_corners[2] == 0 else prior[0]
                     lines.append((x + w - offset, cy))
                 prior = c
             cy = y - prior[1]
-            offset = 0 if self._rounded_corners[1] == 0 else prior[0]  # Top Left corners
+            # Top Left corners
+            offset = 0 if self._rounded_corners[1] == 0 else prior[0]
             lines.append((x + 0 + offset, cy))
-            offset = 0 if self._rounded_corners[2] == 0 else prior[0]  # Top Right corners
+            # Top Right corners
+            offset = 0 if self._rounded_corners[2] == 0 else prior[0]
             lines.append((x + w - offset, cy))
             # Middle section
             next_y = cy - 1
@@ -1137,9 +1195,11 @@ class BL_UI_Widget():
             for c in reversed(coords):
                 if c[1] != prior[1]:
                     cy = y - h + c[1]
-                    offset = 0 if self._rounded_corners[0] == 0 else c[0]  # Bottom Left corners
+                    # Bottom Left corners
+                    offset = 0 if self._rounded_corners[0] == 0 else c[0]
                     lines.append((x + 0 + offset, cy))
-                    offset = 0 if self._rounded_corners[3] == 0 else c[0]  # Bottom Right corners
+                    # Bottom Right corners
+                    offset = 0 if self._rounded_corners[3] == 0 else c[0]
                     lines.append((x + w - offset, cy))
                 prior = c
             return lines
@@ -1152,16 +1212,16 @@ class BL_UI_Widget():
             manually created by me and they should always give a nice contour.
             May the god of I.T. forgive me!
         '''
-        map = [( 0,),
-               ( 1, 0),
-               ( 2, 0, 1),
-               ( 3, 0, 2, 1, 1),
-               ( 4, 0, 3, 1, 2, 1),
-               ( 5, 0, 4, 1, 3, 1, 2),
-               ( 6, 0, 5, 1, 4, 1, 3, 2, 2),
-               ( 7, 0, 6, 1, 5, 1, 4, 2, 3, 2),
-               ( 8, 0, 7, 1, 6, 1, 5, 2, 4, 2, 3),
-               ( 9, 0, 8, 1, 7, 1, 6, 2, 5, 2, 4, 3),
+        map = [(0,),
+               (1, 0),
+               (2, 0, 1),
+               (3, 0, 2, 1, 1),
+               (4, 0, 3, 1, 2, 1),
+               (5, 0, 4, 1, 3, 1, 2),
+               (6, 0, 5, 1, 4, 1, 3, 2, 2),
+               (7, 0, 6, 1, 5, 1, 4, 2, 3, 2),
+               (8, 0, 7, 1, 6, 1, 5, 2, 4, 2, 3),
+               (9, 0, 8, 1, 7, 1, 6, 2, 5, 2, 4, 3),
                (10, 0, 9, 1, 8, 1, 7, 1, 6, 2, 5, 2, 4, 3),
                ]
         i = 0
