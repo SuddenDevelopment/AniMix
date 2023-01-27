@@ -152,36 +152,37 @@ class KEY_OT_BlankKey(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
-        intDirection = 1
-        if self.ctrl_pressed == True:
-            intDirection = -1
-        intNextFrame = context.scene.frame_current+intDirection
-        for obj in context.selected_objects:
-            objBlank = actions.getBlankFrameObject(obj)
-            intSwapObjectID = objBlank.get('key_object_id')
-            strAction = keyframes.getKeyframeVacancy(
-                obj, '["key_object_id"]', context.scene.frame_current, intNextFrame)
-            if strAction == 'CURRENT':
-                actions.setSwapKey(obj, intSwapObjectID,
-                                   context.scene.frame_current, update=True, )
-            elif strAction == 'NEXT':
-                context.scene.frame_set(intNextFrame)
-                actions.setSwapKey(obj, intSwapObjectID,
-                                   intNextFrame, update=False)
-            else:
-                intStartFrame = context.scene.frame_current
-                intStopFrame = None
-                if intDirection == -1:
-                    intStartFrame = 0
-                    intStopFrame = context.scene.frame_current
-                keyframes.nudgeFrames(
-                    obj, intStartFrame, intDirection, False, intStopFrame)
-                actions.setSwapKey(obj, intSwapObjectID,
-                                   context.scene.frame_current, update=False)
-        actions.onFrame(context.scene)
+        if len(context.selected_objects) > 0:
+            intDirection = 1
+            if self.ctrl_pressed == True:
+                intDirection = -1
+            intNextFrame = context.scene.frame_current+intDirection
+            for obj in context.selected_objects:
+                objBlank = actions.getBlankFrameObject(obj)
+                intSwapObjectID = objBlank.get('key_object_id')
+                strAction = keyframes.getKeyframeVacancy(
+                    obj, '["key_object_id"]', context.scene.frame_current, intNextFrame)
+                if strAction == 'CURRENT':
+                    actions.setSwapKey(obj, intSwapObjectID,
+                                       context.scene.frame_current, update=True, )
+                elif strAction == 'NEXT':
+                    context.scene.frame_set(intNextFrame)
+                    actions.setSwapKey(obj, intSwapObjectID,
+                                       intNextFrame, update=False)
+                else:
+                    intStartFrame = context.scene.frame_current
+                    intStopFrame = None
+                    if intDirection == -1:
+                        intStartFrame = 0
+                        intStopFrame = context.scene.frame_current
+                    keyframes.nudgeFrames(
+                        obj, intStartFrame, intDirection, False, intStopFrame)
+                    actions.setSwapKey(obj, intSwapObjectID,
+                                       context.scene.frame_current, update=False)
+            actions.onFrame(context.scene)
         return {'FINISHED'}
 
 
@@ -200,17 +201,18 @@ class KEY_OT_CloneKey(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
-        intDirection = 1
-        if self.ctrl_pressed == True:
-            intDirection = -1
-        intNextFrame = context.scene.frame_current + intDirection
-        for obj in context.selected_objects:
-            actions.clone_key(
-                context, obj, context.scene.frame_current, intNextFrame)
-        context.scene.frame_set(intNextFrame)
+        if len(context.selected_objects) > 0:
+            intDirection = 1
+            if self.ctrl_pressed == True:
+                intDirection = -1
+            intNextFrame = context.scene.frame_current + intDirection
+            for obj in context.selected_objects:
+                actions.clone_key(
+                    context, obj, context.scene.frame_current, intNextFrame)
+            context.scene.frame_set(intNextFrame)
         return {'FINISHED'}
 
 
@@ -221,7 +223,7 @@ class KEY_OT_CloneUniqueKey(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         for obj in context.selected_objects:
@@ -236,7 +238,7 @@ class KEY_OT_CloneObject(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         for obj in context.selected_objects:
@@ -277,7 +279,7 @@ class KEY_OT_AddSpace(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         # nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None)
@@ -311,7 +313,7 @@ class KEY_OT_RemoveSpace(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         # nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None)
@@ -337,7 +339,7 @@ class KEY_OT_SetSpace(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         for obj in context.selected_objects:
@@ -353,7 +355,7 @@ class KEY_OT_NoSpace(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         for obj in context.selected_objects:
@@ -370,7 +372,7 @@ class KEY_OT_CopyObjects(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         actions.exposeSelectedFrameObjects(
@@ -386,7 +388,7 @@ class KEY_OT_SeparateObjects(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         actions.exposeSelectedFrameObjects(
@@ -402,7 +404,7 @@ class KEY_OT_CombineObjects(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.selected_objects is not None and context.active_object is not None
+        return len(context.selected_objects) > 0 and context.active_object is not None
 
     def execute(self, context):
         actions.addSwapObjects(
@@ -444,7 +446,7 @@ class KEY_OT_MergeData(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.active_object is not None and context.selected_objects is not None
+        return context.active_object is not None and len(context.selected_objects) > 0
 
     def execute(self, context):
         bpy.ops.object.join()
@@ -461,7 +463,7 @@ class KEY_OT_AddAsset(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return len(context.selected_objects) > 0
 
     def execute(self, context):
         # create a collection with the name of the object
