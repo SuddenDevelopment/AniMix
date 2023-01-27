@@ -376,13 +376,13 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def add_space_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.add_space()
+            bpy.ops.key.add_space('INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 
     def remove_space_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.remove_space()
+            bpy.ops.key.remove_space('INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 

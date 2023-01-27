@@ -265,17 +265,33 @@ class KEY_OT_AddSpace(bpy.types.Operator):
     bl_idname = "key.add_space"
     bl_label = "Add Keyframe Space"
     bl_options = {'REGISTER', 'UNDO'}
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
 
     @ classmethod
     def poll(cls, context):
         return context.selected_objects is not None
 
     def execute(self, context):
+        # nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None)
+        intStart = context.scene.frame_current+1
+        intStop = None
+        intDirection = 1
+        if self.ctrl_pressed == True:
+            intStart = 0
+            intStop = context.scene.frame_current
+            intDirection = -1
         for obj in context.selected_objects:
             keyframes.nudgeFrames(
-                obj, context.scene.frame_current+1, 1, True)
+                obj, intStart, intDirection, True, intStop)
             keyframes.nudgeFrames(
-                obj, context.scene.frame_current+1, 1, False)
+                obj, intStart, intDirection, False, intStop)
         return {'FINISHED'}
 
 
@@ -283,17 +299,33 @@ class KEY_OT_RemoveSpace(bpy.types.Operator):
     bl_idname = "key.remove_space"
     bl_label = "Remove Keyframe Space"
     bl_options = {'REGISTER', 'UNDO'}
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
 
     @ classmethod
     def poll(cls, context):
         return context.selected_objects is not None
 
     def execute(self, context):
+        # nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None)
+        intStart = context.scene.frame_current+1
+        intStop = None
+        intDirection = -1
+        if self.ctrl_pressed == True:
+            intStart = 0
+            intStop = context.scene.frame_current
+            intDirection = 1
         for obj in context.selected_objects:
             keyframes.nudgeFrames(
-                obj, context.scene.frame_current, -1, True)
+                obj, intStart, intDirection, True, intStop)
             keyframes.nudgeFrames(
-                obj, context.scene.frame_current, -1, False)
+                obj, intStart, intDirection, False, intStop)
         return {'FINISHED'}
 
 
