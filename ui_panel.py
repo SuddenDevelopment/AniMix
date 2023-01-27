@@ -116,7 +116,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons": {
                     "add_space": {
                         "description": "Frame Spacer: Add\n" +
-                        "Inserts a single space to either the Right or Left side of the current keyframes.",
+                        "Inserts a single space to either the Right or Left side of the current keyframes."+
                         "Button behaviors: \n" +
                         "Click: Inserts a single space to the Right of the current keyframes.\n" +
                         "Ctrl + Click: Inserts a single space to the Left of the current keyframes."},
@@ -126,7 +126,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     },
                     "remove_space": {
                         "description": "Frame Spacer: Subtract\n" +
-                        "Removes a single space from either Right or Left side of the current keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys.",
+                        "Removes a single space from either Right or Left side of the current keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys." +
                         "Button behaviors: \n" +
                         "Click: Removes a single space to the Right of the current keyframes.\n" +
                         "Ctrl + Click: Removes a single space to the Left of the current keyframes."},
@@ -146,15 +146,23 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons":
                     {
 
-                        "separate_objects": {"description": "Seperate Selection: Separates and converts the currently active selection in edit mode to a new object."},
-                        "combine_objects": {"description": "Combine With Active Object: Combines the selected object with the active merging keyframe data"}
+                        "separate_objects": {"description": "Sperate Selection: Separates and converts the currently active selection in edit mode to a new object.\n" +
+                        "Button behaviors: \n" +
+                        "Click: Creates a Copy from the object or selection.\n" +
+                        "Ctrl + Click: Cuts the current object or selection to a new object."},
+                        },
+                        "combine_objects": {"description": "Combine With Active Object: Combines the selected object with the active merging keyframe data"
+                        "Button behaviors: \n" +
+                        "Click: Combines with the active objects selections keyframe.\n" +
+                        "Ctrl + Click: Create new keyframe/s from selected objects to the active object."},
+                        }
 
                     }
             }, {
                 "name": 'Assets',
                 "buttons":
                     {
-                        "add_asset": {"description": "Asset Library: Create assets out of what is selected. Object & Edit mode and Keyframe data is supported."},
+                        "add_asset": {"description": "Asset Library: Create assets out of what is selected. Object, Edit mode and from selected Keyframe/s data."},
                     }
             }
         ]
