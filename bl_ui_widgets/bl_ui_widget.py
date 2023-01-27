@@ -437,7 +437,7 @@ class BL_UI_Widget():
            (widget._tooltip_python == "" or not prefs.show_tooltips_python):
             # Widget has no tooltip message to display
             return True
-        if time.time() - widget.__tooltip_gotimer < 1.0:  # <-- Hard coded delay
+        if time.time() - widget.__tooltip_gotimer < .5:  # <-- Hard coded delay
             # Timer has not reached the threshold yet
             return True
 
