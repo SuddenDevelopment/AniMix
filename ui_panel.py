@@ -116,30 +116,29 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons": {
                     "add_space": {
                         "description": "Frame Spacer: Add\n" +
-                        "Inserts a single space to either the Right or Left side of the current keyframes."+
+                        "Inserts a single space to either the Right or Left side of the current keyframes." +
                         "Button behaviors: \n" +
                         "Click: Inserts a single space to the Right of the current keyframes.\n" +
                         "Ctrl + Click: Inserts a single space to the Left of the current keyframes."},
-                        "imageSize": (32, 16),
-                        "imagePosition": (2, 0),
-                        "buttonSize": (38, 17)
-                    },
+                    "imageSize": (32, 16),
+                    "imagePosition": (2, 0),
+                    "buttonSize": (38, 17)
+                },
                     "remove_space": {
                         "description": "Frame Spacer: Subtract\n" +
                         "Removes a single space from either Right or Left side of the current keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys." +
                         "Button behaviors: \n" +
                         "Click: Removes a single space to the Right of the current keyframes.\n" +
-                        "Ctrl + Click: Removes a single space to the Left of the current keyframes."},
+                        "Ctrl + Click: Removes a single space to the Left of the current keyframes.",
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
-                    },
+                },
                     "no_space": {
                         "description": "Removes all space between selected keyframes",
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
-                    }
                 }
             }, {
                 "name": 'Frame Objects',
@@ -147,16 +146,15 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     {
 
                         "separate_objects": {"description": "Sperate Selection: Separates and converts the currently active selection in edit mode to a new object.\n" +
-                        "Button behaviors: \n" +
-                        "Click: Creates a Copy from the object or selection.\n" +
-                        "Ctrl + Click: Cuts the current object or selection to a new object."},
-                        },
+                                             "Button behaviors: \n" +
+                                             "Click: Creates a Copy from the object or selection.\n" +
+                                             "Ctrl + Click: Cuts the current object or selection to a new object.",
+                                             },
                         "combine_objects": {"description": "Combine With Active Object: Combines the selected object with the active merging keyframe data"
-                        "Button behaviors: \n" +
-                        "Click: Combines with the active objects selections keyframe.\n" +
-                        "Ctrl + Click: Create new keyframe/s from selected objects to the active object."},
-                        }
-
+                                            "Button behaviors: \n" +
+                                            "Click: Combines with the active objects selections keyframe.\n" +
+                                            "Ctrl + Click: Create new keyframe/s from selected objects to the active object.",
+                                            }
                     }
             }, {
                 "name": 'Assets',
@@ -267,7 +265,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         # --------------------------------------------------------------------------------------------------
 
         widgets_panel = [self.panel]
-        #widgets_items = [self.frame_space_slider]
+        # widgets_items = [self.frame_space_slider]
         widgets_items = [self.frame_space_slider, self.set_space]
         for objGroup in self.arrButtonGroups:
             widgets_items.append(
@@ -288,7 +286,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         if self.panel.quadview and region:
             # When in QuadView mode it has to be manually repositioned otherwise may get stuck out of region space
             if __package__.find(".") != -1:
-                package = __package__[0:__package__.find(".")]
+                package = __package__[0: __package__.find(".")]
             else:
                 package = __package__
             if bpy.context.preferences.addons[package].preferences.RC_UI_BIND:
