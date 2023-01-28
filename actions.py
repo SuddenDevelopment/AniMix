@@ -23,14 +23,19 @@ def getNextSwapObjectId(obj):
 def setSwapKey(obj, intObjectId, intFrame, update=True):
     if update == True:
         obj['key_object_id'] = intObjectId
-    if obj.animation_data is None:
+
+    foundFcurve = False
+    if obj.animation_data is not None:
+        for fcurve in obj.animation_data.action.fcurves:
+            if fcurve.data_path == '["key_object_id"]':
+                foundFcurve = True
+                fcurve.keyframe_points.insert(
+                    frame=intFrame, value=intObjectId)
+                for keyframe_point in fcurve.keyframe_points:
+                    keyframe_point.interpolation = 'CONSTANT'
+    if foundFcurve == False:
         obj.keyframe_insert(
             data_path='["key_object_id"]', frame=intFrame)
-    for fcurve in obj.animation_data.action.fcurves:
-        if fcurve.data_path == '["key_object_id"]':
-            fcurve.keyframe_points.insert(frame=intFrame, value=intObjectId)
-            for keyframe_point in fcurve.keyframe_points:
-                keyframe_point.interpolation = 'CONSTANT'
 
 
 def getSwapObjectName(intSwapId, intSwapObjectId):
