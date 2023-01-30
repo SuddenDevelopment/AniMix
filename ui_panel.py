@@ -71,13 +71,15 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         self.arrButtonGroups = [
             {
                 "name": 'Onion',
-                "buttons": {"pin_frames": {
-                    "description":
-                        "Pin Frame: Sets the selected object/s to be used as a reference object for working in and out of poses.\n" +
-                        "Button behaviors:\n" +
-                        "  Click: Pins the current selection\n" +
-                        "  Ctrl + Click: Removes all pin frames"}
-                }
+                "buttons": {"pin_frames":
+                            {
+                                "description":
+                                "Pin Frame: Sets the selected object/s to be used as a reference object for working in and out of poses.\n" +
+                                "Button behaviors:\n" +
+                                "  Click: Pins the current selection\n" +
+                                "  Ctrl + Click: Removes all pin frames"
+                            }
+                            }
             }, {
                 "name": 'StopMotion Keys',
                 "buttons": {
@@ -119,11 +121,11 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "Inserts a single space to either the Right or Left side of the current keyframes." +
                         "Button behaviors: \n" +
                         "Click: Inserts a single space to the Right of the current keyframes.\n" +
-                        "Ctrl + Click: Inserts a single space to the Left of the current keyframes."},
-                    "imageSize": (32, 16),
-                    "imagePosition": (2, 0),
-                    "buttonSize": (38, 17)
-                },
+                        "Ctrl + Click: Inserts a single space to the Left of the current keyframes.",
+                        "imageSize": (32, 16),
+                        "imagePosition": (2, 0),
+                        "buttonSize": (38, 17)
+                    },
                     "remove_space": {
                         "description": "Frame Spacer: Subtract\n" +
                         "Removes a single space from either Right or Left side of the current keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys." +
@@ -133,19 +135,19 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
-                },
+                    },
                     "no_space": {
                         "description": "Removes all space between selected keyframes",
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
-                }
+                    }}
             }, {
                 "name": 'Frame Objects',
                 "buttons":
                     {
 
-                        "separate_objects": {"description": "Sperate Selection: Separates and converts the currently active selection in edit mode to a new object.\n" +
+                        "separate_objects": {"description": "Separate Selection: Separates and converts the currently active selection in edit mode to a new object.\n" +
                                              "Button behaviors: \n" +
                                              "Click: Creates a Copy from the object or selection.\n" +
                                              "Ctrl + Click: Cuts the current object or selection to a new object.",
@@ -425,7 +427,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def combine_objects_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.combine_objects()
+            bpy.ops.key.combine_objects(
+                'INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
         except:
             pass
 
