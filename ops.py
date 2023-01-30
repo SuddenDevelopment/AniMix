@@ -410,14 +410,27 @@ class KEY_OT_CombineObjects(bpy.types.Operator):
     bl_idname = "key.combine_objects"
     bl_label = "Add Selected to Active"
     bl_options = {'REGISTER', 'UNDO'}
+    ctrl_pressed: bpy.props.BoolProperty(default=False)
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            self.ctrl_pressed = True
+        else:
+            self.ctrl_pressed = False
+        return self.execute(context)
 
     @ classmethod
     def poll(cls, context):
         return len(context.selected_objects) > 0 and context.active_object is not None
 
     def execute(self, context):
-        actions.addSwapObjects(
-            context, context.selected_objects, context.active_object)
+        if self.ctrl_pressed == True:
+            actions.addSwapObjects(
+                context, context.selected_objects, context.active_object)
+        else:
+            bpy.ops.object.join()
+            actions.setSwapObject(context, context.active_object,
+                                  context.scene.frame_current)
         return {'FINISHED'}
 
 

@@ -430,8 +430,6 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
                 objFrame.name = strFrameName
                 objCollection.objects.link(objFrame)
                 objFrame['key_id'] = None
-                # leave the new object as selected.
-                objNew.select_set(select)
                 # remove keyframes from old object
                 keyframes.actKeyframe(obj, intFrame, 'remove')
                 arrNewObjects.append(objFrame)
