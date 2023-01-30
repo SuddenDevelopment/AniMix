@@ -82,8 +82,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                             }
             }, {
                 "name": 'StopMotion Keys',
-                "buttons": {
-                    "clear_key": 
+                "buttons": {"clear_key": 
                             {
                                 "description": "Clear keyframes: Keyframe is not removed(not deleted).\n" +
                                   "Clears the id data from the currently selected StopMotion object.\n" +
@@ -96,20 +95,25 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                              }
             }, {
                 "name": '',
-                "buttons": {
-                    "insert_key": {"description": "Add Keyframe: Adds and inserts a single keyframe with a unique StopMotion Object id\n" +
-                                   "Button behaviors: \n" +
-                                   "- Click: Insert add / insert a keyframe to the Right of the timeline indicators playhead.\n" +
-                                   "- Ctrl + Click: Insert add / insert a keyframe to the Left of the timeline indicators playhead."},
-                    "remove_key": {"description": "Remove keyframe: Removes the current keyframe and pulls keyframes into the deleted keyframe position.\n" +
-                                   "This is like deleting a keyframe.\n" +
-                                   "Button behaviors: \n" +
-                                   "- Click: Remove/Deletes insert a keyframe to the Right of the timeline indicators playhead.\n" +
-                                   "- Ctrl + Click: Remove/Deletes a keyframe to the Left of the timeline indicators playhead."},
-                    "blank_key": {"description": "Insert Blank Keyframe: Inserts a single blank keyframe to the right or the left of the timeline indicators playhead.\n" +
-                                  "Button behaviors: \n" +
-                                  "- Click: Inserts a blank keyframe to the Right of the timeline indicators playhead.\n" +
-                                  "- Ctrl + Click: Inserts a blank keyframe to the Left of the timeline indicators playhead."},
+                "buttons": {"insert_key": 
+                            {
+                                "description": "Add Keyframe: Adds and inserts a single keyframe with a unique StopMotion Object id\n" +
+                                "Button behaviors: \n" +
+                                "- Click: Insert add / insert a keyframe to the Right of the timeline indicators playhead.\n" +
+                                "- Ctrl + Click: Insert add / insert a keyframe to the Left of the timeline indicators playhead."},
+                    "remove_key": 
+                            {
+                                "description": "Remove keyframe: Removes the current keyframe and pulls keyframes into the deleted keyframe position.\n" +
+                                "This is like deleting a keyframe.\n" +
+                                "Button behaviors: \n" +
+                                "- Click: Remove/Deletes insert a keyframe to the Right of the timeline indicators playhead.\n" +
+                                "- Ctrl + Click: Remove/Deletes a keyframe to the Left of the timeline indicators playhead."},
+                    "blank_key": 
+                            {
+                                "description": "Insert Blank Keyframe: Inserts a single blank keyframe to the right or the left of the timeline indicators playhead.\n" +
+                                "Button behaviors: \n" +
+                                "- Click: Inserts a blank keyframe to the Right of the timeline indicators playhead.\n" +
+                                "- Ctrl + Click: Inserts a blank keyframe to the Left of the timeline indicators playhead."},
                 },
             }, {
                 "name": 'Duplicate',
