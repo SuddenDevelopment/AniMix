@@ -1,4 +1,5 @@
 import bpy
+import bpy.utils.previews
 import time
 import sys
 import os
