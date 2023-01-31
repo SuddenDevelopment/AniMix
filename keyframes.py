@@ -128,7 +128,7 @@ def removeKeyframe(obj, strPath, intFrame, inDataBlock=False):
     arrFrames = []
     arrFCurves = getFCurves(obj, inDataBlock)
     for i, fcurve in enumerate(arrFCurves):
-        if fcurve.data_path == strPath:
+        if fcurve.data_path == strPath or strPath is None:
             for ii, keyframe in enumerate(fcurve.keyframe_points):
                 if keyframe.co.x == intFrame:
                     try:

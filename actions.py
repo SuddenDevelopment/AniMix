@@ -306,8 +306,12 @@ def redraw(arrAreas=[]):
                 region.tag_redraw()
 
 
-def remove_keys(obj, intFrame):
-    keyframes.removeKeyframe(obj, '["key_object_id"]', intFrame)
+def remove_keys(obj, intFrame, all=False):
+    strPath = None
+    if all == False:
+        strPath = '["key_object_id"]'
+    keyframes.removeKeyframe(obj, strPath, intFrame)
+
     # pull keyframes left by one
     keyframes.nudgeFrames(
         obj, intFrame, -1, False)

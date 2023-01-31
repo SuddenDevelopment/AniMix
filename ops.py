@@ -132,7 +132,8 @@ class KEY_OT_RemoveKey(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            actions.remove_keys(obj, context.scene.frame_current)
+            actions.remove_keys(
+                obj, context.scene.frame_current, not self.ctrl_pressed)
         actions.onFrame(context.scene)
         return {'FINISHED'}
 
