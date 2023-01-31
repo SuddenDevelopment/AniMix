@@ -13,17 +13,17 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "StopMotion",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 1, 3),
+    "version": (1, 1, 4),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
     "warning": "",
     "category": "Animation",
 }
-####|| CREDIT ||####
+#### || CREDIT ||####
 # stop motion logic was started from the keymesh addon https://github.com/pablodp606/keymesh-addon
 # UI is from the bl_ui_widgets library here: https://github.com/mmmrqs/bl_ui_widgets
-####|| NOTES ||####
+#### || NOTES ||####
 # custom_properties:
 # key_id = the container object id, may change later to allow copying frames across objects
 # key_object = the swap NAME data currently in use
@@ -148,7 +148,7 @@ class KEY_PT_Main(bpy.types.Panel):
         return None
 
 
-####|| HANDLER ||####
+#### || HANDLER ||####
 
 
 @persistent
@@ -162,7 +162,7 @@ def onFrame_handler(scene: bpy.types.Scene):
             break
 
 
-####|| CLASS MAINTENANCE ||####
+#### || CLASS MAINTENANCE ||####
 arrClasses = [
     KEY_PT_Main,
     PanelProps
