@@ -125,12 +125,11 @@ def removeSelectedKeyframe(obj, strPath, inDataBlock=False):
 
 
 def removeKeyframe(obj, strPath, intFrame, inDataBlock=False):
-    arrFrames = []
     arrFCurves = getFCurves(obj, inDataBlock)
     for i, fcurve in enumerate(arrFCurves):
-        if fcurve.data_path == strPath or strPath is None:
+        if fcurve.data_path == strPath or strPath == None:
             for ii, keyframe in enumerate(fcurve.keyframe_points):
-                if keyframe.co.x == intFrame:
+                if int(keyframe.co.x) == intFrame:
                     try:
                         fcurve.keyframe_points.remove(keyframe, fast=True)
                     except:
@@ -153,17 +152,18 @@ def setKeyType(obj, strPath, intFrame, strType, inDataBlock=False):
     return
 
 
-def nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None):
+def nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None, strPath=None):
     arrFCurves = getFCurves(obj, inDataBlock)
     for i, fcurve in enumerate(arrFCurves):
-        intX = 0
-        for ii, keyframe_point in enumerate(fcurve.keyframe_points):
-            if keyframe_point.co.x >= intStart and (intStop == None or intStop >= keyframe_point.co.x):
-                # lets make sure we aren't overwriting a keyframe_point
-                intNewX = keyframe_point.co.x + intMove
-                if intNewX > intX and intNewX >= intStart:
-                    keyframe_point.co.x = intNewX
-                intX = keyframe_point.co.x
+        if fcurve.data_path == strPath or strPath == None:
+            intX = 0
+            for ii, keyframe_point in enumerate(fcurve.keyframe_points):
+                if keyframe_point.co.x >= intStart and (intStop == None or intStop >= keyframe_point.co.x):
+                    # lets make sure we aren't overwriting a keyframe_point
+                    intNewX = keyframe_point.co.x + intMove
+                    if intNewX > intX and intNewX >= intStart:
+                        keyframe_point.co.x = intNewX
+                    intX = keyframe_point.co.x
     return
 
 
