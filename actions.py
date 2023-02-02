@@ -311,10 +311,12 @@ def remove_keys(obj, intFrame, all=False):
     strPath = None
     if all == False:
         strPath = '["key_object_id"]'
-    keyframes.removeKeyframe(obj, strPath, intFrame)
+    keyframes.removeKeyframe(obj, strPath, intFrame, False)
+    keyframes.removeKeyframe(obj, strPath, intFrame, True)
 
     # pull keyframes left by one
     keyframes.nudgeFrames(obj, intFrame, -1, False, None, strPath)
+    keyframes.nudgeFrames(obj, intFrame, -1, True, None, strPath)
     redraw(['DOPESHEET_EDITOR', 'GRAPH_EDITOR'])
     return
 
