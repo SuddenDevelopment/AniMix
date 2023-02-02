@@ -363,7 +363,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
     def remove_key_click(self, widget, event, x, y):
         try:
-            bpy.ops.key.remove_key('INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
+            bpy.ops.key.remove_key()
         except:
             pass
 

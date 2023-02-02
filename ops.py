@@ -117,14 +117,6 @@ class KEY_OT_RemoveKey(bpy.types.Operator):
     bl_idname = "key.remove_key"
     bl_label = "Remove Key Data"
     bl_options = {'REGISTER', 'UNDO'}
-    ctrl_pressed: bpy.props.BoolProperty(default=False)
-
-    def invoke(self, context, event):
-        if event.ctrl:
-            self.ctrl_pressed = True
-        else:
-            self.ctrl_pressed = False
-        return self.execute(context)
 
     @ classmethod
     def poll(cls, context):
@@ -133,7 +125,7 @@ class KEY_OT_RemoveKey(bpy.types.Operator):
     def execute(self, context):
         for obj in context.selected_objects:
             actions.remove_keys(
-                obj, context.scene.frame_current, not self.ctrl_pressed)
+                obj, context.scene.frame_current, True)
         # actions.onFrame(context.scene)
         return {'FINISHED'}
 
