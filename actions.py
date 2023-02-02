@@ -429,6 +429,7 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
         objFrame = getObject(strFrameObject)
         # link the object to the same collection as parent
         if objFrame is not None:
+            objTransforms = keyframes.getTransFormsAtFrame(obj, intFrame)
             strFrameName = f'{obj.name}_Frame_{intFrame}'
             if remove == True:
                 objFrame.name = strFrameName
@@ -436,6 +437,10 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
                 objFrame['key_id'] = None
                 # remove keyframes from old object
                 keyframes.actKeyframe(obj, intFrame, 'remove')
+                objFrame.location = objTransforms['location'].copy()
+                objFrame.rotation_euler = objTransforms['rotation_euler'].copy(
+                )
+                objFrame.scale = objTransforms['scale'].copy()
                 arrNewObjects.append(objFrame)
             elif remove == False:
                 # make a copy
@@ -443,6 +448,10 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
                     strFrameName, objFrame.data.copy())
                 objCollection.objects.link(objNew)
                 objNew.select_set(select)
+                objNew.location = objTransforms['location'].copy()
+                objNew.rotation_euler = objTransforms['rotation_euler'].copy(
+                )
+                objNew.scale = objTransforms['scale'].copy()
                 arrNewObjects.append(objNew)
         else:
             print('stop motion could find frame object to separate', strFrameObject)
