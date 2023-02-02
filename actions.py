@@ -264,15 +264,16 @@ def addSwapObjects(context, arrSelected, obj):
     intSwapId = getSwapId(obj)
     intCurrentFrame = context.scene.frame_current
     for i, objSelected in enumerate(arrSelected):
-        intInsertFrame = intCurrentFrame+i
-        keyframes.nudgeFrames(obj, intInsertFrame, 1)
-        intSwapObjectId = getSwapObjectId(obj, intInsertFrame)
-        # get the frame object name based on the target object
-        strFrame = getSwapObjectName(obj.get("key_id"), intSwapObjectId)
-        # but the objects being copied are the selected ones
-        setFrameObject(objSelected, strFrame, intSwapId)
-        # set swap key, but dont change current key, because we are nudging frames not changing frames
-        setSwapKey(obj, intSwapObjectId, intInsertFrame, update=False)
+        if objSelected != context.active_object:
+            intInsertFrame = intCurrentFrame+i
+            keyframes.nudgeFrames(obj, intInsertFrame, 1)
+            intSwapObjectId = getSwapObjectId(obj, intInsertFrame)
+            # get the frame object name based on the target object
+            strFrame = getSwapObjectName(obj.get("key_id"), intSwapObjectId)
+            # but the objects being copied are the selected ones
+            setFrameObject(objSelected, strFrame, intSwapId)
+            # set swap key, but dont change current key, because we are nudging frames not changing frames
+            setSwapKey(obj, intSwapObjectId, intInsertFrame, update=False)
 
 
 def removeObject(obj):

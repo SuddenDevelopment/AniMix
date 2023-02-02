@@ -420,6 +420,9 @@ class KEY_OT_CombineObjects(bpy.types.Operator):
         if self.ctrl_pressed == True:
             actions.addSwapObjects(
                 context, context.selected_objects, context.active_object)
+            for obj in context.selected_objects:
+                if obj != context.active_object:
+                    bpy.data.objects.remove(obj)
         else:
             bpy.ops.object.join()
             actions.setSwapObject(context, context.active_object,
