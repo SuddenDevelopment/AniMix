@@ -13,7 +13,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "StopMotion",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 1, 4),
+    "version": (1, 1, 5),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
@@ -88,6 +88,10 @@ class KEY_PT_Main(bpy.types.Panel):
         row.label(text="Onion Skin")
         row.operator("key.pin_frames", text="PIN",
                      icon_value=icons_collection["pin_frame"].icon_id)
+        row = layout.row()
+        row.label(text="Clear Frame")
+        row.operator("key.clear_key", text="CLEAR",
+                     icon_value=icons_collection["clear_key"].icon_id)
         row = layout.row()
         row.label(text="StopMotion Keys")
         row = layout.column_flow(columns=3)
