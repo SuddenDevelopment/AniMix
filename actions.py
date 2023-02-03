@@ -412,14 +412,6 @@ def add_asset(obj):
             objFrame.asset_generate_preview()
 
 
-def setTransforms(obj, intFrame, objTarget):
-    objTransforms = keyframes.getTransFormsAtFrame(obj, intFrame)
-    objTarget.location = objTransforms['location'].copy()
-    objTarget.rotation_euler = objTransforms['rotation_euler'].copy(
-    )
-    objTarget.scale = objTransforms['scale'].copy()
-
-
 def getCurrentFrame(obj, intFrame):
     # get the data object needed.
     strFrame = obj.get("key_object")
@@ -431,7 +423,9 @@ def getCurrentFrame(obj, intFrame):
         objNew = bpy.data.objects.new(
             strFrameName, objFrame.data.copy())
         objCollection.objects.link(objNew)
-        setTransforms(obj, intFrame, objNew)
+        objNew.data.animation_data_clear()
+        keyframes.transferFrameState(obj, objNew, intFrame, False)
+        keyframes.transferFrameState(obj, objNew, intFrame, True)
         return objNew
 
 
@@ -461,7 +455,9 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
                 objFrame['key_id'] = None
                 # remove keyframes from old object
                 keyframes.actKeyframe(obj, intFrame, 'remove')
-                setTransforms(obj, intFrame, objFrame)
+                objFrame.animation_data_clear()
+                keyframes.transferFrameState(obj, objFrame, intFrame, False)
+                keyframes.transferFrameState(obj, objFrame, intFrame, True)
                 arrNewObjects.append(objFrame)
             elif remove == False:
                 # make a copy
@@ -469,7 +465,9 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
                     strFrameName, objFrame.data.copy())
                 objCollection.objects.link(objNew)
                 objNew.select_set(select)
-                setTransforms(obj, intFrame, objFrame)
+                objNew.data.animation_data_clear()
+                keyframes.transferFrameState(obj, objNew, intFrame, False)
+                keyframes.transferFrameState(obj, objNew, intFrame, True)
                 arrNewObjects.append(objNew)
         else:
             print('stop motion could find frame object to separate', strFrameObject)
@@ -494,16 +492,19 @@ def pinFrames(obj, intFrame):
     # for objFrame in arrFrameObjects:
     # set custom property as pinned so we can quickly remove later
     objFrame = getCurrentFrame(obj, intFrame)
-    objFrame["key_object_type"] = 'pinned'
-    # remove the materials
-    objFrame.data.materials.clear()
-    # set them as unselectable
-    objFrame.hide_select = True
-    setTransforms(obj, intFrame, objFrame)
-    # give them a transparent material
-    objMaterial = getMaterial('KEY_OnionSkin')
-    if objMaterial is not None:
-        objFrame.data.materials.append(objMaterial)
+    if objFrame is not None:
+        objFrame["key_object_type"] = 'pinned'
+        # remove the materials
+        objFrame.data.materials.clear()
+        # set them as unselectable
+        objFrame.hide_select = True
+        objFrame.data.animation_data_clear()
+        keyframes.transferFrameState(obj, objFrame, intFrame, False)
+        keyframes.transferFrameState(obj, objFrame, intFrame, True)
+        # give them a transparent material
+        objMaterial = getMaterial('KEY_OnionSkin')
+        if objMaterial is not None:
+            objFrame.data.materials.append(objMaterial)
 
 
 def unpinFrames():

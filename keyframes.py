@@ -204,14 +204,12 @@ def getFrames(obj, strPath, intFrame, direction, mode='y', intCount=False):
     return arrFrames
 
 
-def getTransFormsAtFrame(obj, intFrame):
-    objTransforms = {}
-    objTransforms['location'] = list(obj.location.xyz[:3])
-    objTransforms['rotation_euler'] = list(obj.rotation_euler[:3])
-    objTransforms['scale'] = list(obj.scale[:3])
-    arrFcurves = getFCurves(obj)
+def transferFrameState(objSource, objTarget, intFrame, inDataBlock=False):
+    if inDataBlock == True:
+        objTarget = objTarget.data
+    arrFcurves = getFCurves(objSource, inDataBlock)
     for fcurve in arrFcurves:
-        if fcurve.data_path in ['location', 'rotation_euler', 'scale']:
-            objTransforms[fcurve.data_path][fcurve.array_index] = fcurve.evaluate(
-                intFrame)
-    return objTransforms
+        if fcurve.array_index is not None and fcurve.data_path[0] != '[':
+            objData = eval(
+                f'objTarget.{fcurve.data_path}')
+            objData[fcurve.array_index] = fcurve.evaluate(intFrame)
