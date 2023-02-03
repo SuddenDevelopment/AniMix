@@ -424,16 +424,10 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         except:
             pass
 
-    def copy_objects_click(self, widget, event, x, y):
-        try:
-            bpy.ops.key.copy_objects()
-        except:
-            pass
-
     def separate_objects_click(self, widget, event, x, y):
         try:
             bpy.ops.key.separate_objects(
-                'INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
+                'INVOKE_DEFAULT', ctrl_pressed=event.ctrl, alt_pressed=event.alt)
         except:
             pass
 

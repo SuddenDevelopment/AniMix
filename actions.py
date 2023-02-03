@@ -412,6 +412,29 @@ def add_asset(obj):
             objFrame.asset_generate_preview()
 
 
+def setTransforms(obj, intFrame, objTarget):
+    objTransforms = keyframes.getTransFormsAtFrame(obj, intFrame)
+    objTarget.location = objTransforms['location'].copy()
+    objTarget.rotation_euler = objTransforms['rotation_euler'].copy(
+    )
+    objTarget.scale = objTransforms['scale'].copy()
+
+
+def getCurrentFrame(obj, intFrame):
+    # get the data object needed.
+    strFrame = obj.get("key_object")
+    objFrame = getObject(strFrame)
+    objCollection = obj.users_collection[0]
+    if objFrame is not None:
+        strFrameName = f'{obj.name}_Frame_{intFrame}'
+        # make a copy
+        objNew = bpy.data.objects.new(
+            strFrameName, objFrame.data.copy())
+        objCollection.objects.link(objNew)
+        setTransforms(obj, intFrame, objNew)
+        return objNew
+
+
 def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
     arrNewObjects = []
     # unselect the parent object
@@ -431,7 +454,6 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
         objFrame = getObject(strFrameObject)
         # link the object to the same collection as parent
         if objFrame is not None:
-            objTransforms = keyframes.getTransFormsAtFrame(obj, intFrame)
             strFrameName = f'{obj.name}_Frame_{intFrame}'
             if remove == True:
                 objFrame.name = strFrameName
@@ -439,10 +461,7 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
                 objFrame['key_id'] = None
                 # remove keyframes from old object
                 keyframes.actKeyframe(obj, intFrame, 'remove')
-                objFrame.location = objTransforms['location'].copy()
-                objFrame.rotation_euler = objTransforms['rotation_euler'].copy(
-                )
-                objFrame.scale = objTransforms['scale'].copy()
+                setTransforms(obj, intFrame, objFrame)
                 arrNewObjects.append(objFrame)
             elif remove == False:
                 # make a copy
@@ -450,10 +469,7 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
                     strFrameName, objFrame.data.copy())
                 objCollection.objects.link(objNew)
                 objNew.select_set(select)
-                objNew.location = objTransforms['location'].copy()
-                objNew.rotation_euler = objTransforms['rotation_euler'].copy(
-                )
-                objNew.scale = objTransforms['scale'].copy()
+                setTransforms(obj, intFrame, objFrame)
                 arrNewObjects.append(objNew)
         else:
             print('stop motion could find frame object to separate', strFrameObject)
@@ -474,19 +490,20 @@ def getMaterial(strMaterial):
 
 
 def pinFrames(obj, intFrame):
-    arrFrameObjects = exposeSelectedFrameObjects(
-        obj, intFrame, remove=False, select=False)
-    for objFrame in arrFrameObjects:
-        # set custom property as pinned so we can quickly remove later
-        objFrame["key_object_type"] = 'pinned'
-        # remove the materials
-        objFrame.data.materials.clear()
-        # set them as unselectable
-        objFrame.hide_select = True
-        # give them a transparent material
-        objMaterial = getMaterial('KEY_OnionSkin')
-        if objMaterial is not None:
-            objFrame.data.materials.append(objMaterial)
+    # arrFrameObjects = exposeSelectedFrameObjects(obj, intFrame, remove=False, select=False)
+    # for objFrame in arrFrameObjects:
+    # set custom property as pinned so we can quickly remove later
+    objFrame = getCurrentFrame(obj, intFrame)
+    objFrame["key_object_type"] = 'pinned'
+    # remove the materials
+    objFrame.data.materials.clear()
+    # set them as unselectable
+    objFrame.hide_select = True
+    setTransforms(obj, intFrame, objFrame)
+    # give them a transparent material
+    objMaterial = getMaterial('KEY_OnionSkin')
+    if objMaterial is not None:
+        objFrame.data.materials.append(objMaterial)
 
 
 def unpinFrames():

@@ -364,34 +364,23 @@ class KEY_OT_NoSpace(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class KEY_OT_CopyObjects(bpy.types.Operator):
-    """remove selected frames from active object to be their own objects in a collection"""
-    bl_idname = "key.copy_objects"
-    bl_label = "Copy Selected Frames"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    @ classmethod
-    def poll(cls, context):
-        return len(context.selected_objects) > 0
-
-    def execute(self, context):
-        actions.exposeSelectedFrameObjects(
-            context.active_object, context.scene.frame_current, False)
-        return {'FINISHED'}
-
-
 class KEY_OT_SeparateObjects(bpy.types.Operator):
     """remove selected frames from active object to be their own objects in a collection"""
     bl_idname = "key.separate_objects"
     bl_label = "Separate Selected Frames"
     bl_options = {'REGISTER', 'UNDO'}
     ctrl_pressed: bpy.props.BoolProperty(default=False)
+    alt_pressed: bpy.props.BoolProperty(default=False)
 
     def invoke(self, context, event):
         if event.ctrl:
             self.ctrl_pressed = True
         else:
             self.ctrl_pressed = False
+        if event.alt:
+            self.alt_pressed = True
+        else:
+            self.alt_pressed = False
         return self.execute(context)
 
     @ classmethod
@@ -400,8 +389,11 @@ class KEY_OT_SeparateObjects(bpy.types.Operator):
 
     def execute(self, context):
         # exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True)
-        actions.exposeSelectedFrameObjects(
-            context.active_object, context.scene.frame_current, self.ctrl_pressed)
+        actions.getCurrentFrame(context.active_object,
+                                context.scene.frame_current)
+        if self.ctrl_pressed == True or self.alt_pressed == True:
+            actions.exposeSelectedFrameObjects(
+                context.active_object, self.alt_pressed, self.alt_pressed)
         return {'FINISHED'}
 
 
@@ -554,7 +546,6 @@ arrClasses = [
     KEY_OT_RemoveSpace,
     KEY_OT_SetSpace,
     KEY_OT_NoSpace,
-    KEY_OT_CopyObjects,
     KEY_OT_SeparateObjects,
     KEY_OT_CombineObjects,
     KEY_OT_PinFrames,
