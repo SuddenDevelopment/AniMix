@@ -76,32 +76,32 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                                 "description":
                                 "Pin Frame:  Sets the selected object/s to be used as a reference.\n" +
                                 "\n"
-                                "- Click: Pins the current selection\n" +
-                                "- Ctrl + Click: Removes all pin frames"
+                                "- Click:  Pins the current selection\n" +
+                                "- Ctrl + Click:  Removes all pin frames"
                             }
                             }
             }, {
                 "name": 'StopMotion Keys',
                 "buttons": {"clear_key":
                             {
-                                "description": "Clear keyframes:  Clears the id data from the current StopMotion object. Keyframe is not deleted.\n" +
+                                "description": "Clear Keyframes:  Clears the id data from the current StopMotion object. Keyframe is not deleted.\n" +
                                 "\n"
-                                "- Click: Clears the geometry from the current keyframe.\n" +
-                                "- Ctrl + Click: Clears the selected geometry from the current keyframe.\n" +
-                                "- Alt + Click: Clears the non selected geometry from the current keyframe."
+                                "- Click:  Clears the geometry from the current keyframe.\n" +
+                                "- Ctrl + Click:  Clears the selected geometry from the current keyframe.\n" +
+                                "- Alt + Click:  Clears the non selected geometry from the current keyframe."
                             }
                             }
             }, {
                 "name": '',
                 "buttons": {"insert_key":
                             {
-                                "description": "Add Keyframe: Adds and inserts a single keyframe with a unique StopMotion Object id\n" +
+                                "description": "Add Keyframe:  Adds/ inserts a keyframe with unique StopMotion Object id\n" +
                                 "\n"
-                                "- Click: Insert add / insert a keyframe to the Right of the timeline indicators playhead.\n" +
-                                "- Ctrl + Click: Insert add / insert a keyframe to the Left of the timeline indicators playhead."},
+                                "- Click:  Insert add/ insert a keyframe to the Right of the timeline indicators playhead.\n" +
+                                "- Ctrl + Click:  Insert add / insert a keyframe to the Left of the timeline indicators playhead."},
                             "remove_key":
                             {
-                                "description": "Remove keyframe:  Removes the current keyframe and pulls keyframes into the deleted keyframe position.\n" +
+                                "description": "Remove Keyframe:  Removes the current keyframe and pulls keyframes into the deleted keyframe position.\n" +
                                 "This is like deleting a keyframe.\n" +
                                 "\n"
                                 "- Click: Remove/Deletes insert a keyframe to the Right of the timeline indicators playhead.\n" +
@@ -119,34 +119,32 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     {
                         "clone_key": {"description": "Duplicate Keyframe:  Duplicates the current keyframe to the right of the current active keyframe/s."},
                         "clone_object": {"description": "Duplicate Object With Keys:  Duplicates the object/s and the current keyframes with a unique id."},
-                        "clone_object_blank_keys": {"description":  "Duplicate Object With Blank Keys: Duplicates the object/s with blank keyframes."},
+                        "clone_object_blank_keys": {"description":  "Duplicate Object With Blank Keys:  Duplicates the object/s with blank keyframes."},
                     },
             },  {
                 "name": 'Frame Spacing',
                 "setPosition": True,
                 "buttons": {
-                    "add_space": {
-                        "description": "Frame Spacer:  Add\n" +
-                        "Inserts a single space to either the Right or Left side of the current keyframes.\n" +
+                    "Add_Space": {
+                        "description": "Frame Space Add:  Inserts a single space to either the Right or Left side of the current keyframes.\n" +
                         "\n"
-                        "- Click: Inserts a single space to the Right of the current keyframes.\n" +
-                        "- Ctrl + Click: Inserts a single space to the Left of the current keyframes.",
+                        "- Click:  Inserts a single space to the Right of the current keyframes.\n" +
+                        "- Ctrl + Click:  Inserts a single space to the Left of the current keyframes.",
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
                     },
-                    "remove_space": {
-                        "description": "Frame Spacer:  Subtract\n" +
-                        "Removes a single space from either Right or Left side of the current keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys.\n" +
+                    "Remove_Space": {
+                        "description": "Frame Space Subtract:  Removes a single space from either Right or Left side of the current keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys.\n" +
                         "\n"
-                        "- Click: Removes a single space to the Right of the current keyframes.\n" +
-                        "- Ctrl + Click: Removes a single space to the Left of the current keyframes.",
+                        "- Click:  Removes a single space to the Right of the current keyframes.\n" +
+                        "- Ctrl + Click:  Removes a single space to the Left of the current keyframes.",
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
                     },
-                    "no_space": {
-                        "description": "Removes all space between selected keyframes",
+                    "No_Space": {
+                        "description": "No_Space:  Removes all space between selected keyframes",
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
@@ -156,15 +154,15 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons":
                     {
 
-                        "separate_objects": {"description": "Separate Selection:  Separates and converts the currently active selection in edit mode to a new object.\n" +
+                        "separate_objects": {"description": "Separate Selection:  Separates the current objects transfomration to a sperate object.\n" +
                                              "\n"
-                                             "- Click: Creates a Copy from the object or selection.\n" +
-                                             "- Ctrl + Click: Cuts the current object or selection to a new object.",
+                                             "- Click:  Creates a Copy from the object or selection.\n" +
+                                          
                                              },
                         "combine_objects": {"description": "Combine With Active Object:  Combines the selected object with the active merging keyframe data\n"
                                             "\n"
-                                            "- Click: Combines with the active objects selections keyframe.\n" +
-                                            "- Ctrl + Click: Create new keyframe/s from selected objects to the active object.",
+                                            "- Click:  Combines with the active objects selections keyframe.\n" +
+                                            "- Ctrl + Click:  Create new keyframe/s from selected objects to the active object.",
                                             }
                     }
             }, {
