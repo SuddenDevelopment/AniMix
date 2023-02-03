@@ -21,21 +21,20 @@ def getNextSwapObjectId(obj):
 
 
 def setSwapKey(obj, intObjectId, intFrame, update=True):
+    strPath = '["key_object_id"]'
     if update == True:
         obj['key_object_id'] = intObjectId
-
-    foundFcurve = False
-    if obj.animation_data is not None:
-        for fcurve in obj.animation_data.action.fcurves:
-            if fcurve.data_path == '["key_object_id"]':
-                foundFcurve = True
-                fcurve.keyframe_points.insert(
-                    frame=intFrame, value=intObjectId)
-                for keyframe_point in fcurve.keyframe_points:
-                    keyframe_point.interpolation = 'CONSTANT'
-    if foundFcurve == False:
-        obj.keyframe_insert(
-            data_path='["key_object_id"]', frame=intFrame)
+    objFCurve = keyframes.getFCurveByPath(
+        obj, strPath, False)
+    if objFCurve == None:
+        obj.keyframe_insert(data_path=strPath, frame=intFrame)
+    else:
+        objFCurve.keyframe_points.insert(
+            frame=intFrame, value=intObjectId)
+        for keyframe_point in objFCurve.keyframe_points:
+            keyframe_point.interpolation = 'CONSTANT'
+    keyframes.setKeyType(obj, strPath, intFrame,
+                         'BREAKDOWN', inDataBlock=False)
 
 
 def getSwapObjectName(intSwapId, intSwapObjectId):

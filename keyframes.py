@@ -7,6 +7,14 @@ def getFCurves(obj, inDataBlock=False):
     return arrFCurves
 
 
+def getFCurveByPath(obj, strPath, inDataBlock):
+    arrFCurves = getFCurves(obj, inDataBlock)
+    for fcurve in arrFCurves:
+        if fcurve.data_path == strPath:
+            return fcurve
+    return None
+
+
 def actKeyframe(obj, intFrame, strMode, inDataBlock=False):
     arrFcurves = getFCurves(obj, inDataBlock)
     for fcurve in arrFcurves:
@@ -70,26 +78,25 @@ def setNewFrames(obj, dicFrames, intLastFrame, intPushFrames, inDataBlock=False)
 
 def getKeyframeValue(obj, strPath, intFrame, mode, value='y'):
     intFrameId = None
-    arrFcurves = getFCurves(obj)
-    for fcurve in arrFcurves:
-        if fcurve.data_path == strPath:
-            for keyframe_point in fcurve.keyframe_points:
-                intValue = getattr(keyframe_point.co, value)
-                if mode == '<':
-                    if keyframe_point.co.x < intFrame or (intFrameId is None and keyframe_point.co.x != intFrame):
-                        intFrameId = intValue
-                elif mode == '=':
-                    if keyframe_point.co.x == intFrame:
-                        intFrameId = intValue
-                        break
-                elif mode == '<=':
-                    if keyframe_point.co.x <= intFrame or intFrameId is None:
-                        intFrameId = intValue
-                elif mode == 'max':
-                    if intFrameId is None:
-                        intFrameId = 0
-                    if keyframe_point.co.y > intFrameId or intFrameId is None:
-                        intFrameId = intValue
+    objFCurve = getFCurveByPath(obj, strPath, False)
+    if objFCurve != None:
+        for keyframe_point in objFCurve.keyframe_points:
+            intValue = getattr(keyframe_point.co, value)
+            if mode == '<':
+                if keyframe_point.co.x < intFrame or (intFrameId is None and keyframe_point.co.x != intFrame):
+                    intFrameId = intValue
+            elif mode == '=':
+                if keyframe_point.co.x == intFrame:
+                    intFrameId = intValue
+                    break
+            elif mode == '<=':
+                if keyframe_point.co.x <= intFrame or intFrameId is None:
+                    intFrameId = intValue
+            elif mode == 'max':
+                if intFrameId is None:
+                    intFrameId = 0
+                if keyframe_point.co.y > intFrameId or intFrameId is None:
+                    intFrameId = intValue
     if intFrameId != None:
         intFrameId = int(intFrameId)
     return intFrameId
@@ -112,15 +119,14 @@ def getSelectedFrames(obj, strPath, mode='y', inDataBlock=False, frames='selecte
 
 def removeSelectedKeyframe(obj, strPath, inDataBlock=False):
     arrFrames = []
-    arrFCurves = getFCurves(obj, inDataBlock)
-    for i, fcurve in enumerate(arrFCurves):
-        if fcurve.data_path == strPath:
-            for ii, keyframe in enumerate(fcurve.keyframe_points):
-                if keyframe.select_control_point == True:
-                    try:
-                        fcurve.keyframe_points.remove(keyframe, fast=True)
-                    except:
-                        pass
+    objFCurve = getFCurveByPath(obj, strPath, inDataBlock)
+    if objFCurve != None:
+        for ii, keyframe in enumerate(objFCurve.keyframe_points):
+            if keyframe.select_control_point == True:
+                try:
+                    objFCurve.keyframe_points.remove(keyframe, fast=True)
+                except:
+                    pass
     return
 
 
@@ -140,15 +146,14 @@ def removeKeyframe(obj, strPath, intFrame, inDataBlock=False):
 
 
 def setKeyType(obj, strPath, intFrame, strType, inDataBlock=False):
-    arrFCurves = getFCurves(obj, inDataBlock)
-    for i, fcurve in enumerate(arrFCurves):
-        if fcurve.data_path == strPath:
-            for ii, keyframe in enumerate(fcurve.keyframe_points):
-                if keyframe.co.x == intFrame:
-                    try:
-                        keyframe.type = strType
-                    except:
-                        pass
+    objFCurve = getFCurveByPath(obj, strPath, inDataBlock)
+    if objFCurve != None:
+        for ii, keyframe in enumerate(objFCurve.keyframe_points):
+            if keyframe.co.x == intFrame:
+                try:
+                    keyframe.type = strType
+                except:
+                    pass
     return
 
 
@@ -185,22 +190,20 @@ def getKeyframeVacancy(obj, strpath, intFrame, intNextFrame):
 def getFrames(obj, strPath, intFrame, direction, mode='y', intCount=False):
     # mode = x for frame number, mode = y for value
     arrFrames = []
-    arrFcurves = getFCurves(obj)
-    for fcurve in arrFcurves:
-        if fcurve.data_path == strPath:
-            for keyframe_point in fcurve.keyframe_points:
-                if direction == '<' and keyframe_point.co.x < intFrame:
-                    arrFrames.append(getattr(keyframe_point.co, mode))
-                elif direction == '>' and keyframe_point.co.x > intFrame:
-                    arrFrames.append(getattr(keyframe_point.co, mode))
-            break
-    if intCount is not False and len(arrFrames) > intCount:
-        if direction == '<':
-            arrFrames = arrFrames[-intCount]
-            # reverse the array
-            arrFrames = arrFrames[::-1]
-        elif direction == '>':
-            arrFrames = arrFrames[0:intCount]
+    objFCurve = getFCurveByPath(obj, strPath, False)
+    if objFCurve != None:
+        for keyframe_point in objFCurve.keyframe_points:
+            if direction == '<' and keyframe_point.co.x < intFrame:
+                arrFrames.append(getattr(keyframe_point.co, mode))
+            elif direction == '>' and keyframe_point.co.x > intFrame:
+                arrFrames.append(getattr(keyframe_point.co, mode))
+        if intCount is not False and len(arrFrames) > intCount:
+            if direction == '<':
+                arrFrames = arrFrames[-intCount]
+                # reverse the array
+                arrFrames = arrFrames[::-1]
+            elif direction == '>':
+                arrFrames = arrFrames[0:intCount]
     return arrFrames
 
 
