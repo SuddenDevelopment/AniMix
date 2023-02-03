@@ -116,7 +116,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'Duplicate',
                 "buttons":
                     {
-                        "clone_key": {"description": "Duplicate Keyframe:  Duplicates the current keyframe to the right of the current active keyframe/s."},
+                        "clone_key": {"description": "Duplicate Keyframe:  Duplicates the current keyframe to the right of the current active keyframe."},
                         "clone_object": {"description": "Duplicate Object With Keys:  Duplicates the object/s and the current keyframes with a unique id."},
                         "clone_object_blank_keys": {"description":  "Duplicate Object With Blank Keys:  Duplicates the object/s with blank keyframes."},
                     },
@@ -161,14 +161,14 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "combine_objects": {"description": "Combine To Active Object:  Combines the selected object with the active objects keyframes.\n"
                                             "\n"
                                             "Click:  Combines the selection with the active objects keyframe.\n" +
-                                            "Ctrl + Click:  Create new keyframe/s from selected objects to the active objects keyframes.",
+                                            "Ctrl + Click:  Creates new keyframe/s from selected objects to the active objects keyframes.",
                                             }
                     }
             }, {
                 "name": 'Assets',
                 "buttons":
                     {
-                        "add_asset": {"description": "Asset Library:  Create assets out of what is selected. Object, Edit mode and from selected Keyframe/s data."},
+                        "add_asset": {"description": "Asset Library:  Creates assets in Object mode, selections in Edit mode, and from active Keyframes."},
                     }
             }
         ]
