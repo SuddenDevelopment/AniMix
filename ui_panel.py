@@ -154,9 +154,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                     {
 
                         "separate_objects": {"description": "Separate Selection:  Separates the current objects transfomration to a sperate object.\n" +
-                                             "\n"
-                                             "Click:  Creates a Copy from the Object/ Edit mode of the selection.\n" +
-                                          
+                                             "Click:  Creates a Copy from the Object/ Edit mode of the selection.\n"
+
                                              },
                         "combine_objects": {"description": "Combine To Active Object:  Combines the selected object with the active objects keyframes.\n"
                                             "\n"
