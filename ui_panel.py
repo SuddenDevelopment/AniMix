@@ -143,7 +143,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
                     },
-                    "No_Space": {
+                    "no_space": {
                         "description": "No_Space:  Removes all space between selected keyframes",
                         "imageSize": (32, 16),
                         "imagePosition": (2, 0),
