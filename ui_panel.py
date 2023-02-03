@@ -125,7 +125,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'Frame Spacing',
                 "setPosition": True,
                 "buttons": {
-                    "Add_Space": {
+                    "add_space": {
                         "description": "Frame Space Add:  Inserts a single space to either the Right or Left side of the current keyframes.\n" +
                         "\n"
                         "- Click:  Inserts a single space to the Right of the current keyframes.\n" +
@@ -134,7 +134,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                         "imagePosition": (2, 0),
                         "buttonSize": (38, 17)
                     },
-                    "Remove_Space": {
+                    "remove_space": {
                         "description": "Frame Space Subtract:  Removes a single space from either Right or Left side of the current keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys.\n" +
                         "\n"
                         "- Click:  Removes a single space to the Right of the current keyframes.\n" +
