@@ -85,7 +85,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'StopMotion Keys',
                 "buttons": {"clear_key":
                             {
-                                "description": (BOLD + "Clear keyframes:\n") +
+                                "description": "Clear keyframes:\n"+
                                 "\n"
                                 "Clears the id data from the current StopMotion object. Keyframe is not deleted.\n" +
                                 "\n"
