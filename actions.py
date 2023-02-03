@@ -417,16 +417,17 @@ def getCurrentFrame(obj, intFrame):
     strFrame = obj.get("key_object")
     objFrame = getObject(strFrame)
     objCollection = obj.users_collection[0]
-    if objFrame is not None:
-        strFrameName = f'{obj.name}_Frame_{intFrame}'
-        # make a copy
-        objNew = bpy.data.objects.new(
-            strFrameName, objFrame.data.copy())
-        objCollection.objects.link(objNew)
-        objNew.data.animation_data_clear()
-        keyframes.transferFrameState(obj, objNew, intFrame, False)
-        keyframes.transferFrameState(obj, objNew, intFrame, True)
-        return objNew
+    if objFrame == None:
+        objFrame = obj
+    strFrameName = f'{obj.name}_Frame_{intFrame}'
+    # make a copy
+    objNew = bpy.data.objects.new(
+        strFrameName, objFrame.data.copy())
+    objCollection.objects.link(objNew)
+    objNew.data.animation_data_clear()
+    keyframes.transferFrameState(obj, objNew, intFrame, False)
+    keyframes.transferFrameState(obj, objNew, intFrame, True)
+    return objNew
 
 
 def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
@@ -447,28 +448,29 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
         strFrameObject = getSwapObjectName(obj.get("key_id"), intSwapObjectId)
         objFrame = getObject(strFrameObject)
         # link the object to the same collection as parent
-        if objFrame is not None:
-            strFrameName = f'{obj.name}_Frame_{intFrame}'
-            if remove == True:
-                objFrame.name = strFrameName
-                objCollection.objects.link(objFrame)
-                objFrame['key_id'] = None
-                # remove keyframes from old object
-                keyframes.actKeyframe(obj, intFrame, 'remove')
-                objFrame.animation_data_clear()
-                keyframes.transferFrameState(obj, objFrame, intFrame, False)
-                keyframes.transferFrameState(obj, objFrame, intFrame, True)
-                arrNewObjects.append(objFrame)
-            elif remove == False:
-                # make a copy
-                objNew = bpy.data.objects.new(
-                    strFrameName, objFrame.data.copy())
-                objCollection.objects.link(objNew)
-                objNew.select_set(select)
-                objNew.data.animation_data_clear()
-                keyframes.transferFrameState(obj, objNew, intFrame, False)
-                keyframes.transferFrameState(obj, objNew, intFrame, True)
-                arrNewObjects.append(objNew)
+        if objFrame == None:
+            objFrame = obj.copy()
+        strFrameName = f'{obj.name}_Frame_{intFrame}'
+        if remove == True:
+            objFrame.name = strFrameName
+            objCollection.objects.link(objFrame)
+            objFrame['key_id'] = None
+            # remove keyframes from old object
+            keyframes.actKeyframe(obj, intFrame, 'remove')
+            objFrame.animation_data_clear()
+            keyframes.transferFrameState(obj, objFrame, intFrame, False)
+            keyframes.transferFrameState(obj, objFrame, intFrame, True)
+            arrNewObjects.append(objFrame)
+        elif remove == False:
+            # make a copy
+            objNew = bpy.data.objects.new(
+                strFrameName, objFrame.data.copy())
+            objCollection.objects.link(objNew)
+            objNew.select_set(select)
+            objNew.data.animation_data_clear()
+            keyframes.transferFrameState(obj, objNew, intFrame, False)
+            keyframes.transferFrameState(obj, objNew, intFrame, True)
+            arrNewObjects.append(objNew)
         else:
             print('stop motion could find frame object to separate', strFrameObject)
     obj.select_set(not select)
@@ -492,19 +494,20 @@ def pinFrames(obj, intFrame):
     # for objFrame in arrFrameObjects:
     # set custom property as pinned so we can quickly remove later
     objFrame = getCurrentFrame(obj, intFrame)
-    if objFrame is not None:
-        objFrame["key_object_type"] = 'pinned'
-        # remove the materials
-        objFrame.data.materials.clear()
-        # set them as unselectable
-        objFrame.hide_select = True
-        objFrame.data.animation_data_clear()
-        keyframes.transferFrameState(obj, objFrame, intFrame, False)
-        keyframes.transferFrameState(obj, objFrame, intFrame, True)
-        # give them a transparent material
-        objMaterial = getMaterial('KEY_OnionSkin')
-        if objMaterial is not None:
-            objFrame.data.materials.append(objMaterial)
+    if objFrame == None:
+        objFrame = obj.copy()
+    objFrame["key_object_type"] = 'pinned'
+    # remove the materials
+    objFrame.data.materials.clear()
+    # set them as unselectable
+    objFrame.hide_select = True
+    objFrame.data.animation_data_clear()
+    keyframes.transferFrameState(obj, objFrame, intFrame, False)
+    keyframes.transferFrameState(obj, objFrame, intFrame, True)
+    # give them a transparent material
+    objMaterial = getMaterial('KEY_OnionSkin')
+    if objMaterial is not None:
+        objFrame.data.materials.append(objMaterial)
 
 
 def unpinFrames():

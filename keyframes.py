@@ -205,11 +205,11 @@ def getFrames(obj, strPath, intFrame, direction, mode='y', intCount=False):
 
 
 def transferFrameState(objSource, objTarget, intFrame, inDataBlock=False):
-    if inDataBlock == True:
-        objTarget = objTarget.data
     arrFcurves = getFCurves(objSource, inDataBlock)
     for fcurve in arrFcurves:
         if fcurve.array_index is not None and fcurve.data_path[0] != '[':
-            objData = eval(
-                f'objTarget.{fcurve.data_path}')
+            strDataPath = fcurve.data_path
+            if inDataBlock == True:
+                strDataPath = f'data.{strDataPath}'
+            objData = objTarget.path_resolve(strDataPath)
             objData[fcurve.array_index] = fcurve.evaluate(intFrame)
