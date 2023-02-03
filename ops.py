@@ -50,7 +50,10 @@ class KEY_OT_ClearKey(bpy.types.Operator):
             # object swapping for key feature
             if strMode == 'EDIT':
                 if self.alt_pressed == True:
-                    bpy.ops.mesh.select_all(action='INVERT')
+                    if obj.type == 'MESH':
+                        bpy.ops.mesh.select_all(action='INVERT')
+                    elif obj.type == 'CURVE':
+                        bpy.ops.curve.select_all(action='INVERT')
                 if self.ctrl_pressed == True or self.alt_pressed == True:
                     if obj.type == 'MESH':
                         bpy.ops.mesh.delete(type='VERT')
