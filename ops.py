@@ -26,12 +26,17 @@ class KEY_OT_ClearKey(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     ctrl_pressed: bpy.props.BoolProperty(default=False)
+    alt_pressed: bpy.props.BoolProperty(default=False)
 
     def invoke(self, context, event):
         if event.ctrl:
             self.ctrl_pressed = True
         else:
             self.ctrl_pressed = False
+        if event.alt:
+            self.alt_pressed = True
+        else:
+            self.alt_pressed = False
         return self.execute(context)
 
     @ classmethod
@@ -44,7 +49,9 @@ class KEY_OT_ClearKey(bpy.types.Operator):
             obj = context.active_object
             # object swapping for key feature
             if strMode == 'EDIT':
-                if self.ctrl_pressed == True:
+                if self.alt_pressed == True:
+                    bpy.ops.mesh.select_all(action='INVERT')
+                if self.ctrl_pressed == True or self.alt_pressed == True:
                     if obj.type == 'MESH':
                         bpy.ops.mesh.delete(type='VERT')
                     elif obj.type == 'CURVE':
