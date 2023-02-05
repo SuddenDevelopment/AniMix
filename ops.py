@@ -391,12 +391,36 @@ class KEY_OT_SeparateObjects(bpy.types.Operator):
         return len(context.selected_objects) > 0
 
     def execute(self, context):
+        strMode = context.object.mode
+        obj = context.active_object
         # exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True)
-        actions.getCurrentFrame(context.active_object,
-                                context.scene.frame_current)
-        if self.ctrl_pressed == True or self.alt_pressed == True:
-            actions.exposeSelectedFrameObjects(
-                context.active_object, self.alt_pressed, self.alt_pressed)
+        if strMode == 'EDIT':
+            objNew = actions.getCurrentFrame(obj, context.scene.frame_current)
+            bpy.ops.object.mode_set(mode='OBJECT')
+            obj.select_set(False)
+            context.view_layer.objects.active = objNew
+            objNew.select_set(True)
+            bpy.ops.object.mode_set(mode='EDIT')
+            if self.alt_pressed == False:
+                if objNew.type == 'MESH':
+                    bpy.ops.mesh.select_all(action='INVERT')
+                elif objNew.type == 'CURVE':
+                    bpy.ops.curve.select_all(action='INVERT')
+            if objNew.type == 'MESH':
+                bpy.ops.mesh.delete(type='VERT')
+            elif objNew.type == 'CURVE':
+                bpy.ops.curve.delete(type='VERT')
+            bpy.ops.object.mode_set(mode='OBJECT')
+            objNew.select_set(False)
+            obj.select_set(True)
+            context.view_layer.objects.active = obj
+            bpy.ops.object.mode_set(mode='EDIT')
+        else:
+            if self.ctrl_pressed == True or self.alt_pressed == True:
+                actions.exposeSelectedFrameObjects(
+                    obj, self.alt_pressed, self.alt_pressed)
+            else:
+                actions.getCurrentFrame(obj, context.scene.frame_current)
         return {'FINISHED'}
 
 

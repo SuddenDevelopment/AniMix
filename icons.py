@@ -21,7 +21,10 @@ def getIcon(strIcon, strPath=None):
         strPath = strDirectory
     if strIcon in arrIcons:
         return arrIcons[strIcon]
-    return arrIcons.load(strIcon, os.path.join(strPath, strIcon + ".png"), "IMAGE")
+    try:
+        return arrIcons.load(strIcon, os.path.join(strPath, strIcon + ".png"), "IMAGE")
+    except:
+        print("couldn't find file for icon: ", strIcon, strPath)
 
 
 def initIcons():

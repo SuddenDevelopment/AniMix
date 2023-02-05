@@ -469,6 +469,7 @@ def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
             objNew.data.animation_data_clear()
             keyframes.transferFrameState(obj, objNew, intFrame, False)
             keyframes.transferFrameState(obj, objNew, intFrame, True)
+            copySelections(obj, objNew)
             arrNewObjects.append(objNew)
         else:
             print('stop motion could find frame object to separate', strFrameObject)
@@ -513,3 +514,24 @@ def unpinFrames():
     for obj in bpy.data.objects:
         if obj.get("key_object_type") == 'pinned':
             bpy.data.objects.remove(obj)
+
+
+def copySelections(objSource, objTarget):
+    if objSource.type == 'MESH':
+        for vert in objSource.data.vertices:
+            try:
+                objTarget.data.vertices[vert.index].Select = vert.Select
+            except:
+                pass
+    elif objSource.type == 'CURVE':
+        for i, spline in enumerate(objSource.data.splines):
+            for ii, point in enumerate(spline.points):
+                try:
+                    objTarget.data.splines[i].points[ii].select = point.select
+                except:
+                    pass
+            for ii, point in enumerate(spline.bezier_points):
+                try:
+                    objTarget.data.splines[i].bezier_points[ii].select_control_point = point.select_control_point
+                except:
+                    pass
