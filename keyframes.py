@@ -1,9 +1,15 @@
 def getFCurves(obj, inDataBlock=False):
     arrFCurves = []
     if inDataBlock == False and hasattr(obj, 'animation_data') == True and hasattr(obj.animation_data, 'action') == True:
-        arrFCurves = obj.animation_data.action.fcurves
+        try:
+            arrFCurves = obj.animation_data.action.fcurves
+        except:
+            pass
     if inDataBlock == True and hasattr(obj.data, 'animation_data') == True and hasattr(obj.data.animation_data, 'action') == True:
-        arrFCurves = obj.data.animation_data.action.fcurves
+        try:
+            arrFCurves = obj.data.animation_data.action.fcurves
+        except:
+            pass
     return arrFCurves
 
 
