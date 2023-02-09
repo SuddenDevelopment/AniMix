@@ -502,8 +502,8 @@ def copyConstraints(objSource, objTarget):
             if not attr.startswith("__"):
                 try:
                     setattr(new_constraint, attr, getattr(constraint, attr))
-                except Exception as e:
-                    print(e)
+                except:
+                    pass
 
 
 def applyConstraints(obj):
@@ -512,6 +512,22 @@ def applyConstraints(obj):
         # Check if the constraint is enabled
         if constraint.mute:
             continue
+
+
+def copy_modifiers(src_obj, dest_obj):
+    # Loop through all modifiers on the source object
+    for src_mod in src_obj.modifiers:
+        # Create a new modifier on the destination object
+        dest_mod = dest_obj.modifiers.new(src_mod.name, src_mod.type)
+
+        # Copy the properties of the source modifier to the destination modifier
+        for prop in src_mod.bl_rna.properties:
+            if prop.identifier not in {'rna_type', 'name', 'type'}:
+                try:
+                    setattr(dest_mod, prop.identifier,
+                            getattr(src_mod, prop.identifier))
+                except:
+                    pass
 
 
 def pinFrames(obj, intFrame):
@@ -534,7 +550,7 @@ def pinFrames(obj, intFrame):
     objFrame.location = obj.matrix_world.to_translation()
     objFrame.rotation_euler = obj.matrix_world.to_euler()
     copyConstraints(obj, objFrame)
-    applyConstraints(objFrame)
+    copy_modifiers(obj, objFrame)
     # give them a transparent material
     objMaterial = getMaterial('KEY_OnionSkin')
     if objMaterial is not None:
