@@ -93,31 +93,31 @@ class KEY_OT_InsertKey(bpy.types.Operator):
             self.report(
                 {'ERROR'}, "This object has data block animation data that will not survive data block swapping")
         if len(context.selected_objects) > 0:
-            obj = context.active_object
-            intFrame = context.scene.frame_current
-            intDirection = 1
-            if self.ctrl_pressed == True:
-                intDirection = -1
-            intNextFrame = intFrame+intDirection
-            strAction = keyframes.getKeyframeVacancy(
-                obj, '["key_object_id"]', intFrame, intNextFrame)
-            if strAction == 'CURRENT':
-                actions.setSwapObject(
-                    context, obj, intFrame)
-            elif strAction == 'NEXT':
-                context.scene.frame_set(intNextFrame)
-                actions.setSwapObject(
-                    context, obj, intNextFrame)
-            else:
-                intStartFrame = intFrame
-                intStopFrame = None
-                if intDirection == -1:
-                    intStartFrame = 0
-                    intStopFrame = intFrame
-                keyframes.nudgeFrames(
-                    obj, intStartFrame, intDirection, False, intStopFrame)
-                actions.setSwapObject(
-                    context, obj, intFrame)
+            for obj in context.selected_objects:
+                intFrame = context.scene.frame_current
+                intDirection = 1
+                if self.ctrl_pressed == True:
+                    intDirection = -1
+                intNextFrame = intFrame+intDirection
+                strAction = keyframes.getKeyframeVacancy(
+                    obj, '["key_object_id"]', intFrame, intNextFrame)
+                if strAction == 'CURRENT':
+                    actions.setSwapObject(
+                        context, obj, intFrame)
+                elif strAction == 'NEXT':
+                    context.scene.frame_set(intNextFrame)
+                    actions.setSwapObject(
+                        context, obj, intNextFrame)
+                else:
+                    intStartFrame = intFrame
+                    intStopFrame = None
+                    if intDirection == -1:
+                        intStartFrame = 0
+                        intStopFrame = intFrame
+                    keyframes.nudgeFrames(
+                        obj, intStartFrame, intDirection, False, intStopFrame)
+                    actions.setSwapObject(
+                        context, obj, intFrame)
 
         return {'FINISHED'}
 
