@@ -112,6 +112,7 @@ def setTmp(obj):
     else:
         objTmp = bpy.data.objects.new(strTmp, obj.data.copy())
         objTmp.data.use_fake_user = True
+        objTmp.use_fake_user = True
         objTmp["key_id"] = intSwapId
     return objTmp
 
@@ -120,6 +121,11 @@ def getDataSum(obj):
     # an attempt to get the cheapest data compare possible for equal or not
     intSum = 0
     if obj:
+        # add text, metaballs
+        if obj.type == 'FONT':
+            pass
+        if obj.type == 'META':
+            pass
         if obj.type == 'MESH':
             intSum += len(obj.data.vertices)
             for vert in obj.data.vertices:
@@ -197,6 +203,7 @@ def getSwapId(obj):
     if objTmp is None:
         objTmp = bpy.data.objects.new(strTmp, obj.data.copy())
         objTmp.data.use_fake_user = True
+        objTmp.use_fake_user = True
         objTmp["key_id"] = intSwapId
     return intSwapId
 
@@ -230,6 +237,7 @@ def setFrameObject(obj, strFrame, intSwapId):
         # create the frame object
         objFrame = bpy.data.objects.new(strFrame, obj.data.copy())
         objFrame.data.use_fake_user = True
+        objFrame.use_fake_user = True
         objFrame["key_id"] = intSwapId
     else:
         objFrame.data = obj.data.copy()
@@ -292,6 +300,7 @@ def getBlankFrameObject(obj):
     if strNewObjName:
         objTmp = bpy.data.objects.new(strNewObjName, obj.data.copy())
         objTmp.data.use_fake_user = True
+        objTmp.use_fake_user = True
         objTmp["key_object_id"] = intSwapObjectID
         objTmp["key_id"] = intSwapId
         removeGeo(objTmp)
