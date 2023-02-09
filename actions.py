@@ -123,9 +123,12 @@ def getDataSum(obj):
     if obj:
         # add text, metaballs
         if obj.type == 'FONT':
-            pass
+            intSum = hash(obj.data.body)
         if obj.type == 'META':
-            pass
+            intSum += len(obj.data.elements)
+            for elem in obj.data.elements:
+                intSum += elem.co.x + elem.co.y + elem.co.z
+                intSum += elem.radius
         if obj.type == 'MESH':
             intSum += len(obj.data.vertices)
             for vert in obj.data.vertices:
@@ -404,13 +407,6 @@ def clone_object(context, obj, blank=False):
     return objNew
 
 
-def setCollection(strCollection):
-    if strCollection in bpy.data.collections:
-        setCollection(f'{strCollection}_KEYS')
-    else:
-        return bpy.data.collections.new(name=strCollection)
-
-
 def add_asset(obj):
     # get a list of the the objects
     arrFrames = keyframes.getSelectedFrames(obj, '["key_object_id"]', 'y')
@@ -441,7 +437,6 @@ def getCurrentFrame(obj, intFrame):
     keyframes.transferFrameState(obj, objNew, intFrame, False)
     keyframes.transferFrameState(obj, objNew, intFrame, True)
     return objNew
-
 
 def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
     arrNewObjects = []
@@ -539,15 +534,26 @@ def copy_modifiers(src_obj, dest_obj):
                     pass
 
 
+def getCollection(strCollection, strParent=None):
+    if strCollection not in bpy.data.collections:
+        objCollection = bpy.data.collections.new(name=strCollection)
+        if strParent != None:
+            bpy.data.collections[strParent].children.link(objCollection)
+        else:
+            print("no parent for: "+strCollection)
+    return bpy.data.collections[strCollection]
+
 def pinFrames(obj, intFrame):
     # arrFrameObjects = exposeSelectedFrameObjects(obj, intFrame, remove=False, select=False)
     # for objFrame in arrFrameObjects:
     # set custom property as pinned so we can quickly remove later
+    objCollection = getCollection(f'{config.PREFIX}_pinned_frames')
     objFrame = getCurrentFrame(obj, intFrame)
     if objFrame == None:
         objFrame = obj.copy()
     objFrame.parent = None
     objFrame["key_object_type"] = 'pinned'
+    objCollection.objects.link(objFrame)
     # remove the materials
     objFrame.data.materials.clear()
     # set them as unselectable
