@@ -3,6 +3,7 @@ import requests
 import json
 import textwrap
 import os
+import time
 
 # This fun little script created by Anthony Aragues:  https://AnthonyAragues.com
 # 1. Update the defaults and constants at the top
@@ -12,7 +13,7 @@ import os
 URL = 'https://anthonyaragues.com/stopmotion_check.json'
 PREFIX = 'key'
 ALLOW_DISMISS_VERSION = True
-
+CHECK_FREQUENCY = 86400 * 30
 objDefault = {
     "version": "0",
     "ver_message": "Update Available",
@@ -90,6 +91,11 @@ def check_version(bl_info):
     objResponse = None
     objVersion = None
     objPreference = getVersionFile()
+    # throttle check frequency by setting
+    intTime = int(time.time())
+    if 'lastCheck' in objPreference:
+        if objPreference['lastCheck'] + CHECK_FREQUENCY > intTime:
+            return
     try:
         objResponse = requests.get(URL)
     except:
@@ -100,6 +106,7 @@ def check_version(bl_info):
         except:
             pass
         if objVersion is not None:
+            objPreference['lastCheck'] = intTime
             if getIntVersion(objVersion["version"]) > getIntVersion(str(bl_info["version"])):
                 if getIntVersion(objVersion["version"]) > getIntVersion(objPreference["version"]):
                     objVersion["hide_version"] = False
