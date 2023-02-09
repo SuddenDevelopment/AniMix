@@ -506,6 +506,14 @@ def copyConstraints(objSource, objTarget):
                     print(e)
 
 
+def applyConstraints(obj):
+    # Loop through all constraints on the object
+    for constraint in obj.constraints:
+        # Check if the constraint is enabled
+        if constraint.mute:
+            continue
+
+
 def pinFrames(obj, intFrame):
     # arrFrameObjects = exposeSelectedFrameObjects(obj, intFrame, remove=False, select=False)
     # for objFrame in arrFrameObjects:
@@ -513,6 +521,7 @@ def pinFrames(obj, intFrame):
     objFrame = getCurrentFrame(obj, intFrame)
     if objFrame == None:
         objFrame = obj.copy()
+    objFrame.parent = None
     objFrame["key_object_type"] = 'pinned'
     # remove the materials
     objFrame.data.materials.clear()
@@ -525,6 +534,7 @@ def pinFrames(obj, intFrame):
     objFrame.location = obj.matrix_world.to_translation()
     objFrame.rotation_euler = obj.matrix_world.to_euler()
     copyConstraints(obj, objFrame)
+    applyConstraints(objFrame)
     # give them a transparent material
     objMaterial = getMaterial('KEY_OnionSkin')
     if objMaterial is not None:

@@ -477,8 +477,9 @@ class KEY_OT_PinFrames(bpy.types.Operator):
         if self.ctrl_pressed:
             actions.unpinFrames()
         else:
-            actions.pinFrames(context.active_object,
-                              context.scene.frame_current)
+            for obj in context.selected_objects:
+                if obj.type == 'MESH' or obj.type == 'CURVE':
+                    actions.pinFrames(obj, context.scene.frame_current)
         return {'FINISHED'}
 
 
