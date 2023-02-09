@@ -145,7 +145,7 @@ def onFramePre(scene):
     if context.active_object is not None:
         strMode = context.object.mode
     # object swapping for key feature
-    if strMode == 'EDIT':
+    if strMode == 'EDIT' or strMode == 'SCULPT':
         bpy.ops.object.mode_set(mode='OBJECT')
         for obj in scene.objects:
             strFrame = obj.get("key_object")
@@ -156,7 +156,7 @@ def onFramePre(scene):
                 intSumFrame = getDataSum(objFrame)
                 if intSumTmp != intSumFrame:
                     setDataBlock(objFrame, objTmp)
-        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.mode_set(mode=strMode)
 
 
 def onFrame(scene):
