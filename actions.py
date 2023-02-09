@@ -494,6 +494,18 @@ def getMaterial(strMaterial):
     return objMaterial
 
 
+def copyConstraints(objSource, objTarget):
+    for constraint in objSource.constraints:
+        new_constraint = objTarget.constraints.new(constraint.type)
+        new_constraint.target = constraint.target
+        for attr in dir(constraint):
+            if not attr.startswith("__"):
+                try:
+                    setattr(new_constraint, attr, getattr(constraint, attr))
+                except Exception as e:
+                    print(e)
+
+
 def pinFrames(obj, intFrame):
     # arrFrameObjects = exposeSelectedFrameObjects(obj, intFrame, remove=False, select=False)
     # for objFrame in arrFrameObjects:
@@ -509,6 +521,10 @@ def pinFrames(obj, intFrame):
     objFrame.data.animation_data_clear()
     keyframes.transferFrameState(obj, objFrame, intFrame, False)
     keyframes.transferFrameState(obj, objFrame, intFrame, True)
+    # move the frameobject to the sam world location as the original
+    objFrame.location = obj.matrix_world.to_translation()
+    objFrame.rotation_euler = obj.matrix_world.to_euler()
+    copyConstraints(obj, objFrame)
     # give them a transparent material
     objMaterial = getMaterial('KEY_OnionSkin')
     if objMaterial is not None:
