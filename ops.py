@@ -479,7 +479,7 @@ class KEY_OT_PinFrames(bpy.types.Operator):
         else:
             for obj in context.selected_objects:
                 if obj.type == 'MESH' or obj.type == 'CURVE':
-                    actions.pinFrames(obj, context.scene.frame_current)
+                    actions.pinFrame(context, obj, context.scene.frame_current)
         return {'FINISHED'}
 
 

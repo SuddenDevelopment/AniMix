@@ -364,7 +364,6 @@ def clone_key(context, obj, intFrame, intNextFrame):
                              intNextFrame, 'MOVING_HOLD')
         # bpy.context.active_object.animation_data.action.fcurves[0].keyframe_points[0].type = 'KEYFRAME'
 
-
 def clone_unique_key(context, obj, intFrame):
     # Push keyframes to make room for duplicate
     keyframes.nudgeFrames(obj, intFrame+1, 1)
@@ -498,32 +497,30 @@ def getMaterial(strMaterial):
     return objMaterial
 
 
-def copyConstraints(objSource, objTarget):
+def copyConstraints(context, objSource, objTarget, intFrame=None):
     for constraint in objSource.constraints:
         new_constraint = objTarget.constraints.new(constraint.type)
-        new_constraint.target = constraint.target
         for attr in dir(constraint):
             if not attr.startswith("__"):
                 try:
                     setattr(new_constraint, attr, getattr(constraint, attr))
                 except:
                     pass
+        objConstraintTarget = constraint.target
+        if intFrame != None:
+            strTarget = f'{objConstraintTarget.name}_Frame_{intFrame}'
+            print('constraint target = ', strTarget)
+            objNewTarget = pinFrame(context, objConstraintTarget, intFrame)
+            if objNewTarget:
+                objConstraintTarget = objNewTarget
+        new_constraint.target = objConstraintTarget
 
 
-def applyConstraints(obj):
-    # Loop through all constraints on the object
-    for constraint in obj.constraints:
-        # Check if the constraint is enabled
-        if constraint.mute:
-            continue
-
-
-def copy_modifiers(src_obj, dest_obj):
+def copyModifiers(objSource, objTarget):
     # Loop through all modifiers on the source object
-    for src_mod in src_obj.modifiers:
+    for src_mod in objSource.modifiers:
         # Create a new modifier on the destination object
-        dest_mod = dest_obj.modifiers.new(src_mod.name, src_mod.type)
-
+        dest_mod = objTarget.modifiers.new(src_mod.name, src_mod.type)
         # Copy the properties of the source modifier to the destination modifier
         for prop in src_mod.bl_rna.properties:
             if prop.identifier not in {'rna_type', 'name', 'type'}:
@@ -534,26 +531,34 @@ def copy_modifiers(src_obj, dest_obj):
                     pass
 
 
-def getCollection(strCollection, strParent=None):
+def getCollection(strCollection, objParent):
     if strCollection not in bpy.data.collections:
         objCollection = bpy.data.collections.new(name=strCollection)
-        if strParent != None:
-            bpy.data.collections[strParent].children.link(objCollection)
+        if objParent != None:
+            objParent.children.link(objCollection)
         else:
             print("no parent for: "+strCollection)
     return bpy.data.collections[strCollection]
 
-def pinFrames(obj, intFrame):
+def pinFrame(context, obj, intFrame):
     # arrFrameObjects = exposeSelectedFrameObjects(obj, intFrame, remove=False, select=False)
     # for objFrame in arrFrameObjects:
     # set custom property as pinned so we can quickly remove later
-    objCollection = getCollection(f'{config.PREFIX}_pinned_frames')
-    objFrame = getCurrentFrame(obj, intFrame)
+    objCollection = getCollection(f'{config.PREFIX}_pinned_frames', context.scene.collection)
+    strFrame = f'{obj.name}_Frame_{intFrame}'
+    objFrame = getObject(strFrame)
+    if objFrame != None:
+        return objFrame
+    else:
+        objFrame = getCurrentFrame(obj, intFrame)
+        objCollection.objects.link(objFrame)
+    # get the old pin if it exists for this obj+frame, this is necessary so that some objects can create pins for relationship objects and
     if objFrame == None:
         objFrame = obj.copy()
+        objCollection.objects.link(objFrame)
     objFrame.parent = None
     objFrame["key_object_type"] = 'pinned'
-    objCollection.objects.link(objFrame)
+    
     # remove the materials
     objFrame.data.materials.clear()
     # set them as unselectable
@@ -564,12 +569,13 @@ def pinFrames(obj, intFrame):
     # move the frameobject to the sam world location as the original
     objFrame.location = obj.matrix_world.to_translation()
     objFrame.rotation_euler = obj.matrix_world.to_euler()
-    copyConstraints(obj, objFrame)
-    copy_modifiers(obj, objFrame)
+    copyConstraints(context, obj, objFrame, intFrame)
+    copyModifiers(obj, objFrame)
     # give them a transparent material
     objMaterial = getMaterial('KEY_OnionSkin')
     if objMaterial is not None:
         objFrame.data.materials.append(objMaterial)
+    return objFrame
 
 
 def unpinFrames():
