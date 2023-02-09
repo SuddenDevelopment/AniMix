@@ -325,19 +325,24 @@ def insert_blank(obj, intFrame):
 
 
 def clone_key(context, obj, intFrame, intNextFrame):
-    intStartFrame = intNextFrame
-    intStopFrame = None
-    intDirection = 1
-    if intNextFrame < intFrame:
-        intStartFrame = 0
-        intStopFrame = intStopFrame
-        intDirection = -1
-    # Push keyframes to make room for duplicate
-    keyframes.nudgeFrames(obj, intStartFrame,
-                          intDirection, False, intStopFrame)
+    strAction = keyframes.getKeyframeVacancy(
+        obj, '["key_object_id"]', intFrame, intNextFrame)
+    if strAction != 'CURRENT':
+        # Push keyframes to make room for duplicate
+        intStartFrame = intNextFrame
+        intStopFrame = None
+        intDirection = 1
+        if intNextFrame < intFrame:
+            intStartFrame = 0
+            intStopFrame = intStopFrame
+            intDirection = -1
+        keyframes.nudgeFrames(obj, intStartFrame,
+                              intDirection, False, intStopFrame)
+    else:
+        intNextFrame = intFrame
     # get current key
-    intSwapObjectId = keyframes.getKeyframeValue(
-        obj, '["key_object_id"]', intFrame, '=')
+    intSwapObjectId = obj["key_object_id"]
+    print(strAction, intNextFrame, intSwapObjectId)
     if intSwapObjectId is not None:
         # Duplicate key in next frame
         setSwapKey(obj, intSwapObjectId, intNextFrame, update=False)
