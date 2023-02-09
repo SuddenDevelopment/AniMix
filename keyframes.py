@@ -76,9 +76,14 @@ def setNewFrames(obj, dicFrames, intLastFrame, intPushFrames, inDataBlock=False)
             intFrame = keyframe_point.co.x
             intNewFrame = dicFrames.get(intFrame)
             if intNewFrame != None:
+                intDiff = intNewFrame - keyframe_point.co.x
                 keyframe_point.co.x = intNewFrame
+                keyframe_point.handle_left.x = keyframe_point.handle_left.x + intDiff
+                keyframe_point.handle_right.x = keyframe_point.handle_right.x + intDiff
             elif intFrame > intLastFrame:
                 keyframe_point.co.x += intPushFrames
+                keyframe_point.handle_left.x = keyframe_point.handle_left.x + intPushFrames
+                keyframe_point.handle_right.x = keyframe_point.handle_right.x + intPushFrames
     return
 
 
@@ -174,6 +179,8 @@ def nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None, strPath
                     intNewX = keyframe_point.co.x + intMove
                     if intNewX > intX and intNewX >= intStart:
                         keyframe_point.co.x = intNewX
+                        keyframe_point.handle_left.x = keyframe_point.handle_left.x + intMove
+                        keyframe_point.handle_right.x = keyframe_point.handle_right.x + intMove
                     intX = keyframe_point.co.x
     return
 
