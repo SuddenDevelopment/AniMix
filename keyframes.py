@@ -228,4 +228,14 @@ def transferFrameState(objSource, objTarget, intFrame, inDataBlock=False):
             if inDataBlock == True:
                 strDataPath = f'data.{strDataPath}'
             objData = objTarget.path_resolve(strDataPath)
-            objData[fcurve.array_index] = fcurve.evaluate(intFrame)
+            intValue = fcurve.evaluate(intFrame)
+            if isinstance(objData, float):
+                # need to back string path off one and not use the array_index
+                arrDataPath = strDataPath.split('.')
+                strProperty = arrDataPath.pop()
+                # objData = eval('.'.join(arrDataPath))
+                objData = objTarget.path_resolve('.'.join(arrDataPath))
+                setattr(objData, strProperty, intValue)
+            else:
+                objData[fcurve.array_index] = intValue
+            # except Exception as e:
