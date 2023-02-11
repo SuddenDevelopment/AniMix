@@ -84,7 +84,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'StopMotion Keys',
                 "buttons": {"clear_key":
                             {
-                                "description": "Clear Keyframe:  Clears the id data from the current StopMotion object. Keyframe is not deleted.\n" +
+                                "description": "Clear Keyframe:  Clears the id data from the current StopMotion object. The keyframe isn't deleted.\n" +
                                 "\n"
                                 "Click:  Clears the geometry from the current keyframe.\n" +
                                 "Ctrl + Click:  Clears the selected geometry from the current keyframe.\n" +
@@ -95,7 +95,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": '',
                 "buttons": {"insert_key":
                             {
-                                "description": "Add Keyframe:  Adds/ inserts a keyframe with unique StopMotion Object id\n" +
+                                "description": "Add Keyframe:  Adds/ inserts a new StopMotion keyframe to the right of the current active keyframe or at the position of the playhead id\n" +
                                 "\n"
                                 "Click:  Add/ inserts a keyframe to the Right of the playhead.\n" +
                                 "Ctrl + Click:  Add/ insertst a keyframe to the Left of the playhead."},
@@ -116,7 +116,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'Duplicate',
                 "buttons":
                     {
-                        "clone_key": {"description": "Duplicate Keyframe:  Duplicates the current keyframe to the right of the current active keyframe."},
+                        "clone_key": {"description": "Duplicate Keyframe:  Duplicates the current keyframe to the right of the current active keyframe or at the position of the playhead."},
                         "clone_object": {"description": "Duplicate Object With Keys:  Duplicates the object/s and the current keyframes with a unique id."},
                         "clone_object_blank_keys": {"description":  "Duplicate Object With Blank Keys:  Duplicates the object/s with blank keyframes."},
                     },
