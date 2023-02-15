@@ -174,6 +174,9 @@ def nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None, strPath
         if fcurve.data_path == strPath or strPath == None:
             intX = 0
             for ii, keyframe_point in enumerate(fcurve.keyframe_points):
+                intNextFrame = None
+                if len(fcurve.keyframe_points) > ii+1:
+                    intNextFrame = fcurve.keyframe_points[ii+1].co.x
                 if keyframe_point.co.x >= intStart and (intStop == None or intStop >= keyframe_point.co.x):
                     # lets make sure we aren't overwriting a keyframe_point
                     intNewX = keyframe_point.co.x + intMove

@@ -103,10 +103,13 @@ def setDataBlock(objTarget, objReference):
         bpy.data.meshes.remove(objDataBlock)
 
 
-def setTmp(obj):
+def setTmp(obj, forceNew=False):
     intSwapId = obj.get("key_id")
     strTmp = f'{config.PREFIX}_{intSwapId}_tmp'
     objTmp = getObject(strTmp)
+    if forceNew == True and objTmp is not None:
+        bpy.data.objects.remove(objTmp, do_unlink=True)
+        objTmp = None
     if objTmp is not None:
         setDataBlock(objTmp, obj)
     else:
@@ -161,13 +164,10 @@ def onFramePre(scene):
             strFrame = obj.get("key_object")
             objFrame = getObject(strFrame)
             objTmp = getTmp(obj)
-            objTmp.update_from_editmode()
             if objFrame is not None and obj.get("key_object") == objFrame.name:
                 intSumTmp = getDataSum(objTmp)
                 intSumFrame = getDataSum(objFrame)
                 if intSumTmp != intSumFrame:
-                    print('preframe', objFrame.name,
-                          intSumTmp, '!=', intSumFrame)
                     setDataBlock(objFrame, objTmp)
         bpy.ops.object.mode_set(mode=strMode)
 
@@ -251,7 +251,6 @@ def setFrameObject(obj, strFrame, intSwapId):
     #    objFrame.animation_data = obj.animation_data.copy()
     if obj.data.animation_data is not None and hasattr(obj.data.animation_data, 'copy'):
         objFrame.data.animation_data = obj.data.animation_data.copy()
-    setTmp(obj)
 
 
 def setSwapObject(context, obj, intFrame):
@@ -265,6 +264,7 @@ def setSwapObject(context, obj, intFrame):
     # make sure a frame object doesn't already exist
     setFrameObject(obj, strFrame, intSwapId)
     setSwapKey(obj, intSwapObjectId, intFrame)
+    setTmp(obj, True)
     bpy.app.handlers.frame_change_post.clear()
     bpy.app.handlers.frame_change_post.append(onFrame)
     bpy.app.handlers.frame_change_pre.clear()
@@ -520,7 +520,6 @@ def copyConstraints(context, objSource, objTarget, intFrame=None):
         objConstraintTarget = constraint.target
         if intFrame != None:
             strTarget = f'{objConstraintTarget.name}_Frame_{intFrame}'
-            print('constraint target = ', strTarget)
             objNewTarget = pinFrame(context, objConstraintTarget, intFrame)
             if objNewTarget:
                 objConstraintTarget = objNewTarget

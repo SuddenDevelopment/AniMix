@@ -89,9 +89,6 @@ class KEY_OT_InsertKey(bpy.types.Operator):
         return len(context.selected_objects) > 0
 
     def execute(self, context):
-        if context.active_object.data is not None and hasattr(context.active_object.data, 'animation_data') and hasattr(context.active_object.data.animation_data, 'action'):
-            self.report(
-                {'ERROR'}, "This object has data block animation data that will not survive data block swapping")
         if len(context.selected_objects) > 0:
             for obj in context.selected_objects:
                 intFrame = context.scene.frame_current
