@@ -558,8 +558,6 @@ class KEY_OT_Show_Panel(bpy.types.Operator):
             except:
                 return {'CANCELLED'}
 
-        return {'FINISHED'}
-
 
 arrClasses = [
     KEY_OT_ClearKey,

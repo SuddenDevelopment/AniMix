@@ -337,6 +337,8 @@ def insert_blank(obj, intFrame):
 
 
 def clone_key(context, obj, intFrame, intNextFrame):
+    intLastKey = keyframes.getKeyframeValue(
+        obj, '["key_object_id"]', intFrame, '<=', value='x')
     strAction = keyframes.getKeyframeVacancy(
         obj, '["key_object_id"]', intFrame, intNextFrame)
     if strAction != 'CURRENT':
@@ -354,15 +356,18 @@ def clone_key(context, obj, intFrame, intNextFrame):
         intNextFrame = intFrame
     # get current key
     intSwapObjectId = obj["key_object_id"]
-    print(strAction, intNextFrame, intSwapObjectId)
+    # find the last frame to have this key so we can update its type
+
     if intSwapObjectId is not None:
         # Duplicate key in next frame
         setSwapKey(obj, intSwapObjectId, intNextFrame, update=False)
+
         keyframes.setKeyType(obj, '["key_object_id"]',
-                             intFrame, 'MOVING_HOLD')
+                             intLastKey, 'MOVING_HOLD')
         keyframes.setKeyType(obj, '["key_object_id"]',
                              intNextFrame, 'MOVING_HOLD')
         # bpy.context.active_object.animation_data.action.fcurves[0].keyframe_points[0].type = 'KEYFRAME'
+
 
 def clone_unique_key(context, obj, intFrame):
     # Push keyframes to make room for duplicate
@@ -436,6 +441,7 @@ def getCurrentFrame(obj, intFrame):
     keyframes.transferFrameState(obj, objNew, intFrame, False)
     keyframes.transferFrameState(obj, objNew, intFrame, True)
     return objNew
+
 
 def exposeSelectedFrameObjects(obj, intFrame, remove=False, select=True):
     arrNewObjects = []
@@ -540,11 +546,13 @@ def getCollection(strCollection, objParent):
             print("no parent for: "+strCollection)
     return bpy.data.collections[strCollection]
 
+
 def pinFrame(context, obj, intFrame):
     # arrFrameObjects = exposeSelectedFrameObjects(obj, intFrame, remove=False, select=False)
     # for objFrame in arrFrameObjects:
     # set custom property as pinned so we can quickly remove later
-    objCollection = getCollection(f'{config.PREFIX}_pinned_frames', context.scene.collection)
+    objCollection = getCollection(
+        f'{config.PREFIX}_pinned_frames', context.scene.collection)
     strFrame = f'{obj.name}_Frame_{intFrame}'
     objFrame = getObject(strFrame)
     if objFrame != None:
@@ -558,7 +566,7 @@ def pinFrame(context, obj, intFrame):
         objCollection.objects.link(objFrame)
     objFrame.parent = None
     objFrame["key_object_type"] = 'pinned'
-    
+
     # remove the materials
     objFrame.data.materials.clear()
     # set them as unselectable
