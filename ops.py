@@ -471,15 +471,17 @@ class KEY_OT_PinFrames(bpy.types.Operator):
 
     @ classmethod
     def poll(cls, context):
-        return len(context.selected_objects) > 0 and context.active_object is not None
+        return True
 
     def execute(self, context):
         if self.ctrl_pressed:
             actions.unpinFrames()
         else:
-            for obj in context.selected_objects:
-                if obj.type == 'MESH' or obj.type == 'CURVE':
-                    actions.pinFrame(context, obj, context.scene.frame_current)
+            if len(context.selected_objects) > 0 and context.active_object is not None:
+                for obj in context.selected_objects:
+                    if obj.type == 'MESH' or obj.type == 'CURVE':
+                        actions.pinFrame(
+                            context, obj, context.scene.frame_current)
         return {'FINISHED'}
 
 

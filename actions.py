@@ -428,18 +428,20 @@ def add_asset(obj):
             objFrame.asset_generate_preview()
 
 
-def getCurrentFrame(obj, intFrame):
+def getCurrentFrame(obj, intFrame, link=True):
     # get the data object needed.
     strFrame = obj.get("key_object")
     objFrame = getObject(strFrame)
-    objCollection = obj.users_collection[0]
+
     if objFrame == None:
         objFrame = obj
     strFrameName = f'{obj.name}_Frame_{intFrame}'
     # make a copy
     objNew = bpy.data.objects.new(
         strFrameName, objFrame.data.copy())
-    objCollection.objects.link(objNew)
+    if link == True:
+        objCollection = obj.users_collection[0]
+        objCollection.objects.link(objNew)
     objNew.data.animation_data_clear()
     keyframes.transferFrameState(obj, objNew, intFrame, False)
     keyframes.transferFrameState(obj, objNew, intFrame, True)
@@ -555,18 +557,18 @@ def pinFrame(context, obj, intFrame):
     # for objFrame in arrFrameObjects:
     # set custom property as pinned so we can quickly remove later
     objCollection = getCollection(
-        f'{config.PREFIX}_pinned_frames', context.scene.collection)
+        f'pinned_frames', context.scene.collection)
+    objPinCollection = getCollection(f'pinned {obj.name}', objCollection)
     strFrame = f'{obj.name}_Frame_{intFrame}'
     objFrame = getObject(strFrame)
     if objFrame != None:
         return objFrame
     else:
-        objFrame = getCurrentFrame(obj, intFrame)
-        objCollection.objects.link(objFrame)
+        objFrame = getCurrentFrame(obj, intFrame, False)
     # get the old pin if it exists for this obj+frame, this is necessary so that some objects can create pins for relationship objects and
     if objFrame == None:
         objFrame = obj.copy()
-        objCollection.objects.link(objFrame)
+    objPinCollection.objects.link(objFrame)
     objFrame.parent = None
     objFrame["key_object_type"] = 'pinned'
 
