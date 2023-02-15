@@ -180,6 +180,8 @@ def nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None, strPath
                 if keyframe_point.co.x >= intStart and (intStop == None or intStop >= keyframe_point.co.x):
                     # lets make sure we aren't overwriting a keyframe_point
                     intNewX = keyframe_point.co.x + intMove
+                    if intNextFrame and intNewX >= intNextFrame:
+                        intNewX = intNextFrame-1
                     if intNewX > intX and intNewX >= intStart:
                         keyframe_point.co.x = intNewX
                         keyframe_point.handle_left.x = keyframe_point.handle_left.x + intMove
