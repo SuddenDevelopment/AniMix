@@ -155,15 +155,19 @@ def onFramePre(scene):
         strMode = context.object.mode
     # object swapping for key feature
     if strMode == 'EDIT' or strMode == 'SCULPT':
-        bpy.ops.object.mode_set(mode='OBJECT')
+        # bpy.ops.object.mode_set(mode='OBJECT')
         for obj in scene.objects:
+            obj.update_from_editmode()
             strFrame = obj.get("key_object")
             objFrame = getObject(strFrame)
             objTmp = getTmp(obj)
+            objTmp.update_from_editmode()
             if objFrame is not None and obj.get("key_object") == objFrame.name:
                 intSumTmp = getDataSum(objTmp)
                 intSumFrame = getDataSum(objFrame)
                 if intSumTmp != intSumFrame:
+                    print('preframe', objFrame.name,
+                          intSumTmp, '!=', intSumFrame)
                     setDataBlock(objFrame, objTmp)
         bpy.ops.object.mode_set(mode=strMode)
 
@@ -236,7 +240,6 @@ def removeGeo(obj):
 def setFrameObject(obj, strFrame, intSwapId):
     objFrame = getObject(strFrame)
     if objFrame is None:
-        # print('no frame object found', strFrame)
         # create the frame object
         objFrame = bpy.data.objects.new(strFrame, obj.data.copy())
         objFrame.data.use_fake_user = True
@@ -248,14 +251,13 @@ def setFrameObject(obj, strFrame, intSwapId):
     #    objFrame.animation_data = obj.animation_data.copy()
     if obj.data.animation_data is not None and hasattr(obj.data.animation_data, 'copy'):
         objFrame.data.animation_data = obj.data.animation_data.copy()
+    setTmp(obj)
 
 
 def setSwapObject(context, obj, intFrame):
     strMode = context.object.mode
     if strMode == 'EDIT':
         obj.update_from_editmode()
-    if hasattr(context, 'active_object') == False:
-        context.view_layer.objects.active = obj
     intSwapId = getSwapId(obj)
     intSwapObjectId = getSwapObjectId(obj, intFrame)
     strFrame = getSwapObjectName(obj.get("key_id"), intSwapObjectId)
@@ -339,34 +341,35 @@ def insert_blank(obj, intFrame):
 def clone_key(context, obj, intFrame, intNextFrame):
     intLastKey = keyframes.getKeyframeValue(
         obj, '["key_object_id"]', intFrame, '<=', value='x')
-    strAction = keyframes.getKeyframeVacancy(
-        obj, '["key_object_id"]', intFrame, intNextFrame)
-    if strAction != 'CURRENT':
-        # Push keyframes to make room for duplicate
-        intStartFrame = intNextFrame
-        intStopFrame = None
-        intDirection = 1
-        if intNextFrame < intFrame:
-            intStartFrame = 0
-            intStopFrame = intStopFrame
-            intDirection = -1
-        keyframes.nudgeFrames(obj, intStartFrame,
-                              intDirection, False, intStopFrame)
-    else:
-        intNextFrame = intFrame
-    # get current key
-    intSwapObjectId = obj["key_object_id"]
-    # find the last frame to have this key so we can update its type
+    if intLastKey:
+        strAction = keyframes.getKeyframeVacancy(
+            obj, '["key_object_id"]', intFrame, intNextFrame)
+        if strAction != 'CURRENT':
+            # Push keyframes to make room for duplicate
+            intStartFrame = intNextFrame
+            intStopFrame = None
+            intDirection = 1
+            if intNextFrame < intFrame:
+                intStartFrame = 0
+                intStopFrame = intStopFrame
+                intDirection = -1
+            keyframes.nudgeFrames(obj, intStartFrame,
+                                  intDirection, False, intStopFrame)
+        else:
+            intNextFrame = intFrame
+        # get current key
+        intSwapObjectId = obj["key_object_id"]
+        # find the last frame to have this key so we can update its type
 
-    if intSwapObjectId is not None:
-        # Duplicate key in next frame
-        setSwapKey(obj, intSwapObjectId, intNextFrame, update=False)
+        if intSwapObjectId is not None:
+            # Duplicate key in next frame
+            setSwapKey(obj, intSwapObjectId, intNextFrame, update=False)
 
-        keyframes.setKeyType(obj, '["key_object_id"]',
-                             intLastKey, 'MOVING_HOLD')
-        keyframes.setKeyType(obj, '["key_object_id"]',
-                             intNextFrame, 'MOVING_HOLD')
-        # bpy.context.active_object.animation_data.action.fcurves[0].keyframe_points[0].type = 'KEYFRAME'
+            keyframes.setKeyType(obj, '["key_object_id"]',
+                                 intLastKey, 'MOVING_HOLD')
+            keyframes.setKeyType(obj, '["key_object_id"]',
+                                 intNextFrame, 'MOVING_HOLD')
+            # bpy.context.active_object.animation_data.action.fcurves[0].keyframe_points[0].type = 'KEYFRAME'
 
 
 def clone_unique_key(context, obj, intFrame):
