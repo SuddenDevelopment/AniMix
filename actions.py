@@ -225,7 +225,7 @@ def getSwapObjectId(obj, intFrame):
 
 
 def removeGeo(obj):
-    if obj.type == 'CURVE':
+    if obj.type == 'CURVE' or obj.type == 'SURFACE':
         for i, spline in enumerate(obj.data.splines):
             try:
                 obj.data.splines.remove(spline)
@@ -234,6 +234,16 @@ def removeGeo(obj):
     elif obj.type == 'MESH':
         try:
             obj.data.vertices.data.clear_geometry()
+        except:
+            pass
+    elif obj.type == 'FONT':
+        try:
+            obj.data.body = ''
+        except:
+            pass
+    elif obj.type == 'META':
+        try:
+            obj.data.elements.clear()
         except:
             pass
 
