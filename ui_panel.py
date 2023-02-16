@@ -167,10 +167,18 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'Assets',
                 "buttons":
                     {
-                        "add_asset": {"description": "Asset Library:  Creates assets from seleted objects or selected keys in either object or Edit mode"},
+                        "add_asset": {"description": "Asset Library:  Creates assets from selected objects or selected keys in either object or Edit mode"},
                     }
             }
         ]
+        if hasattr(bpy.types, "ANIM_OT_insert_keyframe_animall"):
+            self.arrButtonGroups.insert(3, {
+                "name": 'AnimAll',
+                "buttons":
+                    {
+                        "insert_animall": {"description": "AnimAll key insert"},
+                    }
+            })
         # layout settings
         intGroupSpacing = 3
         intButtonSpacing = 3
@@ -346,6 +354,12 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         try:
             bpy.ops.key.clear_key(
                 'INVOKE_DEFAULT', ctrl_pressed=event.ctrl, alt_pressed=event.alt)
+        except:
+            pass
+
+    def insert_animall_click(self, widget, event, x, y):
+        try:
+            bpy.ops.anim.insert_keyframe_animall()
         except:
             pass
 
