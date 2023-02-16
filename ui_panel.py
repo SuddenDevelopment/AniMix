@@ -167,7 +167,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": 'Assets',
                 "buttons":
                     {
-                        "add_asset": {"description": "Asset Library:  Creates assets in Object mode, selections in Edit mode, and from active Keyframes."},
+                        "add_asset": {"description": "Asset Library:  Creates assets from seleted objects or selected keys in either object or Edit mode"},
                     }
             }
         ]
