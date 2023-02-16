@@ -172,21 +172,27 @@ def nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None, strPath
     arrFCurves = getFCurves(obj, inDataBlock)
     for i, fcurve in enumerate(arrFCurves):
         if fcurve.data_path == strPath or strPath == None:
-            intX = 0
+            intLastX = 0
             for ii, keyframe_point in enumerate(fcurve.keyframe_points):
                 intNextFrame = None
                 if len(fcurve.keyframe_points) > ii+1:
-                    intNextFrame = fcurve.keyframe_points[ii+1].co.x
-                if keyframe_point.co.x >= intStart and (intStop == None or intStop >= keyframe_point.co.x):
+                    intNextFrame = int(fcurve.keyframe_points[ii+1].co.x)
+                    if intNextFrame and intStop and intNextFrame >= intStop:
+                        intNextFrame = None
+                if keyframe_point.co.x >= intStart and (intStop == None or intStop > keyframe_point.co.x):
                     # lets make sure we aren't overwriting a keyframe_point
-                    intNewX = keyframe_point.co.x + intMove
-                    if intNextFrame and intNewX >= intNextFrame:
-                        intNewX = intNextFrame-1
-                    if intNewX > intX and intNewX >= intStart:
+                    intNewX = int(keyframe_point.co.x) + intMove
+                    if intStop and intNewX >= intStop:
+                        intNewX = intStop - 1
+                    if intStop and keyframe_point.co.x < intStop:
+                        # only woirking with stuff behind the current frame
+                        if intNextFrame and intNewX >= intNextFrame:
+                            intNewX = intNextFrame - 1
+                    if intNewX > intLastX and intNewX >= intStart:
                         keyframe_point.co.x = intNewX
                         keyframe_point.handle_left.x = keyframe_point.handle_left.x + intMove
                         keyframe_point.handle_right.x = keyframe_point.handle_right.x + intMove
-                    intX = keyframe_point.co.x
+                    intLastX = keyframe_point.co.x
     return
 
 
