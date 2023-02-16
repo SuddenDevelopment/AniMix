@@ -130,6 +130,21 @@ def onFrame_handler(scene: bpy.types.Scene):
             break
 
 
+class ModeTracker:
+    def __init__(self):
+        self.previous_mode = None
+
+
+def on_depsgraph_update(scene, mode_tracker):
+    current_mode = bpy.context.object.mode
+    if current_mode != mode_tracker.previous_mode:
+        mode_tracker.previous_mode = current_mode
+        if mode_tracker.previous_mode == 'EDIT' and bpy.context.active_object:
+            obj = bpy.context.active_object
+            if obj.get("key_id"):
+                actions.onFramePre(scene)
+
+
 #### || CLASS MAINTENANCE ||####
 arrClasses = [
     KEY_PT_Main,
@@ -151,6 +166,9 @@ def register():
     for i in arrClasses:
         bpy.utils.register_class(i)
     icons.initIcons()
+    mode_tracker = ModeTracker()
+    bpy.app.handlers.depsgraph_update_pre.append(
+        lambda scene: on_depsgraph_update(scene, mode_tracker))
     bpy.app.handlers.load_post.append(onFrame_handler)
     bpy.app.handlers.frame_change_post.clear()
     bpy.app.handlers.frame_change_post.append(actions.onFrame)
@@ -178,6 +196,7 @@ def unregister():
     cleanse_modules()
     for i in reversed(arrClasses):
         bpy.utils.unregister_class(i)
+    bpy.app.handlers.depsgraph_update_pre.clear()
     bpy.app.handlers.load_post.remove(onFrame_handler)
     bpy.app.handlers.frame_change_post.clear()
     bpy.app.handlers.frame_change_pre.clear()

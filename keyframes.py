@@ -185,7 +185,7 @@ def nudgeFrames(obj, intStart, intMove, inDataBlock=False, intStop=None, strPath
                     if intStop and intNewX >= intStop:
                         intNewX = intStop - 1
                     if intStop and keyframe_point.co.x < intStop:
-                        # only woirking with stuff behind the current frame
+                        # only working with stuff behind the current frame
                         if intNextFrame and intNewX >= intNextFrame:
                             intNewX = intNextFrame - 1
                     if intNewX > intLastX and intNewX >= intStart:
