@@ -194,6 +194,7 @@ def onFrame(scene):
                 swapData(obj, objFrame)
                 objTmp = setTmp(objFrame)
                 swapData(obj, objTmp, False)
+                swapMaterials(objFrame, obj)
     if strMode == 'EDIT':
         bpy.ops.object.mode_set(mode='EDIT')
 
@@ -251,6 +252,7 @@ def setFrameObject(obj, strFrame, intSwapId):
     #    objFrame.animation_data = obj.animation_data.copy()
     if obj.data.animation_data is not None and hasattr(obj.data.animation_data, 'copy'):
         objFrame.data.animation_data = obj.data.animation_data.copy()
+    return objFrame
 
 
 def setSwapObject(context, obj, intFrame):
@@ -262,7 +264,8 @@ def setSwapObject(context, obj, intFrame):
     strFrame = getSwapObjectName(obj.get("key_id"), intSwapObjectId)
     obj["key_object"] = strFrame
     # make sure a frame object doesn't already exist
-    setFrameObject(obj, strFrame, intSwapId)
+    objFrame = setFrameObject(obj, strFrame, intSwapId)
+    swapMaterials(obj, objFrame)
     setSwapKey(obj, intSwapObjectId, intFrame)
     setTmp(obj, True)
     bpy.app.handlers.frame_change_post.clear()
@@ -615,3 +618,12 @@ def copySelections(objSource, objTarget):
                     objTarget.data.splines[i].bezier_points[ii].select_control_point = point.select_control_point
                 except:
                     pass
+
+
+def swapMaterials(objSource, objTarget):
+    arrSourceMaterials = objSource.material_slots
+    if len(arrSourceMaterials) > 0:
+        objTarget.data.materials.clear()
+        for i, objMaterial in enumerate(arrSourceMaterials):
+            objTarget.data.materials.append(
+                bpy.data.materials[objMaterial.name])
