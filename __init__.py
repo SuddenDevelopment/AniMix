@@ -171,26 +171,6 @@ def register():
     ops.register()
     ui_panel.register()
     prefs.register()
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe = (
-        1, 0.75, 0.20)
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_selected = (
-        1, 0, 0)
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_extreme = (
-        0.95, 0.5, 0.5)
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_extreme_selected = (
-        1, 0, 0)
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_breakdown = (
-        0.33, 0.75, 0.93)
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_breakdown_selected = (
-        1, 0, 0)
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_jitter = (
-        0.38, 0.75, 0.26)
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_jitter_selected = (
-        1, 0, 0)
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_movehold = (
-        0.64, 0, 1)
-    bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_movehold_selected = (
-        1, 0, 0)
     version.register(bl_info)
 
 

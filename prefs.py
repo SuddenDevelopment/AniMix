@@ -76,6 +76,11 @@ class BL_UI_Widget_Preferences(AddonPreferences):
         layout = self.layout
 
         split = layout.split(factor=0.45, align=True)
+        split.label(text="Update Keyframe Theme Colors:", icon='DECORATE')
+        splat = split.split(factor=0.4, align=True)
+        splat.operator(KEY_OT_SetKeyColors.bl_idname)
+
+        split = layout.split(factor=0.45, align=True)
         split.label(text="General scaling for panel:", icon='DECORATE')
         splat = split.split(factor=0.8, align=True)
         splat.prop(self, 'RC_UI_BIND', text=" Bound to Blender's UI")
@@ -117,6 +122,36 @@ class BL_UI_Widget_Preferences(AddonPreferences):
         splat.label(text=coords)
         splot = splat.split(factor=0.455, align=True)
         splot.operator(Reset_Coords.bl_idname)
+
+
+class KEY_OT_SetKeyColors(bpy.types.Operator):
+    """update the keyframe theme colors"""
+    bl_idname = "key.set_key_colors"
+    bl_label = "Set Key Colors"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe = (
+            1, 0.75, 0.20)
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_selected = (
+            1, 0, 0)
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_extreme = (
+            0.95, 0.5, 0.5)
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_extreme_selected = (
+            1, 0, 0)
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_breakdown = (
+            0.33, 0.75, 0.93)
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_breakdown_selected = (
+            1, 0, 0)
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_jitter = (
+            0.38, 0.75, 0.26)
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_jitter_selected = (
+            1, 0, 0)
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_movehold = (
+            0.64, 0, 1)
+        bpy.context.preferences.themes['Default'].dopesheet_editor.keyframe_movehold_selected = (
+            1, 0, 0)
+        return {'FINISHED'}
 
 
 class Reset_Coords(bpy.types.Operator):
@@ -170,11 +205,13 @@ class Reset_Coords(bpy.types.Operator):
 # Registration
 def register():
     bpy.utils.register_class(Reset_Coords)
+    bpy.utils.register_class(KEY_OT_SetKeyColors)
     bpy.utils.register_class(BL_UI_Widget_Preferences)
 
 
 def unregister():
     bpy.utils.unregister_class(BL_UI_Widget_Preferences)
+    bpy.utils.unregister_class(KEY_OT_SetKeyColors)
     bpy.utils.unregister_class(Reset_Coords)
 
 
