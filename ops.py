@@ -76,12 +76,17 @@ class KEY_OT_InsertKey(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     ctrl_pressed: bpy.props.BoolProperty(default=False)
+    alt_pressed: bpy.props.BoolProperty(default=False)
 
     def invoke(self, context, event):
         if event.ctrl:
             self.ctrl_pressed = True
         else:
             self.ctrl_pressed = False
+        if event.alt:
+            self.alt_pressed = True
+        else:
+            self.alt_pressed = False
         return self.execute(context)
 
     @ classmethod
@@ -92,27 +97,32 @@ class KEY_OT_InsertKey(bpy.types.Operator):
         if len(context.selected_objects) > 0:
             for obj in context.selected_objects:
                 intFrame = context.scene.frame_current
-                intDirection = 1
-                if self.ctrl_pressed == True:
-                    intDirection = -1
-                intNextFrame = intFrame+intDirection
-                strAction = keyframes.getKeyframeVacancy(
-                    obj, '["key_object_id"]', intFrame, intNextFrame)
-                if strAction == 'CURRENT':
-                    actions.setSwapObject(
-                        context, obj, intFrame)
-                elif strAction == 'NEXT':
-                    context.scene.frame_set(intNextFrame)
-                    actions.setSwapObject(
-                        context, obj, intNextFrame)
+                if self.alt_pressed or self.ctrl_pressed:
+                    intDirection = 1
+                    if self.ctrl_pressed == True:
+                        intDirection = -1
+                    intNextFrame = intFrame+intDirection
+                    strAction = keyframes.getKeyframeVacancy(
+                        obj, '["key_object_id"]', intFrame, intNextFrame)
+                    if strAction == 'CURRENT':
+                        actions.setSwapObject(
+                            context, obj, intFrame)
+                    elif strAction == 'NEXT':
+                        context.scene.frame_set(intNextFrame)
+                        actions.setSwapObject(
+                            context, obj, intNextFrame)
+                    else:
+                        intStartFrame = intFrame
+                        intStopFrame = None
+                        if intDirection == -1:
+                            intStartFrame = 0
+                            intStopFrame = intFrame
+                        keyframes.nudgeFrames(
+                            obj, intStartFrame, intDirection, False, intStopFrame)
+                        actions.setSwapObject(
+                            context, obj, intFrame)
                 else:
-                    intStartFrame = intFrame
-                    intStopFrame = None
-                    if intDirection == -1:
-                        intStartFrame = 0
-                        intStopFrame = intFrame
-                    keyframes.nudgeFrames(
-                        obj, intStartFrame, intDirection, False, intStopFrame)
+                    # default behavior, no key clicks
                     actions.setSwapObject(
                         context, obj, intFrame)
 

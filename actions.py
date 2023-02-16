@@ -13,11 +13,17 @@ def getNextSwapId():
 
 
 def getNextSwapObjectId(obj):
-    intSwapObjectId = keyframes.getKeyframeValue(
-        obj, '["key_object_id"]', 0, 'max')
-    if intSwapObjectId is None:
-        return 0
-    return intSwapObjectId+1
+    # changing to method where we look at all objects in file and thjeri properties and get a new max
+    # intSwapObjectId = keyframes.getKeyframeValue(obj, '["key_object_id"]', 0, 'max')
+    intSwapObjectId = 0
+    intSwapId = getSwapId(obj)
+    for objAll in bpy.data.objects:
+        if objAll.get("key_id") is not None and objAll.get("key_id") == intSwapId and f'{config.PREFIX}_{intSwapId}_' in objAll.name:
+            # now we know this is a frame object for the object we are looking at
+            arrName = objAll.name.split('_')
+            if arrName[2] != 'tmp' and int(arrName[2]) >= intSwapObjectId:
+                intSwapObjectId = int(arrName[2])+1
+    return intSwapObjectId
 
 
 def setSwapKey(obj, intObjectId, intFrame, update=True):
@@ -128,25 +134,12 @@ def getDataSum(obj):
         if obj.type == 'FONT':
             intSum = hash(obj.data.body)
         if obj.type == 'META':
-            intSum += len(obj.data.elements)
-            for elem in obj.data.elements:
-                intSum += elem.co.x + elem.co.y + elem.co.z
-                intSum += elem.radius
+            intSum = hash(obj.data.elements)
         if obj.type == 'MESH':
-            intSum += len(obj.data.vertices)
-            for vert in obj.data.vertices:
-                intSum += vert.co.x + vert.co.y + vert.co.z
+            intSum = hash(obj.data.vertices)
         elif obj.type == 'CURVE':
-            intSum += len(obj.data.splines)
-            for spline in obj.data.splines:
-                intSum += len(spline.points)
-                intSum += len(spline.bezier_points)
-                for point in spline.points:
-                    intSum += point.co.x + point.co.y + point.co.z
-                for point in spline.bezier_points:
-                    intSum += point.co.x + point.co.y + point.co.z
-                    intSum += point.handle_left.x + point.handle_left.y + point.handle_left.z
-                    intSum += point.handle_right.x + point.handle_right.y + point.handle_right.z
+            intSum = hash(obj.data.splines)
+        intSum += hash(obj.data.materials)
         return intSum
     return None
 
@@ -154,8 +147,8 @@ def getDataSum(obj):
 def onFramePre(scene):
     context = bpy.context
     strMode = 'OBJECT'
-    if context.active_object is not None:
-        strMode = context.object.mode
+    # if context.active_object is not None:
+    strMode = context.object.mode
     # object swapping for key feature
     if strMode == 'EDIT' or strMode == 'SCULPT':
         # bpy.ops.object.mode_set(mode='OBJECT')
@@ -169,14 +162,12 @@ def onFramePre(scene):
                 intSumFrame = getDataSum(objFrame)
                 if intSumTmp != intSumFrame:
                     setDataBlock(objFrame, objTmp)
-        bpy.ops.object.mode_set(mode=strMode)
+        # bpy.ops.object.mode_set(mode=strMode)
 
 
 def onFrame(scene):
     context = bpy.context
-    strMode = 'OBJECT'
-    if context.active_object is not None:
-        strMode = context.object.mode
+    strMode = context.object.mode
     # object swapping for key feature
     if strMode == 'EDIT':
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -184,6 +175,8 @@ def onFrame(scene):
         # obj must have an id and set an object_id it expects
         # obj must have same id as swa object and not already by the one in use
         # intObjectId = obj.get("key_object_id")
+        # if strMode == 'EDIT':
+        # obj.update_from_editmode()
         objTmp = getTmp(obj)
         intObjectId = keyframes.getKeyframeValue(
             obj, '["key_object_id"]', scene.frame_current, '<=')

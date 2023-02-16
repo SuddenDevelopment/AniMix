@@ -13,7 +13,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "StopMotion",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 2, 0),
+    "version": (1, 2, 1),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > StopMotion",
     "description": "Stop Motion functionality for meshes and curves",
@@ -133,16 +133,21 @@ def onFrame_handler(scene: bpy.types.Scene):
 class ModeTracker:
     def __init__(self):
         self.previous_mode = None
+        self.frame = None
 
 
 def on_depsgraph_update(scene, mode_tracker):
     current_mode = bpy.context.object.mode
     if current_mode != mode_tracker.previous_mode:
-        mode_tracker.previous_mode = current_mode
-        if mode_tracker.previous_mode == 'EDIT' and bpy.context.active_object:
+        if mode_tracker.previous_mode == 'EDIT' and bpy.context.active_object and scene.frame_current == mode_tracker.frame:
             obj = bpy.context.active_object
             if obj.get("key_id"):
-                actions.onFramePre(scene)
+                strFrame = obj.get("key_object")
+                objFrame = actions.getObject(strFrame)
+                objTmp = actions.getTmp(obj)
+                actions.setDataBlock(objFrame, objTmp)
+        mode_tracker.previous_mode = current_mode
+        mode_tracker.frame = scene.frame_current
 
 
 #### || CLASS MAINTENANCE ||####
