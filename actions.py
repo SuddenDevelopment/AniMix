@@ -607,6 +607,9 @@ def unpinFrames():
     for obj in bpy.data.objects:
         if obj.get("key_object_type") == 'pinned':
             bpy.data.objects.remove(obj)
+    for objCollection in bpy.data.collections['pinned_frames'].children:
+        bpy.data.collections.remove(objCollection)
+    bpy.data.collections.remove(bpy.data.collections['pinned_frames'])
 
 
 def copySelections(objSource, objTarget):
