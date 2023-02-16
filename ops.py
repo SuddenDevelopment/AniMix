@@ -556,6 +556,7 @@ class KEY_OT_Show_Panel(bpy.types.Operator):
                         'INVOKE_DEFAULT')
             except:
                 return {'CANCELLED'}
+        return {'FINISHED'}
 
 
 arrClasses = [
