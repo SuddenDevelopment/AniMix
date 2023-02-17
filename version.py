@@ -14,6 +14,7 @@ URL = 'https://anthonyaragues.com/stopmotion_check.json'
 PREFIX = 'key'
 ALLOW_DISMISS_VERSION = True
 CHECK_FREQUENCY = 86400 * 30
+CHECK_EVERY = 10
 objDefault = {
     "version": "0",
     "ver_message": "Update Available",
@@ -91,12 +92,20 @@ def check_version(bl_info):
     objResponse = None
     objVersion = None
     objPreference = getVersionFile()
+    # some fail early modes
     # throttle check frequency by setting
     intTime = int(time.time())
-    if 'lastCheck' in objPreference:
-        if objPreference['lastCheck'] + CHECK_FREQUENCY > intTime:
+    if 'checkIn' in objPreference:
+        if objPreference['checkIn'] > 0:
+            objPreference['checkIn'] = objPreference['checkIn']-1
+            setVersionFile(objPreference)
             return
+
+    if 'lastCheck' in objPreference and objPreference['lastCheck'] + CHECK_FREQUENCY > intTime:
+        return
+
     try:
+        print('check url')
         objResponse = requests.get(URL)
     except:
         pass
@@ -106,7 +115,8 @@ def check_version(bl_info):
         except:
             pass
         if objVersion is not None:
-            objPreference['lastCheck'] = intTime
+            objVersion['lastCheck'] = intTime
+            objVersion['checkIn'] = CHECK_EVERY
             if getIntVersion(objVersion["version"]) > getIntVersion(str(bl_info["version"])):
                 if getIntVersion(objVersion["version"]) > getIntVersion(objPreference["version"]):
                     objVersion["hide_version"] = False
@@ -118,7 +128,7 @@ def check_version(bl_info):
                 objVersion["hide_message"] = False
             else:
                 objVersion["hide_message"] = objPreference["hide_message"]
-    setVersionFile(objVersion)
+            setVersionFile(objVersion)
 
 
 def getTextArray(context, text):
