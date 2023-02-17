@@ -246,7 +246,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         objSlider = BL_UI_Slider(
             self.Frame_SpacingPosition[0] + intButtonSpacing, self.Frame_SpacingPosition[1]+20, 70, 18)
         objSlider.style = 'NUMBER_CLICK'
-        objSlider.text = 'space'
+        objSlider.text = ''
         objSlider.value = bpy.context.scene.KEY_frameSpace
         objSlider.step = 1
         objSlider.min = 1
