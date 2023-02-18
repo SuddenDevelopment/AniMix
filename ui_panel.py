@@ -95,7 +95,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": '',
                 "buttons": {"insert_key":
                             {
-                                "description": "Add Keyframe:  Adds/ inserts a new StopMotion keyframe to the right of the current active keyframe or at the position of the playhead id\n" +
+                                "description": "Add Keyframe:  Typical Blender behaviour when adding keys and over writing keys. HotKeys give extra functionality to Adds/ inserts a new StopMotion keyframe to the right of the current active keyframe or at the position of the playhead id\n" +
                                 "\n"
                                 "Click:  Add/ inserts a keyframe to the Right of the playhead.\n" +
                                 "Ctrl + Click:  Add/ insertst a keyframe to the Left of the playhead."},
