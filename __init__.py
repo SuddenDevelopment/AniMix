@@ -46,6 +46,12 @@ class KEY_PT_Main(bpy.types.Panel):
     bl_region_type = 'UI'
     # create the panel
 
+    def draw_header_preset(self, context):
+        layout = self.layout
+        row = layout.row()
+        row.operator("wm.url_open", text="HELP",
+                     icon_value=icons.getIconId("discord_16")).url = 'https://discord.gg/wMmgzB5QGH'
+
     def draw(self, context):
         layout = self.layout
         row = layout.row()
