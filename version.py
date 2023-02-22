@@ -10,7 +10,7 @@ import time
 # 2. add the register(bl_info) and unregister() in init chain
 # 3. call the draw function from the panel you want it to appear: version.draw_version_box(self, context)
 
-URL = 'https://anthonyaragues.com/stopmotion_check.json'
+URL = 'https://anthonyaragues.com/animix_check.json'
 PREFIX = 'key'
 ALLOW_DISMISS_VERSION = True
 CHECK_FREQUENCY = 86400 * 30
@@ -18,7 +18,7 @@ CHECK_EVERY = 10
 objDefault = {
     "version": "0",
     "ver_message": "Update Available",
-    "bm_url": "https://blendermarket.com/products/stopmotion",
+    "bm_url": "https://blendermarket.com/products/animix",
     "message": "",
     "btn_name": "",
     "url": "",

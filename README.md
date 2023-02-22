@@ -1,5 +1,5 @@
-#  StopMotion:
-StopMotion Addon is the successor to the experimental addon "KeyMesh". This addon was designed to expose object data blocks. This allows simple data block information to be switched with simple keyframing.
+#  AniMix:
+StopMotion portion of the Addon is the successor to the experimental addon "KeyMesh". This addon was designed to expose object data blocks. This allows simple data block information to be switched with simple keyframing.
 
 
 Compatability:

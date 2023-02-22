@@ -11,11 +11,11 @@ from . import icons
 from bpy.app.handlers import persistent
 
 bl_info = {
-    "name": "StopMotion",
+    "name": "AniMix",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 2, 1),
+    "version": (1, 2, 2),
     "blender": (3, 2, 0),
-    "location": "3D View > Toolbox > Animation tab > StopMotion",
+    "location": "3D View > Toolbox > Animation tab > aniMix",
     "description": "Stop Motion functionality for meshes and curves",
     "warning": "",
     "category": "Animation",
@@ -39,7 +39,7 @@ class PanelProps(bpy.types.PropertyGroup):
 
 
 class KEY_PT_Main(bpy.types.Panel):
-    bl_label = "StopMotion"
+    bl_label = "AniMix"
     bl_category = "Animate"
     bl_idname = "KEY_PT_Main"
     bl_space_type = 'VIEW_3D'
