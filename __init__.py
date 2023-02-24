@@ -46,18 +46,26 @@ class KEY_PT_Main(bpy.types.Panel):
     bl_region_type = 'UI'
     # create the panel
 
-    def draw_header_preset(self, context):
+    def draw_header(self, context):
         layout = self.layout
         row = layout.row()
-        row.operator("wm.url_open", text="HELP",
-                     icon_value=icons.getIconId("discord_16")).url = 'https://discord.gg/wMmgzB5QGH'
+        col1 = row.column()
+        col1.label(text='AniMix', icon_value=icons.getIconId("logo_16"))
+        col2 = row.column(align="right")
+        col2.operator("wm.url_open", text="",
+                      icon_value=icons.getIconId("youtube_16")).url = 'https://www.youtube.com/watch?v=Xzw8j2OyHOc&list=PLWn1OdWrqvz1bhMiWifHW1bYkMfESFTlh'
+        col2.operator("wm.url_open", text="",
+                      icon_value=icons.getIconId("3dialogue_16")).url = 'https://discord.gg/wMmgzB5QGH'
 
     def draw(self, context):
         layout = self.layout
         row = layout.row()
         row.label(text="Onion Skin")
+        row = layout.column_flow(columns=2)
         row.operator("key.pin_frames", text="PIN",
                      icon_value=icons.getIconId("pin_frame_16"))
+        row.operator("key.unpin_frames", text="UNPIN",
+                     icon_value=icons.getIconId("unpin_16"))
         row = layout.row()
         row.label(text="Clear Frame")
         row.operator("key.clear_key", text="CLEAR",

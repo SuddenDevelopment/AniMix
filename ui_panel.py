@@ -78,7 +78,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                                 "\n"
                                 "Click:  Pins the current selection\n" +
                                 "Ctrl + Click:  Removes all pin frames"
-                            }
+                            },
+                            "unpin": {"description": "Clear all existing pins and pin collections"}
                             }
             }, {
                 "name": 'StopMotion Keys',
@@ -95,10 +96,10 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "name": '',
                 "buttons": {"insert_key":
                             {
-                                "description": "Add Keyframe:  Typical Blender behaviour when adding keys and over writing keys. HotKeys give extra functionality to Adds/ inserts a new StopMotion keyframe to the right of the current active keyframe or at the position of the playhead id\n" +
+                                "description": "Add Keyframe:  Typical Blender behavior when adding keys and over writing keys. HotKeys give extra functionality to Adds/ inserts a new StopMotion keyframe to the right of the current active keyframe or at the position of the playhead id\n" +
                                 "\n"
-                                "Click:  Add/ inserts a keyframe to the Right of the playhead.\n" +
-                                "Ctrl + Click:  Add/ insertst a keyframe to the Left of the playhead."},
+                                "Click:  Add / inserts a keyframe to the Right of the playhead.\n" +
+                                "Ctrl + Click:  Add / inserts a keyframe to the Left of the playhead."},
                             "remove_key":
                             {
                                 "description": "Delete Keyframe:  Deletes the current keyframe & pulls keyframes into the deleted keyframe position.\n" +
@@ -153,7 +154,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 "buttons":
                     {
 
-                        "separate_objects": {"description": "Separate Selection:  Separates the current objects transfomration to a sperate object.\n" +
+                        "separate_objects": {"description": "Separate Selection:  Separates the current objects transformation to a separate object.\n" +
                                              "Click:  Creates a Copy from the Object/ Edit mode of the selection.\n"
 
                                              },
@@ -450,6 +451,13 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         try:
             bpy.ops.key.pin_frames(
                 'INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
+        except:
+            pass
+
+    def unpin_click(self, widget, event, x, y):
+        try:
+            bpy.ops.key.pin_frames(
+                'INVOKE_DEFAULT', ctrl_pressed=True)
         except:
             pass
 
