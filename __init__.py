@@ -13,7 +13,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "AniMix",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 2, 2),
+    "version": (1, 2, 3),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > aniMix",
     "description": "Stop Motion functionality for meshes and curves",
@@ -49,13 +49,15 @@ class KEY_PT_Main(bpy.types.Panel):
     def draw_header(self, context):
         layout = self.layout
         row = layout.row()
-        col1 = row.column()
-        col1.label(text='AniMix', icon_value=icons.getIconId("logo_16"))
-        col2 = row.column(align="right")
-        col2.operator("wm.url_open", text="",
-                      icon_value=icons.getIconId("youtube_16")).url = 'https://www.youtube.com/watch?v=Xzw8j2OyHOc&list=PLWn1OdWrqvz1bhMiWifHW1bYkMfESFTlh'
-        col2.operator("wm.url_open", text="",
-                      icon_value=icons.getIconId("3dialogue_16")).url = 'https://discord.gg/wMmgzB5QGH'
+        row.label(text='AniMix', icon_value=icons.getIconId("logo_16"))
+
+    def draw_header_preset(self, context):
+        layout = self.layout
+        row = layout.row()
+        row.operator("wm.url_open", text="",
+                     icon_value=icons.getIconId("youtube_16")).url = 'https://www.youtube.com/watch?v=Xzw8j2OyHOc&list=PLWn1OdWrqvz1bhMiWifHW1bYkMfESFTlh'
+        row.operator("wm.url_open", text="",
+                     icon_value=icons.getIconId("3dialogue_16")).url = 'https://discord.gg/wMmgzB5QGH'
 
     def draw(self, context):
         layout = self.layout
