@@ -21,7 +21,8 @@ def is_quadview_region(context):
 class KEY_OT_ClearKey(bpy.types.Operator):
     """Clear Keyframe:  Clears the id data from the current StopMotion object. The keyframe isn't deleted.
 
-    Click:  Clears the geometry from the current keyframe.\nCtrl + Click:  Clears the selected geometry from the current keyframe.
+    Click:  Clears the geometry from the current keyframe.
+    Ctrl + Click:  Clears the selected geometry from the current keyframe.
     Alt + Click:  Clears the non selected geometry from the current keyframe."""
     bl_idname = "key.clear_key"
     bl_label = "Clear Key"
@@ -72,10 +73,9 @@ class KEY_OT_ClearKey(bpy.types.Operator):
 
 
 class KEY_OT_InsertKey(bpy.types.Operator):
-    """"Add Keyframe:  Typical Blender behavior when adding keys and over writing keys. HotKeys give extra functionality to Adds/ inserts a new StopMotion keyframe to the right of the current active keyframe or at the position of the playhead id
-
-        Click:  Add / inserts a keyframe to the Right of the playhead.
-        Ctrl + Click:  Add / inserts a keyframe to the Left of the playhead."""
+    """Add Keyframe:  Typical Blender behavior when adding keys and over writing keys. HotKeys give extra functionality to Adds/ inserts a new StopMotion keyframe to the right of the current active keyframe or at the position of the playhead id
+    Click:  Add / inserts a keyframe to the Right of the playhead.
+    Ctrl + Click:  Add / inserts a keyframe to the Left of the playhead."""
     bl_idname = "key.insert_key"
     bl_label = "Insert Stop Motion Key"
     bl_options = {'REGISTER', 'UNDO'}
@@ -136,7 +136,6 @@ class KEY_OT_InsertKey(bpy.types.Operator):
 
 class KEY_OT_RemoveKey(bpy.types.Operator):
     """Delete Keyframe:  Deletes the current keyframe & pulls keyframes into the deleted keyframe position.
-
     Click:  Deletes a keyframe to the Right of the playhead.
     Ctrl + Click:  Deletes a keyframe to the Left of the playhead."""
     bl_idname = "key.remove_key"
@@ -157,9 +156,8 @@ class KEY_OT_RemoveKey(bpy.types.Operator):
 
 class KEY_OT_BlankKey(bpy.types.Operator):
     """Insert Blank Keyframe:  Inserts a single blank keyframe to the right or the left of the playhead.
-
-        Click:  Inserts a blank keyframe to the Right of the playhead.
-        Ctrl + Click:  Inserts a blank keyframe to the Left of the playhead."""
+    Click:  Inserts a blank keyframe to the Right of the playhead.
+    Ctrl + Click:  Inserts a blank keyframe to the Left of the playhead."""
     bl_idname = "key.blank_key"
     bl_label = "Insert Blank Key"
     bl_options = {'REGISTER', 'UNDO'}
@@ -291,9 +289,8 @@ class KEY_OT_CloneObjectBlankKeys(bpy.types.Operator):
 
 class KEY_OT_AddSpace(bpy.types.Operator):
     """Add Frame Space:  Inserts a single space to either the Right or Left side of the current keyframes.
-
-        "Click:  Inserts a single space to the Right of the current keyframes.
-        "Ctrl + Click:  Inserts a single space to the Left of the current keyframes."""
+    Click:  Inserts a single space to the Right of the current keyframes.
+    Ctrl + Click:  Inserts a single space to the Left of the current keyframes."""
     bl_idname = "key.add_space"
     bl_label = "Add Keyframe Space"
     bl_options = {'REGISTER', 'UNDO'}
@@ -329,9 +326,8 @@ class KEY_OT_AddSpace(bpy.types.Operator):
 
 class KEY_OT_RemoveSpace(bpy.types.Operator):
     """Subtract Frame Space :  Removes a single space from either Right or Left side of the current keyframes. Accumulative behavior till there are no more spaces between keyframes. Does not delete keys.
-
-        Click:  Removes a single space to the Right of the current keyframes.
-        Ctrl + Click:  Removes a single space to the Left of the current keyframes."""
+    Click:  Removes a single space to the Right of the current keyframes.
+    Ctrl + Click:  Removes a single space to the Left of the current keyframes."""
     bl_idname = "key.remove_space"
     bl_label = "Remove Keyframe Space"
     bl_options = {'REGISTER', 'UNDO'}
@@ -401,7 +397,7 @@ class KEY_OT_NoSpace(bpy.types.Operator):
 
 class KEY_OT_SeparateObjects(bpy.types.Operator):
     """Separate Selection:  Separates the current objects transformation to a separate object.
-                                             "Click:  Creates a Copy from the Object/ Edit mode of the selection."""
+    Click:  Creates a Copy from the Object/ Edit mode of the selection."""
     bl_idname = "key.separate_objects"
     bl_label = "Separate Selected Frames"
     bl_options = {'REGISTER', 'UNDO'}
@@ -458,10 +454,9 @@ class KEY_OT_SeparateObjects(bpy.types.Operator):
 
 
 class KEY_OT_CombineObjects(bpy.types.Operator):
-    """add selected objects as keyframe objects in active_object description": "Combine To Active Object:  Combines the selected object with the active objects keyframes.
-
-        Click:  Combines the selection with the active objects keyframe.
-        Ctrl + Click:  Creates new keyframe/s from selected objects to the active objects keyframes."""
+    """Add selected objects as keyframe objects in active_object description": "Combine To Active Object:  Combines the selected object with the active objects keyframes.
+    Click:  Combines the selection with the active objects keyframe.
+    Ctrl + Click:  Creates new keyframe/s from selected objects to the active objects keyframes."""
     bl_idname = "key.combine_objects"
     bl_label = "Add Selected to Active"
     bl_options = {'REGISTER', 'UNDO'}
@@ -494,7 +489,6 @@ class KEY_OT_CombineObjects(bpy.types.Operator):
 
 class KEY_OT_PinFrames(bpy.types.Operator):
     """Pin Frame:  Sets the selected object/s to be used as a reference.
-
     Click:  Pins the current selection
     Ctrl + Click:  Removes all pin frames"""
     bl_idname = "key.pin_frames"

@@ -61,60 +61,86 @@ class KEY_PT_Main(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        row = layout.row()
-        row.label(text="Onion Skin")
-        row = layout.column_flow(columns=2)
-        row.operator("key.pin_frames", text="PIN",
-                     icon_value=icons.getIconId("pin_frame_16"))
-        row.operator("key.unpin_frames", text="UNPIN",
-                     icon_value=icons.getIconId("unpin_16"))
-        row = layout.row()
-        row.label(text="Clear Frame")
-        row.operator("key.clear_key", text="CLEAR",
-                     icon_value=icons.getIconId("clear_key_16"))
-        row = layout.row()
-        row.label(text="StopMotion Keys")
-        row = layout.column_flow(columns=3)
-        row.operator("key.insert_key", text="ADD",
-                     icon_value=icons.getIconId("insert_key_16"))
-        row.operator("key.remove_key", text="DEL",
-                     icon_value=icons.getIconId("remove_key_16"))
-        row.operator("key.blank_key", text="BLA",
-                     icon_value=icons.getIconId("blank_key_16"))
-        row = layout.row()
-        row.label(text="Duplicate")
-        row = layout.column_flow(columns=3)
-        row.operator("key.clone_key", text="KEY",
-                     icon_value=icons.getIconId("clone_key_16"))
-        row.operator("key.clone_object", text="OBJ",
-                     icon_value=icons.getIconId("clone_object_16"))
-        row.operator("key.clone_object_blank_keys", text="BLA",
-                     icon_value=icons.getIconId("clone_object_blank_keys_16"))
-        row = layout.row()
-        row.label(text="Frame Spacing")
-        row = layout.column_flow(columns=3)
-        row.operator("key.add_space", text="ADD",
-                     icon_value=icons.getIconId("add_space_16"))
-        row.operator("key.remove_space", text="DEL",
-                     icon_value=icons.getIconId("remove_space"))
-        row.operator("key.no_space", text="NO",
-                     icon_value=icons.getIconId("no_space_16"))
-        row = layout.row(align=True)
-        row.prop(context.scene, "KEY_frameSpace")
-        row.operator("key.set_space", text="SET",
-                     icon_value=icons.getIconId("set_space_16"))
 
         row = layout.row()
-        row.label(text="Frame Objects")
-        row = layout.column_flow(columns=2)
-        row.operator("key.separate_objects", text="SEP",
-                     icon_value=icons.getIconId("separate_objects_16"))
-        row.operator("key.combine_objects", text="COM",
-                     icon_value=icons.getIconId("combine_objects_16"))
+        split = row.split(factor=0.4, align=True)
+        colLabel = split.column(align=True)
+        colButtons = split.column_flow(columns=4, align=True)
+        colLabel.label(text="Onion Skin")
+        colButtons.operator("key.pin_frames", text="",
+                            icon_value=icons.getIconId("pin_frame_16"))
+        colButtons.operator("key.unpin_frames", text="",
+                            icon_value=icons.getIconId("unpin_16"))
+
         row = layout.row()
-        row.label(text="Asset Library")
-        row.operator("key.add_asset", text="SET",
-                     icon_value=icons.getIconId("add_asset_16"))
+        split = row.split(factor=0.4, align=True)
+        colLabel = split.column(align=True)
+        colButtons = split.column_flow(columns=4, align=True)
+        colLabel.label(text="Swap Keys")
+        colButtons.operator("key.clear_key", text="",
+                            icon_value=icons.getIconId("clear_key_16"))
+        colButtons.operator("key.insert_key", text="",
+                            icon_value=icons.getIconId("insert_key_16"))
+        colButtons.operator("key.remove_key", text="",
+                            icon_value=icons.getIconId("remove_key_16"))
+        colButtons.operator("key.blank_key", text="",
+                            icon_value=icons.getIconId("blank_key_16"))
+
+        row = layout.row()
+        split = row.split(factor=0.4, align=True)
+        colLabel = split.column(align=True)
+        colButtons = split.column_flow(columns=4, align=True)
+        colLabel.label(text="Anim All")
+        colButtons.operator("anim.insert_keyframe_animall", text="",
+                            icon_value=icons.getIconId("insert_animall_16"))
+
+        colLabel.label(text="Duplicate")
+        colButtons.operator("key.clone_key", text="",
+                            icon_value=icons.getIconId("clone_key_16"))
+        colButtons.operator("key.clone_object", text="",
+                            icon_value=icons.getIconId("clone_object_16"))
+        colButtons.operator("key.clone_object_blank_keys", text="",
+                            icon_value=icons.getIconId("clone_object_blank_keys_16"))
+
+        row = layout.row()
+        split = row.split(factor=0.4, align=True)
+        colLabel = split.column(align=True)
+        colButtons = split.column_flow(columns=4, align=True)
+        colLabel.label(text="Frame Objects")
+        colButtons.operator("key.separate_objects", text="",
+                            icon_value=icons.getIconId("separate_objects_16"))
+        colButtons.operator("key.combine_objects", text="",
+                            icon_value=icons.getIconId("combine_objects_16"))
+
+        row = layout.row()
+        split = row.split(factor=0.4, align=True)
+        colLabel = split.column(align=True)
+        colButtons = split.column_flow(columns=4, align=True)
+        colLabel.label(text="Asset Library")
+        colButtons.operator("key.add_asset", text="",
+                            icon_value=icons.getIconId("add_asset_16"))
+
+        row = layout.row()
+        split = row.split(factor=0.4, align=True)
+        colLabel = split.column(align=True)
+        colButtons = split.column_flow(columns=4, align=True)
+        colLabel.label(text="Space Keys")
+        colButtons.operator("key.add_space", text="",
+                            icon_value=icons.getIconId("add_space_16"))
+        colButtons.operator("key.remove_space", text="",
+                            icon_value=icons.getIconId("remove_space"))
+        colButtons.operator("key.no_space", text="",
+                            icon_value=icons.getIconId("no_space_16"))
+        colButtons.operator("key.set_space", text="",
+                            icon_value=icons.getIconId("set_space_16"))
+
+        row = layout.row()
+        split = row.split(factor=0.4, align=True)
+        colLabel = split.column()
+        colLabel.label(text="Space setting")
+        colButtons = split.column()
+        colButtons.prop(context.scene, "KEY_frameSpace")
+
         row = layout.row()
         row.separator()
         if context.space_data.type == 'VIEW_3D':
