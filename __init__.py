@@ -94,7 +94,11 @@ class KEY_PT_Main(bpy.types.Panel):
         colButtons.operator("anim.insert_keyframe_animall", text="",
                             icon_value=icons.getIconId("insert_animall_16"))
 
+        row = layout.row()
+        split = row.split(factor=0.4, align=True)
+        colLabel = split.column(align=True)
         colLabel.label(text="Duplicate")
+        colButtons = split.column_flow(columns=4, align=True)
         colButtons.operator("key.clone_key", text="",
                             icon_value=icons.getIconId("clone_key_16"))
         colButtons.operator("key.clone_object", text="",
