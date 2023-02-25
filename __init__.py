@@ -49,7 +49,7 @@ class KEY_PT_Main(bpy.types.Panel):
     def draw_header(self, context):
         layout = self.layout
         row = layout.row()
-        row.label(text='AniMix', icon_value=icons.getIconId("logo_16"))
+        row.label(text='', icon_value=icons.getIconId("logo_16"))
 
     def draw_header_preset(self, context):
         layout = self.layout
