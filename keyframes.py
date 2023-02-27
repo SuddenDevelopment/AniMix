@@ -128,6 +128,16 @@ def getSelectedFrames(obj, strPath, mode='y', inDataBlock=False, frames='selecte
     return arrFrames
 
 
+def setKeySelection(obj, intFrame=None, isSelected=True, strPath=None, inDataBlock=False):
+    arrFCurves = getFCurves(obj, inDataBlock)
+    for i, fcurve in enumerate(arrFCurves):
+        if strPath is None or fcurve.data_path == strPath:
+            for ii, keyframe_point in enumerate(fcurve.keyframe_points):
+                if keyframe_point.co.x == intFrame or intFrame is None:
+                    keyframe_point.select_control_point = isSelected
+    return True
+
+
 def removeSelectedKeyframe(obj, strPath, inDataBlock=False):
     arrFrames = []
     objFCurve = getFCurveByPath(obj, strPath, inDataBlock)

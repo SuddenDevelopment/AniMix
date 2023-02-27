@@ -8,6 +8,12 @@ from .bl_ui_widgets.bl_ui_draw_op import get_3d_area_and_region
 class BL_UI_Widget_Preferences(AddonPreferences):
     bl_idname = __package__
 
+    KEY_UNSELECT: BoolProperty(
+        name="Unselect key on creation",
+        description="When a stop motion key is created unselect at afterwards.",
+        default=False
+    )
+
     RC_UI_BIND: BoolProperty(
         name="General scaling for 'Remote Control' panel",
         description="If (ON): remote panel size changes per Blender interface's resolution scale.\nIf (OFF): remote panel size can only change per its own addon scaling factor",
@@ -74,6 +80,11 @@ class BL_UI_Widget_Preferences(AddonPreferences):
 
     def draw(self, context):
         layout = self.layout
+
+        split = layout.split(factor=0.45, align=True)
+        split.label(text="StopMoton key selection:", icon='DECORATE')
+        splat = split.split(factor=0.4, align=True)
+        splat.prop(self, 'KEY_UNSELECT', text="Unselect on creation")
 
         split = layout.split(factor=0.45, align=True)
         split.label(text="Update Keyframe Theme Colors:", icon='DECORATE')

@@ -13,7 +13,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "AniMix",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 2, 3),
+    "version": (1, 2, 4),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > aniMix",
     "description": "Stop Motion functionality for meshes and curves",
@@ -63,8 +63,9 @@ class KEY_PT_Main(bpy.types.Panel):
         layout = self.layout
 
         row = layout.row()
-        split = row.split(factor=0.4, align=True)
+        split = row.split(factor=0.25, align=True)
         colLabel = split.column(align=True)
+        colLabel.alignment = "RIGHT"
         colButtons = split.column_flow(columns=4, align=True)
         colLabel.label(text="Onion Skin")
         colButtons.operator("key.pin_frames", text="",
@@ -73,8 +74,9 @@ class KEY_PT_Main(bpy.types.Panel):
                             icon_value=icons.getIconId("unpin_16"))
 
         row = layout.row()
-        split = row.split(factor=0.4, align=True)
+        split = row.split(factor=0.25, align=True)
         colLabel = split.column(align=True)
+        colLabel.alignment = "RIGHT"
         colButtons = split.column_flow(columns=4, align=True)
         colLabel.label(text="Swap Keys")
         colButtons.operator("key.clear_key", text="",
@@ -87,16 +89,18 @@ class KEY_PT_Main(bpy.types.Panel):
                             icon_value=icons.getIconId("blank_key_16"))
 
         row = layout.row()
-        split = row.split(factor=0.4, align=True)
+        split = row.split(factor=0.25, align=True)
         colLabel = split.column(align=True)
+        colLabel.alignment = "RIGHT"
         colButtons = split.column_flow(columns=4, align=True)
         colLabel.label(text="Anim All")
         colButtons.operator("anim.insert_keyframe_animall", text="",
                             icon_value=icons.getIconId("insert_animall_16"))
 
         row = layout.row()
-        split = row.split(factor=0.4, align=True)
+        split = row.split(factor=0.25, align=True)
         colLabel = split.column(align=True)
+        colLabel.alignment = "RIGHT"
         colLabel.label(text="Duplicate")
         colButtons = split.column_flow(columns=4, align=True)
         colButtons.operator("key.clone_key", text="",
@@ -107,8 +111,9 @@ class KEY_PT_Main(bpy.types.Panel):
                             icon_value=icons.getIconId("clone_object_blank_keys_16"))
 
         row = layout.row()
-        split = row.split(factor=0.4, align=True)
+        split = row.split(factor=0.25, align=True)
         colLabel = split.column(align=True)
+        colLabel.alignment = "RIGHT"
         colButtons = split.column_flow(columns=4, align=True)
         colLabel.label(text="Frame Objects")
         colButtons.operator("key.separate_objects", text="",
@@ -117,17 +122,19 @@ class KEY_PT_Main(bpy.types.Panel):
                             icon_value=icons.getIconId("combine_objects_16"))
 
         row = layout.row()
-        split = row.split(factor=0.4, align=True)
+        split = row.split(factor=0.25, align=True)
         colLabel = split.column(align=True)
+        colLabel.alignment = "RIGHT"
         colButtons = split.column_flow(columns=4, align=True)
         colLabel.label(text="Asset Library")
         colButtons.operator("key.add_asset", text="",
                             icon_value=icons.getIconId("add_asset_16"))
 
         row = layout.row()
-        split = row.split(factor=0.4, align=True)
+        split = row.split(factor=0.25, align=True)
         colLabel = split.column(align=True)
-        colButtons = split.column_flow(columns=4, align=True)
+        colLabel.alignment = "RIGHT"
+        colButtons = split.column_flow(columns=5, align=True)
         colLabel.label(text="Space Keys")
         colButtons.operator("key.add_space", text="",
                             icon_value=icons.getIconId("add_space_16"))
@@ -137,12 +144,6 @@ class KEY_PT_Main(bpy.types.Panel):
                             icon_value=icons.getIconId("no_space_16"))
         colButtons.operator("key.set_space", text="",
                             icon_value=icons.getIconId("set_space_16"))
-
-        row = layout.row()
-        split = row.split(factor=0.4, align=True)
-        colLabel = split.column()
-        colLabel.label(text="Space setting")
-        colButtons = split.column()
         colButtons.prop(context.scene, "KEY_frameSpace")
 
         row = layout.row()
@@ -153,11 +154,11 @@ class KEY_PT_Main(bpy.types.Panel):
             # -- remote control switch button
             if remoteVisible:
                 op = self.layout.operator(
-                    'key.viewport_panel', text="Hide Viewport Panel", icon_value=icons.getIconId("show_panel_16"))
+                    'key.viewport_panel', text="Pro User Panel", icon_value=icons.getIconId("show_panel_16"))
             else:
                 # Make sure the button starts turned off every time
                 op = self.layout.operator(
-                    'key.viewport_panel', text="Show Viewport Panel", icon_value=icons.getIconId("show_panel_16"))
+                    'key.viewport_panel', text="Pro User Panel", icon_value=icons.getIconId("show_panel_16"))
         version.draw_version_box(self, context)
         return None
 

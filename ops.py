@@ -130,6 +130,9 @@ class KEY_OT_InsertKey(bpy.types.Operator):
                     # default behavior, no key clicks
                     actions.setSwapObject(
                         context, obj, intFrame)
+            if bpy.context.preferences.addons[__package__].preferences.KEY_UNSELECT:
+                keyframes.setKeySelection(
+                    obj, intFrame, isSelected=False, strPath='["key_object_id"]', inDataBlock=False)
 
         return {'FINISHED'}
 

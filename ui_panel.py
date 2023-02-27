@@ -51,7 +51,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
         # Note: Leave it empty, e.g. self.valid_modes = {}, for no restrictions to be applied.
         self.valid_modes = {}
-
+        directory = os.path.dirname(os.path.realpath(__file__))
         # This is for displaying the widgets tooltips. Only need one instance!
         self.tooltip = BL_UI_Tooltip()
 # ==========
@@ -78,8 +78,8 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                                 "\n"
                                 "Click:  Pins the current selection\n" +
                                 "Ctrl + Click:  Removes all pin frames"
-                            },
-                            "unpin": {"description": "Clear all existing pins and pin collections"}
+                            }
+
                             }
             }, {
                 "name": 'StopMotion Keys',
@@ -226,7 +226,6 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
                 intPositionX += intButtonSize
                 for strProp in objButtonSettings:
                     if strProp == 'iconFile':
-                        directory = os.path.dirname(os.path.realpath(__file__))
                         objNewBtn.set_image(
                             f'{directory}\\icons\\{strButton}.png')
                     elif strProp == 'imageSize':
@@ -260,11 +259,15 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
         objBtn = BL_UI_Button(
             self.Frame_SpacingPosition[0] + 74, self.Frame_SpacingPosition[1]+20, 50, 18)
-        objBtn.text = "set"
+        objBtn.text = ""
         objBtn.description = "Frame Spacer: Set:**Applies the current number of spaces between keyframes."
-        objBtn.text_size = 14
         objBtn.rounded_corners = (0, 0, 1, 1)
         objBtn.set_mouse_up(self.set_space_click)
+        objBtn.set_image(
+            f'{directory}\\icons\\set_space.png')
+        objBtn.set_image_size((32, 16))
+        objBtn.set_image_position((12, 0))
+
         setattr(self, 'set_space', objBtn)
 
         intPositionX += intGroupSpacing
@@ -451,13 +454,6 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
         try:
             bpy.ops.key.pin_frames(
                 'INVOKE_DEFAULT', ctrl_pressed=event.ctrl)
-        except:
-            pass
-
-    def unpin_click(self, widget, event, x, y):
-        try:
-            bpy.ops.key.pin_frames(
-                'INVOKE_DEFAULT', ctrl_pressed=True)
         except:
             pass
 
