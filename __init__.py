@@ -134,7 +134,7 @@ class KEY_PT_Main(bpy.types.Panel):
         split = row.split(factor=0.25, align=True)
         colLabel = split.column(align=True)
         colLabel.alignment = "RIGHT"
-        colButtons = split.column_flow(columns=5, align=True)
+        colButtons = split.column_flow(columns=4, align=True)
         colLabel.label(text="Space Keys")
         colButtons.operator("key.add_space", text="",
                             icon_value=icons.getIconId("add_space_16"))
@@ -142,9 +142,16 @@ class KEY_PT_Main(bpy.types.Panel):
                             icon_value=icons.getIconId("remove_space"))
         colButtons.operator("key.no_space", text="",
                             icon_value=icons.getIconId("no_space_16"))
+        row = layout.row()
+        split = row.split(factor=0.25, align=True)
+        colLabel = split.column(align=True)
+        colLabel.label(text="")
+        split = split.split()
+        colButtons = split.column()
+        colButtons.prop(context.scene, "KEY_frameSpace")
+        colButtons = split.column_flow(columns=2)
         colButtons.operator("key.set_space", text="",
                             icon_value=icons.getIconId("set_space_16"))
-        colButtons.prop(context.scene, "KEY_frameSpace")
 
         row = layout.row()
         row.separator()
