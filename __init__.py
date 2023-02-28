@@ -13,7 +13,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "AniMix",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 2, 4),
+    "version": (1, 2, 5),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > aniMix",
     "description": "Stop Motion functionality for meshes and curves",
@@ -184,17 +184,18 @@ class ModeTracker:
 
 
 def on_depsgraph_update(scene, mode_tracker):
-    current_mode = bpy.context.object.mode
-    if current_mode != mode_tracker.previous_mode:
-        if mode_tracker.previous_mode == 'EDIT' and bpy.context.active_object and scene.frame_current == mode_tracker.frame:
-            obj = bpy.context.active_object
-            if obj.get("key_id"):
-                strFrame = obj.get("key_object")
-                objFrame = actions.getObject(strFrame)
-                objTmp = actions.getTmp(obj)
-                actions.setDataBlock(objFrame, objTmp)
-        mode_tracker.previous_mode = current_mode
-        mode_tracker.frame = scene.frame_current
+    if bpy.context.object:
+        current_mode = bpy.context.object.mode
+        if current_mode != mode_tracker.previous_mode:
+            if mode_tracker.previous_mode == 'EDIT' and bpy.context.active_object and scene.frame_current == mode_tracker.frame:
+                obj = bpy.context.active_object
+                if obj.get("key_id"):
+                    strFrame = obj.get("key_object")
+                    objFrame = actions.getObject(strFrame)
+                    objTmp = actions.getTmp(obj)
+                    actions.setDataBlock(objFrame, objTmp)
+            mode_tracker.previous_mode = current_mode
+            mode_tracker.frame = scene.frame_current
 
 
 #### || CLASS MAINTENANCE ||####

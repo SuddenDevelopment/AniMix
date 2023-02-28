@@ -185,7 +185,8 @@ class KEY_OT_BlankKey(bpy.types.Operator):
             intNextFrame = context.scene.frame_current+intDirection
             for obj in context.selected_objects:
                 objBlank = actions.getBlankFrameObject(obj)
-                intSwapObjectID = objBlank.get('key_object_id')
+                intSwapObjectID = actions.getSwapId(obj)
+                # intSwapObjectID = objBlank.get('key_object_id')
                 strAction = keyframes.getKeyframeVacancy(
                     obj, '["key_object_id"]', context.scene.frame_current, intNextFrame)
                 if strAction == 'CURRENT':
