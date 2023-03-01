@@ -630,6 +630,6 @@ def swapMaterials(objSource, objTarget):
     arrSourceMaterials = objSource.material_slots
     if len(arrSourceMaterials) > 0:
         objTarget.data.materials.clear()
-        for i, objMaterial in enumerate(arrSourceMaterials):
+        for i, objMaterial in enumerate(reversed(arrSourceMaterials)):
             objTarget.data.materials.append(
                 bpy.data.materials[objMaterial.name])
