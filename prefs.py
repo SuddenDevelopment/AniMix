@@ -9,8 +9,8 @@ class BL_UI_Widget_Preferences(AddonPreferences):
     bl_idname = __package__
 
     KEY_UNSELECT: BoolProperty(
-        name="Unselect key on creation",
-        description="When a stop motion key is created unselect at afterwards.",
+        name="Select key on creation",
+        description="When a stop motion key is created select at afterwards.",
         default=False
     )
 

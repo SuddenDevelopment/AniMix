@@ -130,7 +130,7 @@ class KEY_OT_InsertKey(bpy.types.Operator):
                     # default behavior, no key clicks
                     actions.setSwapObject(
                         context, obj, intFrame)
-            if bpy.context.preferences.addons[__package__].preferences.KEY_UNSELECT:
+            if bpy.context.preferences.addons[__package__].preferences.KEY_UNSELECT == False:
                 keyframes.setKeySelection(
                     obj, intFrame, isSelected=False, strPath='["key_object_id"]', inDataBlock=False)
 
@@ -206,6 +206,9 @@ class KEY_OT_BlankKey(bpy.types.Operator):
                         obj, intStartFrame, intDirection, False, intStopFrame)
                     actions.setSwapKey(obj, intSwapObjectID,
                                        context.scene.frame_current, update=False)
+                    if bpy.context.preferences.addons[__package__].preferences.KEY_UNSELECT == False:
+                        keyframes.setKeySelection(
+                            obj, context.scene.frame_current, isSelected=False, strPath='["key_object_id"]', inDataBlock=False)
             actions.onFrame(context.scene)
         return {'FINISHED'}
 
@@ -237,7 +240,11 @@ class KEY_OT_CloneKey(bpy.types.Operator):
             for obj in context.selected_objects:
                 actions.clone_key(
                     context, obj, context.scene.frame_current, intNextFrame)
+                if bpy.context.preferences.addons[__package__].preferences.KEY_UNSELECT == False:
+                    keyframes.setKeySelection(
+                        obj, context.scene.frame_current, isSelected=False, strPath='["key_object_id"]', inDataBlock=False)
             context.scene.frame_set(intNextFrame)
+
         return {'FINISHED'}
 
 
@@ -253,6 +260,9 @@ class KEY_OT_CloneUniqueKey(bpy.types.Operator):
     def execute(self, context):
         for obj in context.selected_objects:
             actions.clone_unique_key(context, obj, context.scene.frame_current)
+            if bpy.context.preferences.addons[__package__].preferences.KEY_UNSELECT == False:
+                keyframes.setKeySelection(
+                    obj, context.scene.frame_current, isSelected=False, strPath='["key_object_id"]', inDataBlock=False)
         return {'FINISHED'}
 
 
@@ -269,6 +279,7 @@ class KEY_OT_CloneObject(bpy.types.Operator):
     def execute(self, context):
         for obj in context.selected_objects:
             actions.clone_object(context, obj)
+
         return {'FINISHED'}
 
 
