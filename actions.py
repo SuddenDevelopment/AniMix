@@ -532,6 +532,44 @@ def copyConstraints(context, objSource, objTarget, intFrame=None):
         new_constraint.target = objConstraintTarget
 
 
+def getModifiers(obj):
+    arrModifiers = []
+    for src_mod in obj.modifiers:
+        objModifier = {}
+        objModifier['properties'] = {}
+        objModifier['name'] = src_mod.name
+        objModifier['type'] = src_mod.type
+        # Copy the properties of the source modifier to the destination modifier
+        if src_mod.type == 'NODES':
+            objModifier['node_group'] = src_mod.node_group.name
+        for prop in obj.bl_rna.properties:
+            if prop.identifier not in {'rna_type', 'name', 'type'}:
+                try:
+                    objModifier['properties'][prop.identifier] = getattr(
+                        src_mod, prop.identifier)
+                except:
+                    pass
+        arrModifiers.append(objModifier)
+    return arrModifiers
+
+
+def addModifiers(obj, arrModifiers):
+    # Loop through all modifiers on the source object
+    for src_mod in arrModifiers:
+        # Create a new modifier on the destination object
+        dest_mod = obj.modifiers.new(src_mod['name'], src_mod['type'])
+        if src_mod['type'] == 'NODES':
+            dest_mod.node_group = bpy.data.node_groups[src_mod['node_group']]
+            print(dest_mod.name, dest_mod.node_group)
+        # Copy the properties of the source modifier to the destination modifier
+        for prop in src_mod['properties']:
+            try:
+                setattr(dest_mod, prop,
+                        src_mod['properties'][prop])
+            except:
+                pass
+
+
 def copyModifiers(objSource, objTarget):
     # Loop through all modifiers on the source object
     for src_mod in objSource.modifiers:
@@ -633,3 +671,19 @@ def swapMaterials(objSource, objTarget):
         for i, objMaterial in enumerate(reversed(arrSourceMaterials)):
             objTarget.data.materials.append(
                 bpy.data.materials[objMaterial.name])
+
+
+def selectNone():
+    for obj in bpy.data.objects:
+        obj.select_set(False)
+
+
+def applyModifiers(obj, context=None):
+    if context == None:
+        context = bpy.context
+    context.view_layer.objects.active = obj
+    for mod in obj.modifiers:
+        if mod.show_viewport:
+            print(mod.name)
+            bpy.ops.object.modifier_apply(modifier=mod.name, single_user=True)
+    return

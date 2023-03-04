@@ -186,7 +186,6 @@ class KEY_OT_BlankKey(bpy.types.Operator):
             for obj in context.selected_objects:
                 objBlank = actions.getBlankFrameObject(obj)
                 intSwapObjectID = actions.getSwapId(obj)
-                # intSwapObjectID = objBlank.get('key_object_id')
                 strAction = keyframes.getKeyframeVacancy(
                     obj, '["key_object_id"]', context.scene.frame_current, intNextFrame)
                 if strAction == 'CURRENT':
@@ -622,7 +621,30 @@ class KEY_OT_Show_Panel(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class KEY_OT_ITERATE(bpy.types.Operator):
+    """Iterate for frame count, apply a copy of the modifier stack and insert a keyframe of the result"""
+    bl_idname = "key.iterate"
+    bl_label = "UnPin Frames"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        # copy modifier stack.
+        # for x frames, apply modifiers, insert key, go to next frame, replace modifiers
+        obj = context.active_object
+        arrModifiers = actions.getModifiers(obj)
+        for i in range(context.scene.KEY_count):
+            actions.applyModifiers(obj, context)
+            actions.setSwapObject(
+                context, obj, context.scene.frame_current)
+            time.sleep(0.1)
+            context.scene.frame_set(context.scene.frame_current+1)
+            actions.addModifiers(obj, arrModifiers)
+        obj.select_set(True)
+        return {'FINISHED'}
+
+
 arrClasses = [
+    KEY_OT_ITERATE,
     KEY_OT_ClearKey,
     KEY_OT_InsertKey,
     KEY_OT_RemoveKey,

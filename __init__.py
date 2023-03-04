@@ -3,6 +3,7 @@ import bpy.utils.previews
 import time
 import sys
 from . import ops
+from . import props
 from . import actions
 from . import prefs
 from . import ui_panel
@@ -13,7 +14,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "AniMix",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 2, 5),
+    "version": (1, 3, 0),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > aniMix",
     "description": "Stop Motion functionality for meshes and curves",
@@ -30,12 +31,6 @@ bl_info = {
 # key_object_id = the id NEEDED and set by the key
 
 # /Applications/Blender.app/Contents/MacOS/Blender
-
-
-class PanelProps(bpy.types.PropertyGroup):
-    RemoVisible: bpy.props.BoolProperty(default=False)
-    btnRemoText: bpy.props.StringProperty(default="Open Demo Panel")
-    btnRemoTime: bpy.props.IntProperty(default=0)
 
 
 class KEY_PT_Main(bpy.types.Panel):
@@ -154,6 +149,19 @@ class KEY_PT_Main(bpy.types.Panel):
                             icon_value=icons.getIconId("set_space_16"))
 
         row = layout.row()
+        box = row.box()
+        row = box.row()
+        split = row.split()
+        col = split.column()
+        col.label(text="frames")
+        col.prop(context.scene, "KEY_count")
+        col = split.column()
+        col.label(text="apply mods")
+        col.prop(context.scene, "KEY_apply_modifiers")
+        row = box.row()
+        row.operator("key.iterate", text="ITERATE")
+
+        row = layout.row()
         row.separator()
         if context.space_data.type == 'VIEW_3D':
             remoteVisible = (context.window_manager.KEY_UI.RemoVisible and int(
@@ -207,8 +215,7 @@ def on_depsgraph_update(scene, mode_tracker):
 
 #### || CLASS MAINTENANCE ||####
 arrClasses = [
-    KEY_PT_Main,
-    PanelProps
+    KEY_PT_Main
 ]
 
 
@@ -234,18 +241,7 @@ def register():
     bpy.app.handlers.frame_change_post.append(actions.onFrame)
     bpy.app.handlers.frame_change_pre.clear()
     bpy.app.handlers.frame_change_pre.append(actions.onFramePre)
-    # Add the hotkey
-    # wm = bpy.context.window_manager
-    # kc = wm.keyconfigs.addon
-    # if kc:
-    # km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
-    # kmi = km.keymap_items.new("key.insert_key", type="A", value="PRESS", shift=True, ctrl=True)
-    # addon_keymaps.append((km, kmi))
-    bpy.types.Scene.KEY_frameSpace = bpy.props.IntProperty(
-        name="Frame Space", default=2, min=1, max=100)
-    bpy.types.WindowManager.KEY_UI = bpy.props.PointerProperty(type=PanelProps)
-    bpy.types.WindowManager.KEY_message = bpy.props.StringProperty(
-        name="Info", default="")
+    props.register()
     ops.register()
     ui_panel.register()
     prefs.register()
@@ -267,7 +263,6 @@ def unregister():
     ui_panel.unregister()
     prefs.unregister()
     ops.unregister()
-    del bpy.types.Scene.KEY_frameSpace
-    del bpy.types.WindowManager.KEY_UI
-    del bpy.types.WindowManager.KEY_message
+    props.unregister()
+
     icons.delIcons()
