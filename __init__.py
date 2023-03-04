@@ -88,9 +88,10 @@ class KEY_PT_Main(bpy.types.Panel):
         colLabel = split.column(align=True)
         colLabel.alignment = "RIGHT"
         colButtons = split.column_flow(columns=4, align=True)
-        colLabel.label(text="Anim All")
-        colButtons.operator("anim.insert_keyframe_animall", text="",
-                            icon_value=icons.getIconId("insert_animall_16"))
+        if hasattr(bpy.types, "ANIM_OT_insert_keyframe_animall"):
+            colLabel.label(text="Anim All")
+            colButtons.operator("anim.insert_keyframe_animall", text="",
+                                icon_value=icons.getIconId("insert_animall_16"))
 
         row = layout.row()
         split = row.split(factor=0.25, align=True)
