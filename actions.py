@@ -167,10 +167,11 @@ def onFramePre(scene):
 
 def onFrame(scene):
     context = bpy.context
-    strMode = context.object.mode
-    # object swapping for key feature
-    if strMode == 'EDIT':
-        bpy.ops.object.mode_set(mode='OBJECT')
+    if hasattr(context, 'object'):
+        strMode = context.object.mode
+        # object swapping for key feature
+        if strMode == 'EDIT':
+            bpy.ops.object.mode_set(mode='OBJECT')
     for obj in scene.objects:
         # obj must have an id and set an object_id it expects
         # obj must have same id as swa object and not already by the one in use
@@ -188,7 +189,8 @@ def onFrame(scene):
                 objTmp = setTmp(objFrame)
                 swapData(obj, objTmp, False)
                 swapMaterials(objFrame, obj)
-    if strMode == 'EDIT':
+                print('swapped')
+    if hasattr(context, 'object') and strMode == 'EDIT':
         bpy.ops.object.mode_set(mode='EDIT')
 
 
