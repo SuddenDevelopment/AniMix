@@ -185,7 +185,7 @@ class KEY_OT_BlankKey(bpy.types.Operator):
             intNextFrame = context.scene.frame_current+intDirection
             for obj in context.selected_objects:
                 objBlank = actions.getBlankFrameObject(obj)
-                intSwapObjectID = actions.getSwapId(obj)
+                intSwapObjectID = actions.getNextSwapObjectId(obj)
                 strAction = keyframes.getKeyframeVacancy(
                     obj, '["key_object_id"]', context.scene.frame_current, intNextFrame)
                 if strAction == 'CURRENT':
@@ -632,14 +632,20 @@ class KEY_OT_ITERATE(bpy.types.Operator):
         # for x frames, apply modifiers, insert key, go to next frame, replace modifiers
         obj = context.active_object
         arrModifiers = actions.getModifiers(obj)
-        for i in range(context.scene.KEY_count):
+        for i in range(context.scene.KEY_frameSpace):
+            intStart = time.time()
+            context.scene.KEY_current = i+1
             actions.applyModifiers(obj, context)
             actions.setSwapObject(
                 context, obj, context.scene.frame_current)
+            intStop = time.time()
+            if intStop - intStart > context.preferences.addons[__package__].preferences.KEY_MULTI_LIMIT:
+                return {'FINISHED'}
             time.sleep(0.1)
             context.scene.frame_set(context.scene.frame_current+1)
-            actions.addModifiers(obj, arrModifiers)
-        obj.select_set(True)
+            if i < context.scene.KEY_frameSpace - 1:
+                actions.addModifiers(obj, arrModifiers)
+        context.scene.KEY_current = 0
         return {'FINISHED'}
 
 

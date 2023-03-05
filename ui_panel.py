@@ -82,7 +82,7 @@ class KEY_OT_draw_operator(BL_UI_OT_draw_operator):  # in: bl_ui_draw_op.py ##
 
                             }
             }, {
-                "name": 'StopMotion Keys',
+                "name": 'Swap Keys',
                 "buttons": {"clear_key":
                             {
                                 "description": "Clear Keyframe:  Clears the id data from the current StopMotion object. The keyframe isn't deleted.\n" +

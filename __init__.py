@@ -151,16 +151,17 @@ class KEY_PT_Main(bpy.types.Panel):
 
         row = layout.row()
         box = row.box()
+
+        if context.preferences.addons[__package__].preferences.KEY_MULTI_MODS == True:
+            row = box.row()
+            row.label(text="apply mods", icon='ERROR')
+            row.prop(context.scene, "KEY_apply_modifiers")
         row = box.row()
-        split = row.split()
-        col = split.column()
-        col.label(text="frames")
-        col.prop(context.scene, "KEY_count")
-        col = split.column()
-        col.label(text="apply mods")
-        col.prop(context.scene, "KEY_apply_modifiers")
-        row = box.row()
-        row.operator("key.iterate", text="ITERATE")
+        row.operator("key.iterate", text="MULTI KEY")
+        if context.scene.KEY_current > 0:
+            row = box.row()
+            row.label(
+                text=f'frame progress: {context.scene.KEY_current}/{context.scene.KEY_frameSpace}')
 
         row = layout.row()
         row.separator()

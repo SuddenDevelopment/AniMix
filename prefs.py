@@ -8,6 +8,17 @@ from .bl_ui_widgets.bl_ui_draw_op import get_3d_area_and_region
 class BL_UI_Widget_Preferences(AddonPreferences):
     bl_idname = __package__
 
+    KEY_MULTI_MODS: BoolProperty(
+        name="Enable multi key modifiers",
+        description="Apply the modifier stack every frame of multi key. This can be unstable or unpredictable depending on the modifier stack used.",
+        default=False
+    )
+    KEY_MULTI_LIMIT: IntProperty(
+        name="Limit in seconds per frame of multi key",
+        description="If a frame take longer than this setting in seconds, stop.",
+        default=30, min=1
+    )
+
     KEY_UNSELECT: BoolProperty(
         name="Select key on creation",
         description="When a stop motion key is created select at afterwards.",
@@ -82,7 +93,18 @@ class BL_UI_Widget_Preferences(AddonPreferences):
         layout = self.layout
 
         split = layout.split(factor=0.45, align=True)
-        split.label(text="StopMoton key selection:", icon='DECORATE')
+        split.label(text="Apply Modifier Stack on Multi Key:", icon='ERROR')
+        splat = split.split(factor=0.4, align=True)
+        splat.prop(self, 'KEY_MULTI_MODS', text="may be unstable")
+
+        split = layout.split(factor=0.45, align=True)
+        split.label(
+            text="Limit per multi key frame before stopping:", icon='ERROR')
+        splat = split.split(factor=0.4, align=True)
+        splat.prop(self, 'KEY_MULTI_LIMIT', text="seconds")
+
+        split = layout.split(factor=0.45, align=True)
+        split.label(text="Swap key selection:", icon='DECORATE')
         splat = split.split(factor=0.4, align=True)
         splat.prop(self, 'KEY_UNSELECT', text="Unselect on creation")
 
