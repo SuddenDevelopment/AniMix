@@ -14,7 +14,7 @@ from bpy.app.handlers import persistent
 bl_info = {
     "name": "AniMix",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 3, 0),
+    "version": (1, 3, 1),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > aniMix",
     "description": "Stop Motion functionality for meshes and curves",

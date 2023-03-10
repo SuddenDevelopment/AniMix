@@ -635,15 +635,16 @@ class KEY_OT_ITERATE(bpy.types.Operator):
         for i in range(context.scene.KEY_frameSpace):
             intStart = time.time()
             context.scene.KEY_current = i+1
-            actions.applyModifiers(obj, context)
+            if context.scene.KEY_apply_modifiers:
+                actions.applyModifiers(obj, context)
             actions.setSwapObject(
                 context, obj, context.scene.frame_current)
             intStop = time.time()
             if intStop - intStart > context.preferences.addons[__package__].preferences.KEY_MULTI_LIMIT:
                 return {'FINISHED'}
-            time.sleep(0.1)
+            time.sleep(0.01)
             context.scene.frame_set(context.scene.frame_current+1)
-            if i < context.scene.KEY_frameSpace - 1:
+            if i < context.scene.KEY_frameSpace - 1 and context.scene.KEY_apply_modifiers:
                 actions.addModifiers(obj, arrModifiers)
         context.scene.KEY_current = 0
         return {'FINISHED'}
