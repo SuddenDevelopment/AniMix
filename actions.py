@@ -189,7 +189,6 @@ def onFrame(scene):
                 objTmp = setTmp(objFrame)
                 swapData(obj, objTmp, False)
                 swapMaterials(objFrame, obj)
-                print('swapped')
     if hasattr(context, 'object') and strMode == 'EDIT':
         bpy.ops.object.mode_set(mode='EDIT')
 
