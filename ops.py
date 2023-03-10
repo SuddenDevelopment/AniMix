@@ -632,7 +632,7 @@ class KEY_OT_ITERATE(bpy.types.Operator):
         # for x frames, apply modifiers, insert key, go to next frame, replace modifiers
         obj = context.active_object
         arrModifiers = actions.getModifiers(obj)
-        for i in range(context.scene.KEY_frameSpace):
+        for i in range(context.scene.KEY_count):
             intStart = time.time()
             context.scene.KEY_current = i+1
             if context.scene.KEY_apply_modifiers:
@@ -644,7 +644,7 @@ class KEY_OT_ITERATE(bpy.types.Operator):
                 return {'FINISHED'}
             time.sleep(0.01)
             context.scene.frame_set(context.scene.frame_current+1)
-            if i < context.scene.KEY_frameSpace - 1 and context.scene.KEY_apply_modifiers:
+            if i < context.scene.KEY_count - 1 and context.scene.KEY_apply_modifiers:
                 actions.addModifiers(obj, arrModifiers)
         context.scene.KEY_current = 0
         return {'FINISHED'}

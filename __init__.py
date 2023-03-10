@@ -157,6 +157,7 @@ class KEY_PT_Main(bpy.types.Panel):
             row.label(text="apply mods", icon='ERROR')
             row.prop(context.scene, "KEY_apply_modifiers")
         row = box.row()
+        row.prop(context.scene, "KEY_count")
         row.operator("key.iterate", text="MULTI KEY")
         if context.scene.KEY_current > 0:
             row = box.row()
