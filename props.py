@@ -16,8 +16,8 @@ def register():
     bpy.types.Scene.KEY_current = bpy.props.IntProperty(
         name="Current Frame", default=0)
     bpy.types.WindowManager.KEY_UI = bpy.props.PointerProperty(type=PanelProps)
-    bpy.types.WindowManager.KEY_message = bpy.props.StringProperty(
-        name="Info", default="")
+    bpy.types.WindowManager.KEY_state = bpy.props.StringProperty(
+        name="State", default="")
     bpy.types.Scene.KEY_apply_modifiers = bpy.props.BoolProperty(
         name="modifiers", default=False)
 
@@ -28,4 +28,4 @@ def unregister():
     del bpy.types.Scene.KEY_frameSpace
     del bpy.types.Scene.KEY_count
     del bpy.types.WindowManager.KEY_UI
-    del bpy.types.WindowManager.KEY_message
+    del bpy.types.WindowManager.KEY_state

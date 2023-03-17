@@ -9,12 +9,13 @@ from . import prefs
 from . import ui_panel
 from . import version
 from . import icons
+from . import animall
 from bpy.app.handlers import persistent
 
 bl_info = {
     "name": "AniMix",
     "author": "Anthony Aragues, Adam Earle",
-    "version": (1, 3, 1),
+    "version": (1, 3, 3),
     "blender": (3, 2, 0),
     "location": "3D View > Toolbox > Animation tab > aniMix",
     "description": "Stop Motion functionality for meshes and curves",
@@ -34,11 +35,12 @@ bl_info = {
 
 
 class KEY_PT_Main(bpy.types.Panel):
-    bl_label = "AniMix"
-    bl_category = "Animate"
-    bl_idname = "KEY_PT_Main"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
+    bl_category = "Animate"
+    bl_label = "AniMix"
+    bl_idname = "KEY_PT_Main"
+
     # create the panel
 
     def draw_header(self, context):
@@ -205,13 +207,16 @@ def on_depsgraph_update(scene, mode_tracker):
     if bpy.context.object:
         current_mode = bpy.context.object.mode
         if current_mode != mode_tracker.previous_mode:
-            if mode_tracker.previous_mode == 'EDIT' and bpy.context.active_object and scene.frame_current == mode_tracker.frame:
-                obj = bpy.context.active_object
-                if obj.get("key_id"):
-                    strFrame = obj.get("key_object")
-                    objFrame = actions.getObject(strFrame)
-                    objTmp = actions.getTmp(obj)
-                    actions.setDataBlock(objFrame, objTmp)
+            if bpy.context.window_manager.KEY_state != 'ANIMALL':
+                if mode_tracker.previous_mode == 'EDIT' and bpy.context.active_object and scene.frame_current == mode_tracker.frame:
+                    print(current_mode, mode_tracker.previous_mode,
+                          'updating data block')
+                    obj = bpy.context.active_object
+                    if obj.get("key_id"):
+                        strFrame = obj.get("key_object")
+                        objFrame = actions.getObject(strFrame)
+                        objTmp = actions.getTmp(obj)
+                        actions.setDataBlock(objFrame, objTmp)
             mode_tracker.previous_mode = current_mode
             mode_tracker.frame = scene.frame_current
 
@@ -233,6 +238,7 @@ addon_keymaps = []
 
 
 def register():
+    animall.register()
     for i in arrClasses:
         bpy.utils.register_class(i)
     icons.initIcons()
@@ -267,5 +273,5 @@ def unregister():
     prefs.unregister()
     ops.unregister()
     props.unregister()
-
     icons.delIcons()
+    animall.unregister()

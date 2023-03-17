@@ -1,4 +1,5 @@
 import bpy
+import hashlib
 from . import config
 from . import keyframes
 
@@ -68,14 +69,14 @@ def getObjectCopy(obj):
         return objNew
 
 
-def swapData(objTarget, objReference, updateProp=True):
+def swapData(objTarget, objReference, updateProp=True, copy=False):
     if objTarget and objReference:
-        objTarget.data = objReference.data
-        if objReference.animation_data is not None:
-            try:
-                objTarget.animation_data = objReference.animation_data
-            except:
-                pass
+        if copy == True:
+            objTarget.data = objReference.data.copy()
+            keyframes.copyDataKeyframes(
+                objReference, objTarget, '["key_object_id"]')
+        else:
+            objTarget.data = objReference.data
         if updateProp == True:
             objTarget["key_object"] = objReference.name_full
 
@@ -102,7 +103,7 @@ def getTmp(objTarget):
 
 def setDataBlock(objTarget, objReference):
     objDataBlock = objTarget.data
-    objTarget.data = objReference.data.copy()
+    swapData(objTarget, objReference, updateProp=False, copy=True)
     if objTarget.type == 'CURVE':
         bpy.data.curves.remove(objDataBlock)
     elif objTarget.type == 'MESH':
@@ -133,13 +134,17 @@ def getDataSum(obj):
         # add text, metaballs
         if obj.type == 'FONT':
             intSum = hash(obj.data.body)
-        if obj.type == 'META':
+        elif obj.type == 'META':
             intSum = hash(obj.data.elements)
-        if obj.type == 'MESH':
-            intSum = hash(obj.data.vertices)
+        elif obj.type == 'MESH':
+            arrVerts = [v for v in obj.data.vertices]
+            for vert in arrVerts:
+                intSum += vert.co.x + vert.co.y + vert.co.z
         elif obj.type == 'CURVE':
             intSum = hash(obj.data.splines)
-        intSum += hash(obj.data.materials)
+        # intSum += hash(obj.data.materials)
+        # if obj.data.animation_data and obj.data.animation_data.action:
+        #    intSum += hash(obj.data.animation_data.action.fcurves)
         return intSum
     return None
 
@@ -161,6 +166,7 @@ def onFramePre(scene):
                 intSumTmp = getDataSum(objTmp)
                 intSumFrame = getDataSum(objFrame)
                 if intSumTmp != intSumFrame:
+                    print('frame pre', obj.name, intSumTmp, intSumFrame)
                     setDataBlock(objFrame, objTmp)
         # bpy.ops.object.mode_set(mode=strMode)
 
@@ -189,6 +195,8 @@ def onFrame(scene):
                 objTmp = setTmp(objFrame)
                 swapData(obj, objTmp, False)
                 swapMaterials(objFrame, obj)
+                keyframes.copyDataKeyframes(
+                    objFrame, obj, '["key_object_id"]')
     if hasattr(context, 'object') and strMode == 'EDIT':
         bpy.ops.object.mode_set(mode='EDIT')
 
@@ -250,12 +258,7 @@ def setFrameObject(obj, strFrame, intSwapId):
         objFrame.data.use_fake_user = True
         objFrame.use_fake_user = True
         objFrame["key_id"] = intSwapId
-    else:
-        objFrame.data = obj.data.copy()
-    # if obj.animation_data is not None and hasattr(obj.animation_data, 'copy'):
-    #    objFrame.animation_data = obj.animation_data.copy()
-    if obj.data.animation_data is not None and hasattr(obj.data.animation_data, 'copy'):
-        objFrame.data.animation_data = obj.data.animation_data.copy()
+    setDataBlock(objFrame, obj)
     return objFrame
 
 
@@ -329,6 +332,7 @@ def redraw(arrAreas=[]):
 
 def remove_keys(obj, intFrame, all=False):
     strPath = None
+    # TODO: this should be passed into the function
     if all == False:
         strPath = '["key_object_id"]'
     keyframes.removeKeyframe(obj, strPath, intFrame, False)
@@ -561,7 +565,6 @@ def addModifiers(obj, arrModifiers):
         dest_mod = obj.modifiers.new(src_mod['name'], src_mod['type'])
         if src_mod['type'] == 'NODES':
             dest_mod.node_group = bpy.data.node_groups[src_mod['node_group']]
-            print(dest_mod.name, dest_mod.node_group)
         # Copy the properties of the source modifier to the destination modifier
         for prop in src_mod['properties']:
             try:
@@ -685,6 +688,5 @@ def applyModifiers(obj, context=None):
     context.view_layer.objects.active = obj
     for mod in obj.modifiers:
         if mod.show_viewport:
-            print(mod.name)
             bpy.ops.object.modifier_apply(modifier=mod.name, single_user=True)
     return

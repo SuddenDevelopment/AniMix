@@ -13,12 +13,44 @@ def getFCurves(obj, inDataBlock=False):
     return arrFCurves
 
 
-def getFCurveByPath(obj, strPath, inDataBlock):
+def getFCurveByPath(obj, strPath, inDataBlock, inverse=False):
     arrFCurves = getFCurves(obj, inDataBlock)
+    arrReturn = []
     for fcurve in arrFCurves:
         if fcurve.data_path == strPath:
-            return fcurve
+            if inverse:
+                arrReturn.append(fcurve)
+            else:
+                return fcurve
+    if inverse:
+        return arrReturn
     return None
+
+
+def removeFCurves(obj, inDataBlock=False, strNot=None):
+    arrFCurves = getFCurves(obj, inDataBlock)
+    for fCurve in arrFCurves:
+        if strNot == None or fCurve.data_path != strNot:
+            arrFCurves.remove(fCurve)
+
+
+def copyDataKeyframes(objSource, objTarget, strNot):
+    if objSource and objTarget:
+        if objSource.data.animation_data is not None and hasattr(objSource.data.animation_data, 'copy'):
+            objTarget.data.animation_data = objSource.data.animation_data.copy()
+    # This function is specifically for data blocks, data blocks get weird on some objects where they are pointers and read only
+        # remove specific destination fcurves that will be in the way
+        else:
+            # removeFCurves(objTarget, inDataBlock=True, strNot=strNot)
+            arrSourceFCurves = getFCurveByPath(objSource, strNot, True, True)
+            for fCurve in arrSourceFCurves:
+                # copy fcurves to destination
+                target_fcurve = objTarget.data.action.fcurves.new(
+                    fCurve.data_path, index=fCurve.array_index)
+                for keyframe in fCurve.keyframe_points:
+                    target_fcurve.keyframe_points.insert(
+                        keyframe.co[0], keyframe.co[1], options=keyframe.options)
+    return
 
 
 def actKeyframe(obj, intFrame, strMode, inDataBlock=False):
